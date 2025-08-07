@@ -8,7 +8,6 @@ import { useAuth } from '../../contexts/AuthContext';
 import { ResetPasswordForm } from './ResetPasswordForm';
 import ForgotPasswordForm from './ForgotPasswordForm';
 
-
 type AuthView = 'login' | 'signup' | 'forgot-password' | 'success' | 'postSignupPrompt' | 'reset_password';
 
 interface AuthModalProps {
