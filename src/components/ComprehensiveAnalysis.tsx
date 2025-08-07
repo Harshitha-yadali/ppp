@@ -189,7 +189,6 @@ export const ComprehensiveAnalysis: React.FC<ComprehensiveAnalysisProps> = ({
 
             {/* Arrow */}
             <div className="flex items-center justify-center">
-              <div className="hidden lg:flex items-center justify-center w-16 h-16 bg-primary-100 rounded-full">
               <div className="hidden lg:flex items-center justify-center w-16 h-16 bg-primary-100 rounded-full dark:bg-dark-200">
                 <ArrowRight className="w-8 h-8 text-primary-600 dark:text-neon-cyan-400" />
               </div>
