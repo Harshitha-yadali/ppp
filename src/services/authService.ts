@@ -309,7 +309,7 @@ private isValidGmail(email: string): boolean {
   async forgotPassword(email: string): Promise<void> { // Changed parameter name and type
   console.log('AuthService: Starting forgotPassword for email:', email); // Use 'email' directly
   if (!this.isValidGmail(email)) throw new Error('Please enter a valid Gmail address (@gmail.com)'); // Use 'email' directly
-  const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: `${window.location.origin}/reset-password` }); // Use 'email' directly
+ const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: window.location.origin });
   if (error) {
     console.error('AuthService: resetPasswordForEmail error:', error);
     throw new Error(error.message);
