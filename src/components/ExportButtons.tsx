@@ -179,14 +179,14 @@ export const ExportButtons: React.FC<ExportButtonsProps> = ({ resumeData, userTy
       {/* Mobile Export Header with Prominent Button */}
       <div className="lg:hidden">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-fluid-lg font-semibold text-secondary-900 flex items-center">
-            <Download className="w-5 h-5 mr-2 text-primary-600" />
+          <h3 className="text-fluid-lg font-semibold text-secondary-900 dark:text-gray-100 flex items-center">
+            <Download className="w-5 h-5 mr-2 text-primary-600 dark:text-neon-cyan-400" />
             Export Resume
           </h3>
           
           <button
             onClick={toggleShareOptions}
-            className="btn-primary p-2 rounded-full shadow-md min-w-touch min-h-touch"
+            className="btn-primary p-2 rounded-full shadow-md min-w-touch min-h-touch shadow-neon-cyan"
             aria-label="Show export options"
             // Ensure no accidental double taps/clicks
             style={{ 
@@ -202,10 +202,10 @@ export const ExportButtons: React.FC<ExportButtonsProps> = ({ resumeData, userTy
         <button
           onClick={handleExportPDF} // This directly opens the modal for PDF export
           disabled={isExportingPDF || isExportingWord}
-          className={`w-full flex items-center justify-center space-x-2 font-semibold py-4 px-4 rounded-xl transition-all duration-200 text-fluid-base focus:outline-none focus:ring-2 focus:ring-primary-500 min-h-touch mb-4 ${
+          className={`w-full flex items-center justify-center space-x-2 font-semibold py-4 px-4 rounded-xl transition-all duration-200 text-fluid-base focus:outline-none focus:ring-2 focus:ring-neon-cyan-500 min-h-touch mb-4 shadow-lg hover:shadow-neon-cyan ${
             isExportingPDF || isExportingWord
               ? 'bg-secondary-400 text-white cursor-not-allowed'
-              : 'btn-primary shadow-lg hover:shadow-xl active:scale-[0.98]'
+              : 'btn-primary hover:shadow-neon-cyan active:scale-[0.98]'
           }`}
           style={{ 
             WebkitTapHighlightColor: 'transparent',
@@ -229,7 +229,7 @@ export const ExportButtons: React.FC<ExportButtonsProps> = ({ resumeData, userTy
         {showShareOptions && (
           <div className="space-y-3 animate-fadeIn">
             <div className="flex items-center justify-between">
-              <div className="text-fluid-sm font-medium text-secondary-700">More Options:</div> {/* Changed text */}
+              <div className="text-fluid-sm font-medium text-secondary-700 dark:text-gray-300">More Options:</div> {/* Changed text */}
             </div>
             
             <div className="grid-responsive-2 gap-3">
@@ -238,10 +238,10 @@ export const ExportButtons: React.FC<ExportButtonsProps> = ({ resumeData, userTy
               <button
                 onClick={handleExportPDF} // Still triggers modal
                 disabled={isExportingPDF || isExportingWord}
-                className={`flex items-center justify-center space-x-2 font-medium py-3 px-3 rounded-xl transition-all duration-200 text-fluid-sm focus:outline-none min-h-touch ${
+                className={`flex items-center justify-center space-x-2 font-medium py-3 px-3 rounded-xl transition-all duration-200 text-fluid-sm focus:outline-none min-h-touch shadow-md hover:shadow-lg ${
                   isExportingPDF || isExportingWord
                     ? 'bg-secondary-400 text-white cursor-not-allowed'
-                    : 'bg-red-600 hover:bg-red-700 active:bg-red-800 text-white shadow-md'
+                    : 'bg-red-600 hover:bg-red-700 active:bg-red-800 text-white dark:bg-red-500 dark:hover:bg-red-600'
                 }`}
                 style={{ 
                   WebkitTapHighlightColor: 'transparent',
@@ -259,10 +259,10 @@ export const ExportButtons: React.FC<ExportButtonsProps> = ({ resumeData, userTy
               <button
                 onClick={handleExportWord}
                 disabled={isExportingWord || isExportingPDF} // Corrected typo here
-                className={`flex items-center justify-center space-x-2 font-medium py-3 px-3 rounded-xl transition-all duration-200 text-fluid-sm focus:outline-none min-h-touch ${
+                className={`flex items-center justify-center space-x-2 font-medium py-3 px-3 rounded-xl transition-all duration-200 text-fluid-sm focus:outline-none min-h-touch shadow-md hover:shadow-neon-cyan ${
                   isExportingWord || isExportingPDF
                     ? 'bg-secondary-400 text-white cursor-not-allowed'
-                    : 'btn-primary shadow-md'
+                    : 'btn-primary'
                 }`}
                 style={{ 
                   WebkitTapHighlightColor: 'transparent',
@@ -283,10 +283,10 @@ export const ExportButtons: React.FC<ExportButtonsProps> = ({ resumeData, userTy
               <button
                 onClick={() => shareFile('pdf')} // Default to sharing PDF for simplicity
                 disabled={isExportingPDF || isExportingWord}
-                className={`w-full flex items-center justify-center space-x-2 font-medium py-3 px-4 rounded-xl transition-all duration-200 text-fluid-sm focus:outline-none min-h-touch ${
+                className={`w-full flex items-center justify-center space-x-2 font-medium py-3 px-4 rounded-xl transition-all duration-200 text-fluid-sm focus:outline-none min-h-touch shadow-md hover:shadow-lg ${
                   isExportingPDF || isExportingWord
                     ? 'bg-secondary-400 text-white cursor-not-allowed'
-                    : 'bg-green-600 hover:bg-green-700 text-white shadow-md'
+                    : 'bg-green-600 hover:bg-green-700 text-white dark:bg-green-500 dark:hover:bg-green-600'
                 }`}
                 style={{ 
                   WebkitTapHighlightColor: 'transparent',
@@ -303,8 +303,8 @@ export const ExportButtons: React.FC<ExportButtonsProps> = ({ resumeData, userTy
       
       {/* Desktop Export Buttons */}
       <div className="hidden lg:block">
-        <h3 className="text-fluid-xl font-semibold text-secondary-900 mb-4 flex items-center">
-          <Download className="w-5 h-5 mr-2 text-primary-600" />
+        <h3 className="text-fluid-xl font-semibold text-secondary-900 dark:text-gray-100 mb-4 flex items-center">
+          <Download className="w-5 h-5 mr-2 text-primary-600 dark:text-neon-cyan-400" />
           Export Resume
         </h3>
         
@@ -313,10 +313,10 @@ export const ExportButtons: React.FC<ExportButtonsProps> = ({ resumeData, userTy
           <button
             onClick={handleExportPDF} // This directly opens the modal for PDF export
             disabled={isExportingPDF || isExportingWord}
-            className={`flex items-center justify-center space-x-2 font-semibold py-4 px-6 rounded-xl transition-all duration-200 text-fluid-base focus:outline-none focus:ring-2 focus:ring-red-500 min-h-touch ${
+            className={`flex items-center justify-center space-x-2 font-semibold py-4 px-6 rounded-xl transition-all duration-200 text-fluid-base focus:outline-none focus:ring-2 focus:ring-red-500 min-h-touch shadow-lg hover:shadow-xl ${
               isExportingPDF || isExportingWord
                 ? 'bg-secondary-400 text-white cursor-not-allowed'
-                : 'bg-red-600 hover:bg-red-700 active:bg-red-800 text-white shadow-lg hover:shadow-xl active:scale-[0.98]'
+                : 'bg-red-600 hover:bg-red-700 active:bg-red-800 text-white active:scale-[0.98] dark:bg-red-500 dark:hover:bg-red-600'
             }`}
             style={{ 
               WebkitTapHighlightColor: 'transparent',
@@ -340,10 +340,10 @@ export const ExportButtons: React.FC<ExportButtonsProps> = ({ resumeData, userTy
           <button
             onClick={handleExportWord}
             disabled={isExportingWord || isExportingPDF} // Corrected typo here
-            className={`flex items-center justify-center space-x-2 font-semibold py-4 px-6 rounded-xl transition-all duration-200 text-fluid-base focus:outline-none focus:ring-2 focus:ring-primary-500 min-h-touch ${
+            className={`flex items-center justify-center space-x-2 font-semibold py-4 px-6 rounded-xl transition-all duration-200 text-fluid-base focus:outline-none focus:ring-2 focus:ring-neon-cyan-500 min-h-touch shadow-lg hover:shadow-neon-cyan ${
               isExportingWord || isExportingPDF
                 ? 'bg-secondary-400 text-white cursor-not-allowed'
-                : 'btn-primary shadow-lg hover:shadow-xl active:scale-[0.98]'
+                : 'btn-primary hover:shadow-neon-cyan active:scale-[0.98]'
             }`}
             style={{ 
               WebkitTapHighlightColor: 'transparent',
@@ -369,8 +369,8 @@ export const ExportButtons: React.FC<ExportButtonsProps> = ({ resumeData, userTy
       {exportStatus.status && (
         <div className={`mt-4 p-3 rounded-lg border transition-all ${
           exportStatus.status === 'success' 
-            ? 'bg-green-50 border-green-200 text-green-800' 
-            : 'bg-red-50 border-red-200 text-red-800'
+            ? 'bg-green-50 border-green-200 text-green-800 dark:bg-neon-cyan-500/10 dark:border-neon-cyan-400/50 dark:text-neon-cyan-300' 
+            : 'bg-red-50 border-red-200 text-red-800 dark:bg-red-900/20 dark:border-red-500/50 dark:text-red-300'
         }`}>
           <div className="flex items-center space-x-2">
             {exportStatus.status === 'success' ? (
@@ -385,12 +385,12 @@ export const ExportButtons: React.FC<ExportButtonsProps> = ({ resumeData, userTy
       
       {/* Mobile-specific instructions */}
       <div className="mt-6 lg:hidden">
-        <div className="p-3 bg-primary-50 border border-primary-200 rounded-lg">
+        <div className="p-3 bg-primary-50 border border-primary-200 rounded-lg dark:bg-dark-200 dark:border-dark-300">
           <div className="flex items-start space-x-2">
-            <div className="w-2 h-2 bg-primary-500 rounded-full mt-2 flex-shrink-0"></div>
-            <div className="text-fluid-sm text-primary-800">
+            <div className="w-2 h-2 bg-primary-500 rounded-full mt-2 flex-shrink-0 dark:bg-neon-cyan-400"></div>
+            <div className="text-fluid-sm text-primary-800 dark:text-gray-300">
               <p className="font-medium mb-1">📱 Mobile Export Tips</p>
-              <p className="text-fluid-xs text-primary-700">
+              <p className="text-fluid-xs text-primary-700 dark:text-gray-400">
                 After export, check your Downloads folder or browser's download notification.
               </p>
             </div>
@@ -400,11 +400,12 @@ export const ExportButtons: React.FC<ExportButtonsProps> = ({ resumeData, userTy
       
       {/* PDF Quality Notice */}
       <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+      <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg dark:bg-neon-cyan-500/10 dark:border-neon-cyan-400/50">
         <div className="flex items-start space-x-2">
-          <div className="w-2 h-2 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
-          <div className="text-fluid-sm text-green-800">
+          <div className="w-2 h-2 bg-green-500 rounded-full mt-2 flex-shrink-0 dark:bg-neon-cyan-400"></div>
+          <div className="text-fluid-sm text-green-800 dark:text-neon-cyan-300">
             <p className="font-medium mb-1">✨ Enhanced Export Quality</p>
-            <p className="text-fluid-xs text-green-700">
+            <p className="text-fluid-xs text-green-700 dark:text-gray-300">
               Professional formatting with searchable text and optimized file size for both PDF and Word formats.
             </p>
           </div>

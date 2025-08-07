@@ -401,19 +401,19 @@ export const LinkedInMessageGenerator: React.FC<LinkedInMessageGeneratorProps> =
   ];
 
   return (
-    <div className="flex flex-col min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 text-gray-900 font-sans">
+    <div className="flex flex-col min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 text-gray-900 font-sans dark:from-dark-50 dark:to-dark-200 dark:text-gray-100 transition-colors duration-300">
       {/* Sticky Header */}
-      <div className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-40">
+      <div className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-40 dark:bg-dark-50 dark:border-dark-300">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
              <button
               onClick={onNavigateBack}
-              className="mb-6 mt-5 bg-primary-600 text-white hover:bg-primary-700 active:bg-primary-800 shadow-md hover:shadow-lg py-3 px-5 rounded-xl inline-flex items-center space-x-2 transition-all duration-200"
+              className="mb-6 mt-5 bg-gradient-to-r from-neon-cyan-500 to-neon-blue-500 text-white hover:from-neon-cyan-400 hover:to-neon-blue-400 active:from-neon-cyan-600 active:to-neon-blue-600 shadow-md hover:shadow-neon-cyan py-3 px-5 rounded-xl inline-flex items-center space-x-2 transition-all duration-200"
             >
               <ArrowLeft className="w-5 h-5" />
               <span className="hidden sm:block">Back to Home</span>
             </button>
-            <h1 className="text-lg font-semibold text-gray-900">LinkedIn Message Generator</h1>
+            <h1 className="text-lg font-semibold text-gray-900 dark:text-gray-100">LinkedIn Message Generator</h1>
             <div className="w-16"></div>
           </div>
         </div>
@@ -424,14 +424,14 @@ export const LinkedInMessageGenerator: React.FC<LinkedInMessageGeneratorProps> =
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Hero Section */}
           <div className="text-center mb-8">
-            <div className="bg-white rounded-3xl shadow-xl p-8 border border-gray-200">
-              <div className="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Linkedin className="w-8 h-8 text-blue-600" />
+            <div className="bg-white rounded-3xl shadow-xl p-8 border border-gray-200 dark:bg-dark-100 dark:border-dark-300 dark:shadow-dark-xl">
+              <div className="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 dark:bg-neon-cyan-500/20 dark:shadow-neon-cyan">
+                <Linkedin className="w-8 h-8 text-blue-600 dark:text-neon-cyan-400" />
               </div>
-              <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4 leading-tight">
-                Craft Perfect <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">LinkedIn Messages</span>
+              <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-gray-100 mb-4 leading-tight">
+                Craft Perfect <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 dark:from-neon-cyan-400 dark:to-neon-blue-400">LinkedIn Messages</span>
               </h1>
-              <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
                 Generate personalized LinkedIn messages that get responses. Perfect for networking, job hunting, and business outreach.
               </p>
             </div>
@@ -440,10 +440,10 @@ export const LinkedInMessageGenerator: React.FC<LinkedInMessageGeneratorProps> =
           {!generatedMessages.length ? (
             <div className="space-y-8">
               {/* Progress Indicator */}
-              <div className="bg-white rounded-3xl shadow-xl p-6 border border-gray-200">
+              <div className="bg-white rounded-3xl shadow-xl p-6 border border-gray-200 dark:bg-dark-100 dark:border-dark-300 dark:shadow-dark-xl">
                 <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-xl font-bold text-gray-900">Step {currentStep + 1}: {steps[currentStep].title}</h2>
-                  <div className="text-sm font-medium text-gray-500">
+                  <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">Step {currentStep + 1}: {steps[currentStep].title}</h2>
+                  <div className="text-sm font-medium text-gray-500 dark:text-gray-400">
                     Progress: {currentStep + 1} of {steps.length}
                   </div>
                 </div>
@@ -455,10 +455,10 @@ export const LinkedInMessageGenerator: React.FC<LinkedInMessageGeneratorProps> =
                         <div
                           className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 border-2 ${
                             index < currentStep
-                              ? 'bg-green-500 text-white border-green-500'
+                              ? 'bg-green-500 text-white border-green-500 dark:bg-neon-cyan-500 dark:border-neon-cyan-500'
                               : index === currentStep
-                              ? 'bg-blue-500 text-white border-blue-500 shadow-md scale-110'
-                              : 'bg-white text-gray-500 border-gray-300'
+                              ? 'bg-blue-500 text-white border-blue-500 shadow-md scale-110 dark:bg-neon-blue-500 dark:border-neon-blue-500 dark:shadow-neon-blue'
+                              : 'bg-white text-gray-500 border-gray-300 dark:bg-dark-200 dark:text-gray-400 dark:border-dark-300'
                           }`}
                         >
                           {index < currentStep ? (
@@ -468,14 +468,14 @@ export const LinkedInMessageGenerator: React.FC<LinkedInMessageGeneratorProps> =
                           )}
                         </div>
                         <span className={`text-xs mt-2 font-medium text-center ${
-                          index <= currentStep ? 'text-gray-900' : 'text-gray-500'
+                          index <= currentStep ? 'text-gray-900 dark:text-gray-100' : 'text-gray-500 dark:text-gray-400'
                         }`}>
                           {step.title}
                         </span>
                       </div>
                       {index < steps.length - 1 && (
                         <div className={`flex-1 h-1 rounded-full mx-2 transition-all duration-300 ${
-                          index < currentStep ? 'bg-green-500' : 'bg-gray-200'
+                          index < currentStep ? 'bg-green-500 dark:bg-neon-cyan-500' : 'bg-gray-200 dark:bg-dark-300'
                         }`} />
                       )}
                     </React.Fragment>
@@ -484,7 +484,7 @@ export const LinkedInMessageGenerator: React.FC<LinkedInMessageGeneratorProps> =
               </div>
 
               {/* Current Step Content */}
-              <div className="bg-white rounded-3xl shadow-xl p-8 border border-gray-200">
+              <div className="bg-white rounded-3xl shadow-xl p-8 border border-gray-200 dark:bg-dark-100 dark:border-dark-300 dark:shadow-dark-xl">
                 {steps[currentStep].component}
               </div>
             </div>
@@ -492,10 +492,10 @@ export const LinkedInMessageGenerator: React.FC<LinkedInMessageGeneratorProps> =
             /* Generated Messages */
             <div className="space-y-8">
               {/* Results Header */}
-              <div className="bg-white rounded-3xl shadow-xl p-6 border border-gray-200 overflow-hidden">
-                <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-2xl">
+              <div className="bg-white rounded-3xl shadow-xl p-6 border border-gray-200 overflow-hidden dark:bg-dark-100 dark:border-dark-300 dark:shadow-dark-xl">
+                <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-2xl dark:from-dark-200 dark:to-dark-300">
                   <div className="flex items-center justify-between flex-wrap gap-4">
-                    <h3 className="text-xl font-bold text-gray-900">
+                    <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100">
                       Messages Generated!
                     </h3>
                     <button
@@ -503,36 +503,36 @@ export const LinkedInMessageGenerator: React.FC<LinkedInMessageGeneratorProps> =
                         setGeneratedMessages([]);
                         setCurrentStep(0);
                       }}
-                      className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-xl transition-colors shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                      className="bg-gradient-to-r from-neon-cyan-500 to-neon-blue-500 hover:from-neon-cyan-400 hover:to-neon-blue-400 text-white font-semibold py-3 px-6 rounded-xl transition-colors shadow-lg hover:shadow-neon-cyan transform hover:-translate-y-0.5"
                     >
                       Generate New
                     </button>
                   </div>
                 </div>
                 <div className="p-6">
-                  <p className="text-gray-600">Choose the message that best fits your style, and feel free to edit it before sending.</p>
+                  <p className="text-gray-600 dark:text-gray-300">Choose the message that best fits your style, and feel free to edit it before sending.</p>
                 </div>
               </div>
 
               {/* Generated Messages List */}
               <div className="space-y-6">
                 {generatedMessages.map((message, index) => (
-                  <div key={index} className="bg-white rounded-3xl shadow-xl border border-gray-200 overflow-hidden">
-                    <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-6 border-b border-gray-200">
+                  <div key={index} className="bg-white rounded-3xl shadow-xl border border-gray-200 overflow-hidden dark:bg-dark-100 dark:border-dark-300 dark:shadow-dark-xl">
+                    <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-6 border-b border-gray-200 dark:from-dark-200 dark:to-dark-300 dark:border-dark-400">
                       <div className="flex items-center justify-between">
-                        <h3 className="text-lg font-semibold text-gray-900">
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
                           Option {index + 1}
                         </h3>
                         <div className="flex items-center space-x-2">
-                          <span className="text-sm text-gray-600 hidden sm:block">
+                          <span className="text-sm text-gray-600 dark:text-gray-400 hidden sm:block">
                             {message.length} characters
                           </span>
                           <button
                             onClick={() => handleCopyMessage(message, index)}
-                            className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-medium transition-all transform hover:scale-105 ${
+                            className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-medium transition-all transform hover:scale-105 shadow-lg ${
                               copySuccess === index
-                                ? 'bg-green-600 text-white shadow-md'
-                                : 'bg-blue-600 hover:bg-blue-700 text-white shadow-md'
+                                ? 'bg-green-600 text-white shadow-md dark:bg-neon-cyan-500 dark:shadow-neon-cyan'
+                                : 'bg-blue-600 hover:bg-blue-700 text-white shadow-md dark:bg-neon-blue-500 dark:hover:bg-neon-blue-400 dark:shadow-neon-blue'
                             }`}
                           >
                             {copySuccess === index ? (
@@ -551,8 +551,8 @@ export const LinkedInMessageGenerator: React.FC<LinkedInMessageGeneratorProps> =
                       </div>
                     </div>
                     <div className="p-6">
-                      <div className="bg-gray-50 rounded-2xl p-6 border border-gray-200">
-                        <p className="text-gray-800 leading-relaxed whitespace-pre-wrap">
+                      <div className="bg-gray-50 rounded-2xl p-6 border border-gray-200 dark:bg-dark-200 dark:border-dark-300">
+                        <p className="text-gray-800 dark:text-gray-200 leading-relaxed whitespace-pre-wrap">
                           {message}
                         </p>
                       </div>
@@ -562,14 +562,14 @@ export const LinkedInMessageGenerator: React.FC<LinkedInMessageGeneratorProps> =
               </div>
 
               {/* Tips Section */}
-              <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-3xl p-6 border border-blue-200">
+              <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-3xl p-6 border border-blue-200 dark:from-dark-200 dark:to-dark-300 dark:border-neon-cyan-400/50">
                 <div className="flex items-start space-x-3">
-                  <div className="bg-blue-100 p-2 rounded-full">
-                    <Zap className="w-5 h-5 text-blue-600" />
+                  <div className="bg-blue-100 p-2 rounded-full dark:bg-neon-cyan-500/20">
+                    <Zap className="w-5 h-5 text-blue-600 dark:text-neon-cyan-400" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-blue-900 mb-2">💡 Tips for Better Results</h4>
-                    <ul className="text-blue-800 text-sm space-y-1">
+                    <h4 className="font-semibold text-blue-900 dark:text-neon-cyan-300 mb-2">💡 Tips for Better Results</h4>
+                    <ul className="text-blue-800 dark:text-gray-300 text-sm space-y-1">
                       <li>• Personalize with specific details about their work or company</li>
                       <li>• Keep messages concise and focused on value</li>
                       <li>• Always include a clear call-to-action</li>
@@ -585,16 +585,16 @@ export const LinkedInMessageGenerator: React.FC<LinkedInMessageGeneratorProps> =
 
       {/* Sticky Navigation Footer */}
       {!generatedMessages.length && (
-        <div className="sticky bottom-0 z-50 bg-white border-t border-gray-200 shadow-2xl">
+        <div className="sticky bottom-0 z-50 bg-white border-t border-gray-200 shadow-2xl dark:bg-dark-50 dark:border-dark-300">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <div className="flex justify-between items-center">
               <button
                 onClick={() => setCurrentStep(Math.max(0, currentStep - 1))}
                 disabled={currentStep === 0}
-                className={`flex items-center space-x-2 px-6 py-3 rounded-xl font-semibold transition-all duration-300 ${
+                className={`flex items-center space-x-2 px-6 py-3 rounded-xl font-semibold transition-all duration-300 shadow-lg ${
                   currentStep === 0
                     ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                    : 'bg-gray-600 hover:bg-gray-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-0.5'
+                    : 'bg-gray-600 hover:bg-gray-700 text-white hover:shadow-xl transform hover:-translate-y-0.5 dark:bg-dark-300 dark:hover:bg-dark-400'
                 }`}
               >
                 <ArrowLeft className="w-5 h-5" />
@@ -602,10 +602,10 @@ export const LinkedInMessageGenerator: React.FC<LinkedInMessageGeneratorProps> =
               </button>
 
               <div className="text-center hidden md:block">
-                <div className="text-sm text-gray-500 mb-1">Progress</div>
-                <div className="w-48 bg-gray-200 rounded-full h-2">
+                <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">Progress</div>
+                <div className="w-48 bg-gray-200 rounded-full h-2 dark:bg-dark-300">
                   <div
-                    className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full transition-all duration-300"
+                    className="bg-gradient-to-r from-neon-cyan-500 to-neon-purple-500 h-2 rounded-full transition-all duration-300"
                     style={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
                   />
                 </div>
@@ -615,10 +615,10 @@ export const LinkedInMessageGenerator: React.FC<LinkedInMessageGeneratorProps> =
                 <button
                   onClick={() => setCurrentStep(currentStep + 1)}
                   disabled={!validateCurrentStep()}
-                  className={`flex items-center space-x-2 px-6 py-3 rounded-xl font-semibold transition-all duration-300 ${
+                  className={`flex items-center space-x-2 px-6 py-3 rounded-xl font-semibold transition-all duration-300 shadow-lg ${
                     !validateCurrentStep()
                       ? 'bg-gray-400 cursor-not-allowed text-white'
-                      : 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-0.5'
+                      : 'bg-gradient-to-r from-neon-cyan-500 to-neon-blue-500 hover:from-neon-cyan-400 hover:to-neon-blue-400 text-white hover:shadow-neon-cyan transform hover:-translate-y-0.5'
                   }`}
                 >
                   <span>Next</span>
@@ -628,10 +628,10 @@ export const LinkedInMessageGenerator: React.FC<LinkedInMessageGeneratorProps> =
                 <button
                   onClick={handleGenerateMessage}
                   disabled={!formData.recipientFirstName || !formData.messagePurpose || isGenerating}
-                  className={`flex items-center space-x-2 px-6 py-3 rounded-xl font-semibold transition-all duration-300 ${
+                  className={`flex items-center space-x-2 px-6 py-3 rounded-xl font-semibold transition-all duration-300 shadow-lg ${
                     !formData.recipientFirstName || !formData.messagePurpose || isGenerating
                       ? 'bg-gray-400 cursor-not-allowed text-white'
-                      : 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transform hover:-translate-y-0.5'
+                      : 'bg-gradient-to-r from-neon-cyan-500 to-neon-purple-500 hover:from-neon-cyan-400 hover:to-neon-purple-400 text-white hover:shadow-neon-cyan transform hover:-translate-y-0.5'
                   }`}
                 >
                   {isGenerating ? (

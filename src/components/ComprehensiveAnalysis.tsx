@@ -135,27 +135,27 @@ export const ComprehensiveAnalysis: React.FC<ComprehensiveAnalysisProps> = ({
   };
 
   return (
-    <div className="card border border-secondary-100">
+    <div className="card border border-secondary-100 dark:border-dark-300">
       {/* Header */}
-      <div className="bg-gradient-to-r from-primary-50 to-green-50 p-4 sm:p-6 border-b border-secondary-200">
+      <div className="bg-gradient-to-r from-primary-50 to-green-50 p-4 sm:p-6 border-b border-secondary-200 dark:from-dark-200 dark:to-dark-300 dark:border-dark-400">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center">
-            <div className="bg-primary-600 w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center mr-3 sm:mr-4">
+            <div className="bg-gradient-to-r from-neon-cyan-500 to-neon-blue-500 w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center mr-3 sm:mr-4 shadow-neon-cyan">
               <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
             </div>
             <div>
-              <h2 className="text-fluid-lg sm:text-fluid-xl font-bold text-secondary-900">Resume Analysis Complete</h2>
-              <p className="text-fluid-xs sm:text-fluid-sm text-secondary-600">Score Improvement & Optimization Results</p>
+              <h2 className="text-fluid-lg sm:text-fluid-xl font-bold text-secondary-900 dark:text-gray-100">Resume Analysis Complete</h2>
+              <p className="text-fluid-xs sm:text-fluid-sm text-secondary-600 dark:text-gray-300">Score Improvement & Optimization Results</p>
             </div>
           </div>
           
           {/* Improvement Badge */}
           <div className={`px-3 sm:px-4 py-2 rounded-full font-bold text-fluid-sm ${
             improvement > 0 
-              ? 'bg-green-100 text-green-800' 
+              ? 'bg-green-100 text-green-800 dark:bg-neon-cyan-500/20 dark:text-neon-cyan-300' 
               : (improvement < 0 
-                ? 'bg-red-100 text-red-800' 
-                : 'bg-secondary-100 text-secondary-800')
+                ? 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300' 
+                : 'bg-secondary-100 text-secondary-800 dark:bg-dark-200 dark:text-gray-300')
           }`}>
             {improvement > 0 ? '+' : ''}{improvement} points
           </div>
@@ -165,24 +165,24 @@ export const ComprehensiveAnalysis: React.FC<ComprehensiveAnalysisProps> = ({
       <div className="p-4 sm:p-6">
         {/* Score Comparison Section */}
         <div className="mb-6 lg:mb-8">
-          <h3 className="text-fluid-lg sm:text-fluid-xl font-bold text-secondary-900 mb-4 lg:mb-6 flex items-center">
-            <BarChart3 className="w-5 h-5 sm:w-6 sm:h-6 mr-2 text-primary-600" />
+          <h3 className="text-fluid-lg sm:text-fluid-xl font-bold text-secondary-900 dark:text-gray-100 mb-4 lg:mb-6 flex items-center">
+            <BarChart3 className="w-5 h-5 sm:w-6 sm:h-6 mr-2 text-primary-600 dark:text-neon-cyan-400" />
             Score Comparison
           </h3>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8 mb-4 lg:mb-6">
             {/* Before Score */}
             <div className="text-center">
-              <h4 className="text-fluid-base sm:text-fluid-lg font-semibold text-secondary-900 mb-3 sm:mb-4">Before Optimization</h4>
+              <h4 className="text-fluid-base sm:text-fluid-lg font-semibold text-secondary-900 dark:text-gray-100 mb-3 sm:mb-4">Before Optimization</h4>
               <div className="flex justify-center mb-3 sm:mb-4">
                 <PieChart score={initialDetailedScore.totalScore} size={100} strokeWidth={6} />
               </div>
               <div className="mb-3">
-                <span className="px-3 py-1 rounded-full text-fluid-sm font-medium bg-red-100 text-red-800">
+                <span className="px-3 py-1 rounded-full text-fluid-sm font-medium bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300">
                   Needs Improvement
                 </span>
               </div>
-              <p className="text-fluid-xs sm:text-fluid-sm text-secondary-600 leading-relaxed">
+              <p className="text-fluid-xs sm:text-fluid-sm text-secondary-600 dark:text-gray-300 leading-relaxed">
                 {initialDetailedScore.analysis}
               </p>
             </div>
@@ -190,27 +190,28 @@ export const ComprehensiveAnalysis: React.FC<ComprehensiveAnalysisProps> = ({
             {/* Arrow */}
             <div className="flex items-center justify-center">
               <div className="hidden lg:flex items-center justify-center w-16 h-16 bg-primary-100 rounded-full">
-                <ArrowRight className="w-8 h-8 text-primary-600" />
+              <div className="hidden lg:flex items-center justify-center w-16 h-16 bg-primary-100 rounded-full dark:bg-dark-200">
+                <ArrowRight className="w-8 h-8 text-primary-600 dark:text-neon-cyan-400" />
               </div>
               <div className="lg:hidden flex items-center justify-center py-4">
-                <div className="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center rotate-90">
-                  <ArrowRight className="w-6 h-6 text-primary-600" />
+                <div className="w-12 h-12 bg-primary-100 rounded-full flex items-center justify-center rotate-90 dark:bg-dark-200">
+                  <ArrowRight className="w-6 h-6 text-primary-600 dark:text-neon-cyan-400" />
                 </div>
               </div>
             </div>
 
             {/* After Score */}
             <div className="text-center">
-              <h4 className="text-fluid-base sm:text-fluid-lg font-semibold text-secondary-900 mb-3 sm:mb-4">After Optimization</h4>
+              <h4 className="text-fluid-base sm:text-fluid-lg font-semibold text-secondary-900 dark:text-gray-100 mb-3 sm:mb-4">After Optimization</h4>
               <div className="flex justify-center mb-3 sm:mb-4">
                 <PieChart score={finalDetailedScore.totalScore} size={100} strokeWidth={6} />
               </div>
               <div className="mb-3">
-                <span className="px-3 py-1 rounded-full text-fluid-sm font-medium bg-green-100 text-green-800">
+                <span className="px-3 py-1 rounded-full text-fluid-sm font-medium bg-green-100 text-green-800 dark:bg-neon-cyan-500/20 dark:text-neon-cyan-300">
                   Excellent
                 </span>
               </div>
-              <p className="text-fluid-xs sm:text-fluid-sm text-secondary-600 leading-relaxed">
+              <p className="text-fluid-xs sm:text-fluid-sm text-secondary-600 dark:text-gray-300 leading-relaxed">
                 {finalDetailedScore.analysis}
               </p>
             </div>
@@ -218,16 +219,16 @@ export const ComprehensiveAnalysis: React.FC<ComprehensiveAnalysisProps> = ({
 
           {/* Changed Sections */}
           {changedSections.length > 0 && (
-            <div className="bg-gradient-to-r from-green-50 to-primary-50 rounded-xl p-4 sm:p-6 mb-4 lg:mb-6">
-              <h4 className="text-fluid-base sm:text-fluid-lg font-semibold text-secondary-900 mb-3 sm:mb-4 flex items-center">
-                <Target className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-green-600" />
+            <div className="bg-gradient-to-r from-green-50 to-primary-50 rounded-xl p-4 sm:p-6 mb-4 lg:mb-6 dark:from-dark-200 dark:to-dark-300">
+              <h4 className="text-fluid-base sm:text-fluid-lg font-semibold text-secondary-900 dark:text-gray-100 mb-3 sm:mb-4 flex items-center">
+                <Target className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-green-600 dark:text-neon-cyan-400" />
                 Sections Optimized
               </h4>
               <div className="grid-responsive gap-2 sm:gap-3">
                 {changedSections.map((section, index) => (
-                  <div key={index} className="flex items-center bg-white rounded-lg p-2 sm:p-3 shadow-sm">
-                    <CheckCircle className="w-4 h-4 text-green-600 mr-2 flex-shrink-0" />
-                    <span className="text-fluid-xs sm:text-fluid-sm font-medium text-secondary-900">
+                  <div key={index} className="flex items-center bg-white rounded-lg p-2 sm:p-3 shadow-sm dark:bg-dark-100">
+                    <CheckCircle className="w-4 h-4 text-green-600 dark:text-neon-cyan-400 mr-2 flex-shrink-0" />
+                    <span className="text-fluid-xs sm:text-fluid-sm font-medium text-secondary-900 dark:text-gray-100">
                       {getSectionDisplayName(section)}
                     </span>
                   </div>
@@ -239,17 +240,17 @@ export const ComprehensiveAnalysis: React.FC<ComprehensiveAnalysisProps> = ({
 
         {/* --- DETAILED SCORE BREAKDOWN SECTION --- */}
         <div className="mb-6 lg:mb-8">
-          <h3 className="text-fluid-lg sm:text-fluid-xl font-bold text-secondary-900 mb-4 lg:mb-6 flex items-center">
-            <BarChart3 className="w-5 h-5 sm:w-6 sm:h-6 mr-2 text-purple-600" />
+          <h3 className="text-fluid-lg sm:text-fluid-xl font-bold text-secondary-900 dark:text-gray-100 mb-4 lg:mb-6 flex items-center">
+            <BarChart3 className="w-5 h-5 sm:w-6 sm:h-6 mr-2 text-purple-600 dark:text-neon-purple-400" />
             Detailed Score Breakdown
           </h3>
 
           {/* Iterate through each breakdown category in afterScore.breakdown */}
           {Object.entries(finalDetailedScore.breakdown).map(([key, category]) => (
-            <div key={key} className="bg-white rounded-xl shadow-sm border border-gray-200 mb-3">
+            <div key={key} className="bg-white rounded-xl shadow-sm border border-gray-200 mb-3 dark:bg-dark-100 dark:border-dark-300">
               <button
                 onClick={() => toggleSection(key)}
-                className="w-full flex items-center justify-between p-4 sm:p-5 text-left font-semibold text-secondary-900 transition-colors hover:bg-gray-50"
+                className="w-full flex items-center justify-between p-4 sm:p-5 text-left font-semibold text-secondary-900 dark:text-gray-100 transition-colors hover:bg-gray-50 dark:hover:bg-dark-200"
               >
                 <div className="flex items-center space-x-3">
                   {getBreakdownIcon(key)}
@@ -259,15 +260,15 @@ export const ComprehensiveAnalysis: React.FC<ComprehensiveAnalysisProps> = ({
                   <span className={`text-fluid-base sm:text-fluid-lg font-bold ${
                     category.score >= (category.maxScore * 0.9) ? 'text-green-600' :
                     category.score >= (category.maxScore * 0.7) ? 'text-orange-600' :
-                    'text-red-600'
+                    'text-red-600 dark:text-red-400'
                   }`}>
                     {category.score}/{category.maxScore}
                   </span>
-                  {openSections[key] ? <ChevronUp className="w-5 h-5 text-secondary-600" /> : <ChevronDown className="w-5 h-5 text-secondary-600" />}
+                  {openSections[key] ? <ChevronUp className="w-5 h-5 text-secondary-600 dark:text-gray-400" /> : <ChevronDown className="w-5 h-5 text-secondary-600 dark:text-gray-400" />}
                 </div>
               </button>
               {openSections[key] && (
-                <div className="p-4 sm:p-5 border-t border-gray-100 bg-gray-50 text-secondary-700 text-fluid-xs sm:text-fluid-sm leading-relaxed">
+                <div className="p-4 sm:p-5 border-t border-gray-100 bg-gray-50 text-secondary-700 dark:border-dark-300 dark:bg-dark-200 dark:text-gray-300 text-fluid-xs sm:text-fluid-sm leading-relaxed">
                   <p className="mb-3">
                     {category.details}
                   </p>
@@ -281,16 +282,16 @@ export const ComprehensiveAnalysis: React.FC<ComprehensiveAnalysisProps> = ({
 
         {/* Overall Recommendations */}
         {finalDetailedScore.recommendations && finalDetailedScore.recommendations.length > 0 && (
-          <div className="bg-primary-50 rounded-xl p-4 sm:p-6 border border-primary-200 mb-6 lg:mb-8">
-            <h4 className="text-fluid-base sm:text-fluid-lg font-semibold text-secondary-900 mb-3 sm:mb-4 flex items-center">
-              <Lightbulb className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-primary-600" />
+          <div className="bg-primary-50 rounded-xl p-4 sm:p-6 border border-primary-200 mb-6 lg:mb-8 dark:bg-dark-200 dark:border-dark-300">
+            <h4 className="text-fluid-base sm:text-fluid-lg font-semibold text-secondary-900 dark:text-gray-100 mb-3 sm:mb-4 flex items-center">
+              <Lightbulb className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-primary-600 dark:text-neon-cyan-400" />
               Overall Recommendations
             </h4>
             <ul className="space-y-2">
               {finalDetailedScore.recommendations.map((rec, index) => (
                 <li key={index} className="flex items-start">
-                  <div className="w-2 h-2 bg-primary-500 rounded-full mr-3 mt-2 flex-shrink-0"></div>
-                  <span className="text-fluid-xs sm:text-fluid-sm text-secondary-700">{rec}</span>
+                  <div className="w-2 h-2 bg-primary-500 rounded-full mr-3 mt-2 flex-shrink-0 dark:bg-neon-cyan-400"></div>
+                  <span className="text-fluid-xs sm:text-fluid-sm text-secondary-700 dark:text-gray-300">{rec}</span>
                 </li>
               ))}
             </ul>
@@ -298,29 +299,29 @@ export const ComprehensiveAnalysis: React.FC<ComprehensiveAnalysisProps> = ({
         )}
 
         {/* Summary */}
-        <div className="p-4 sm:p-6 bg-gradient-to-r from-primary-50 to-accent-50 rounded-xl border border-primary-200">
+        <div className="p-4 sm:p-6 bg-gradient-to-r from-primary-50 to-accent-50 rounded-xl border border-primary-200 dark:from-dark-200 dark:to-dark-300 dark:border-dark-400">
           <div className="text-center">
             <div className="flex items-center justify-center mb-3">
-              <Award className="w-6 h-6 text-yellow-500 mr-2" />
-              <h3 className="text-fluid-base sm:text-fluid-lg font-bold text-secondary-900">
+              <Award className="w-6 h-6 text-yellow-500 dark:text-neon-cyan-400 mr-2" />
+              <h3 className="text-fluid-base sm:text-fluid-lg font-bold text-secondary-900 dark:text-gray-100">
                 🎉 Optimization Complete!
               </h3>
             </div>
-            <p className="text-fluid-xs sm:text-fluid-sm text-secondary-700 mb-3">
+            <p className="text-fluid-xs sm:text-fluid-sm text-secondary-700 dark:text-gray-300 mb-3">
               Your resume score improved by <strong>{improvement} points</strong> (from {initialDetailedScore.totalScore}% to {finalDetailedScore.totalScore}%),
               making it significantly more competitive and likely to pass ATS systems.
             </p>
             <div className="flex flex-wrap justify-center gap-2 text-fluid-xs">
-              <span className="px-2 py-1 bg-primary-100 text-primary-800 rounded-full">
+              <span className="px-2 py-1 bg-primary-100 text-primary-800 rounded-full dark:bg-neon-cyan-500/20 dark:text-neon-cyan-300">
                 ATS Optimized
               </span>
-              <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full">
+              <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full dark:bg-neon-blue-500/20 dark:text-neon-blue-300">
                 Keyword Enhanced
               </span>
-              <span className="px-2 py-1 bg-accent-100 text-accent-800 rounded-full">
+              <span className="px-2 py-1 bg-accent-100 text-accent-800 rounded-full dark:bg-neon-purple-500/20 dark:text-neon-purple-300">
                 Industry Aligned
               </span>
-              <span className="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full">
+              <span className="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full dark:bg-neon-pink-500/20 dark:text-neon-pink-300">
                 {finalDetailedScore.totalScore >= 90 ? 'Excellent Score' : 'Good Score'}
               </span>
             </div>

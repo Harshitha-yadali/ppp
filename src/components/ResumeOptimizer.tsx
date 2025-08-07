@@ -614,13 +614,13 @@ const ResumeOptimizer: React.FC<ResumeOptimizerProps> = ({
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 pb-16 px-4 sm:px-0">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 pb-16 px-4 sm:px-0 dark:from-dark-50 dark:to-dark-200 transition-colors duration-300">
       <div className="w-90vh max-w-7xl mx-auto px-0 sm:px-6 lg:px-8 py-8">
         {!optimizedResume ? (
           <>
             <button
               onClick={onNavigateBack}
-              className="mb-6 bg-primary-600 text-white hover:bg-primary-700 active:bg-primary-800 shadow-md hover:shadow-lg py-3 px-5 rounded-xl inline-flex items-center space-x-2 transition-all duration-200"
+              className="mb-6 bg-gradient-to-r from-neon-cyan-500 to-neon-blue-500 text-white hover:from-neon-cyan-400 hover:to-neon-blue-400 active:from-neon-cyan-600 active:to-neon-blue-600 shadow-md hover:shadow-neon-cyan py-3 px-5 rounded-xl inline-flex items-center space-x-2 transition-all duration-200"
             >
               <ArrowLeft className="w-5 h-5" />
               <span className="hidden sm:block">Back to Home</span>
@@ -630,7 +630,7 @@ const ResumeOptimizer: React.FC<ResumeOptimizerProps> = ({
               <div className="relative text-center mb-8 z-10">
                 <button
                   onClick={() => setShowOptimizationDropdown(!showOptimizationDropdown)}
-                  className="inline-flex items-center space-x-2 px-6 py-3 rounded-full transition-all duration-200 font-semibold text-sm bg-gradient-to-r from-purple-500 to-indigo-600 text-white shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 max-w-[300px] mx-auto justify-center"
+                  className="inline-flex items-center space-x-2 px-6 py-3 rounded-full transition-all duration-200 font-semibold text-sm bg-gradient-to-r from-neon-purple-500 to-neon-blue-600 text-white shadow-md hover:shadow-neon-purple focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-neon-cyan-500 max-w-[300px] mx-auto justify-center dark:shadow-neon-purple"
                 >
                   <span>
                     {subscription
@@ -641,15 +641,15 @@ const ResumeOptimizer: React.FC<ResumeOptimizerProps> = ({
                 </button>
 
                 {showOptimizationDropdown && (
-                  <div className="absolute left-1/2 -translate-x-1/2 mt-3 w-72 bg-white rounded-xl shadow-xl border border-secondary-200 py-3 z-20">
+                  <div className="absolute left-1/2 -translate-x-1/2 mt-3 w-72 bg-white rounded-xl shadow-xl border border-secondary-200 py-3 z-20 dark:bg-dark-100 dark:border-dark-300 dark:shadow-dark-xl">
                     {subscription ? (
                       <div className="text-center px-4">
-                        <p className="text-sm text-secondary-700 mb-3">
+                        <p className="text-sm text-secondary-700 dark:text-gray-300 mb-3">
                           You have **{subscription.optimizationsTotal - subscription.optimizationsUsed}** optimizations remaining.
                         </p>
                         <button
                           onClick={() => { setShowSubscriptionPlans(true); setShowOptimizationDropdown(false); }}
-                          className="w-full btn-secondary py-2 px-4 rounded-lg text-sm flex items-center justify-center space-x-2"
+                          className="w-full btn-secondary py-2 px-4 rounded-lg text-sm flex items-center justify-center space-x-2 dark:hover:shadow-neon-cyan/20"
                         >
                           <Zap className="w-4 h-4" />
                           <span>Upgrade Plan</span>
@@ -657,7 +657,7 @@ const ResumeOptimizer: React.FC<ResumeOptimizerProps> = ({
                       </div>
                     ) : (
                       <div className="text-center px-4">
-                        <p className="text-sm text-secondary-700 mb-3">
+                        <p className="text-sm text-secondary-700 dark:text-gray-300 mb-3">
                           You currently do not have an active subscription plan.
                         </p>
                         <button
@@ -697,10 +697,10 @@ const ResumeOptimizer: React.FC<ResumeOptimizerProps> = ({
               <div className="flex gap-3">
                 <button
                   onClick={() => setActiveTab('resume')}
-                  className={`inline-flex items-center space-x-2 px-4 py-2 rounded-xl transition-colors font-medium text-sm ${
+                  className={`inline-flex items-center space-x-2 px-4 py-2 rounded-xl transition-colors font-medium text-sm shadow-lg ${
                     activeTab === 'resume'
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      ? 'bg-gradient-to-r from-neon-cyan-500 to-neon-blue-500 text-white shadow-neon-cyan'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-dark-200 dark:text-gray-300 dark:hover:bg-dark-300'
                   }`}
                 >
                   <FileText className="w-4 h-4" />
@@ -708,10 +708,10 @@ const ResumeOptimizer: React.FC<ResumeOptimizerProps> = ({
                 </button>
                 <button
                   onClick={() => setActiveTab('analysis')}
-                  className={`inline-flex items-center space-x-2 px-4 py-2 rounded-xl transition-colors font-medium text-sm ${
+                  className={`inline-flex items-center space-x-2 px-4 py-2 rounded-xl transition-colors font-medium text-sm shadow-lg ${
                     activeTab === 'analysis'
-                      ? 'bg-purple-600 text-white'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      ? 'bg-gradient-to-r from-neon-purple-500 to-neon-pink-500 text-white shadow-neon-purple'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-dark-200 dark:text-gray-300 dark:hover:bg-dark-300'
                   }`}
                 >
                   <BarChart3 className="w-4 h-4" />
@@ -721,7 +721,7 @@ const ResumeOptimizer: React.FC<ResumeOptimizerProps> = ({
 
               <button
                 onClick={handleStartNewResume}
-                className="inline-flex items-center space-x-2 bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-xl shadow transition-colors"
+                className="inline-flex items-center space-x-2 bg-gray-600 hover:bg-gray-700 text-white font-semibold py-2 px-4 rounded-xl shadow transition-colors dark:bg-dark-300 dark:hover:bg-dark-400"
               >
                 <ArrowLeft className="w-4 h-4" />
                 <span>Create New Resume</span>
@@ -730,10 +730,10 @@ const ResumeOptimizer: React.FC<ResumeOptimizerProps> = ({
 
             {optimizedResume && activeTab === 'resume' && (
               <>
-                <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden">
-                  <div className="bg-gradient-to-r from-green-50 to-blue-50 p-4 border-b border-gray-200">
-                    <h2 className="text-xl font-semibold text-gray-900 flex items-center">
-                      <FileText className="w-5 h-5 mr-2 text-green-600" />
+                <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden dark:bg-dark-100 dark:border-dark-300 dark:shadow-dark-xl">
+                  <div className="bg-gradient-to-r from-green-50 to-blue-50 p-4 border-b border-gray-200 dark:from-dark-200 dark:to-dark-300 dark:border-dark-400">
+                    <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 flex items-center">
+                      <FileText className="w-5 h-5 mr-2 text-green-600 dark:text-neon-cyan-400" />
                       Optimized Resume
                     </h2>
                   </div>

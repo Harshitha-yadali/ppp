@@ -315,13 +315,13 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-2 sm:p-4 backdrop-blur-sm">
-      <div className="bg-white rounded-xl sm:rounded-2xl lg:rounded-3xl w-full max-w-7xl max-h-[95vh] overflow-y-auto flex flex-col">
-        <div className="relative bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 px-3 sm:px-6 py-4 sm:py-8 border-b border-gray-100 flex-shrink-0">
+    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-2 sm:p-4 backdrop-blur-sm dark:bg-black/80">
+      <div className="bg-white rounded-xl sm:rounded-2xl lg:rounded-3xl w-full max-w-7xl max-h-[95vh] overflow-y-auto flex flex-col dark:bg-dark-100 dark:shadow-dark-xl">
+        <div className="relative bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 px-3 sm:px-6 py-4 sm:py-8 border-b border-gray-100 flex-shrink-0 dark:from-dark-200 dark:via-dark-300 dark:to-dark-400 dark:border-dark-500">
           {/* Back button */}
           <button
             onClick={onNavigateBack}
-            className="absolute top-2 sm:top-4 left-2 sm:left-4 w-10 h-10 flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors rounded-full hover:bg-white/50 z-10 min-w-[44px] min-h-[44px]"
+            className="absolute top-2 sm:top-4 left-2 sm:left-4 w-10 h-10 flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors rounded-full hover:bg-white/50 z-10 min-w-[44px] min-h-[44px] dark:text-gray-500 dark:hover:text-gray-300 dark:hover:bg-dark-300/50"
           >
             <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
           </button>
@@ -329,19 +329,19 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({
           {/* New X (close) button */}
           <button
             onClick={onNavigateBack}
-            className="absolute top-2 sm:top-4 right-2 sm:right-4 w-10 h-10 flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors rounded-full hover:bg-white/50 z-10 min-w-[44px] min-h-[44px]"
+            className="absolute top-2 sm:top-4 right-2 sm:right-4 w-10 h-10 flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors rounded-full hover:bg-white/50 z-10 min-w-[44px] min-h-[44px] dark:text-gray-500 dark:hover:text-gray-300 dark:hover:bg-dark-300/50"
           >
             <X className="w-5 h-5 sm:w-6 sm:h-6" />
           </button>
 
           <div className="text-center max-w-4xl mx-auto px-8">
-            <div className="bg-gradient-to-r from-indigo-600 to-purple-600 w-12 h-12 sm:w-20 sm:h-20 rounded-xl sm:rounded-3xl flex items-center justify-center mx-auto mb-3 sm:mb-6 shadow-lg">
+            <div className="bg-gradient-to-r from-neon-cyan-500 to-neon-purple-500 w-12 h-12 sm:w-20 sm:h-20 rounded-xl sm:rounded-3xl flex items-center justify-center mx-auto mb-3 sm:mb-6 shadow-lg dark:shadow-neon-cyan">
               <Sparkles className="w-6 h-6 sm:w-10 sm:h-10 text-white" />
             </div>
-            <h1 className="text-lg sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-2 sm:mb-3">
+            <h1 className="text-lg sm:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-gray-100 mb-2 sm:mb-3">
               🏆 Ultimate Resume & Job Prep Plans
             </h1>
-            <p className="text-sm sm:text-lg lg:text-xl text-gray-600 mb-3 sm:mb-6">
+            <p className="text-sm sm:text-lg lg:text-xl text-gray-600 dark:text-gray-300 mb-3 sm:mb-6">
               AI-powered resume optimization with secure payment
             </p>
           </div>
@@ -467,8 +467,8 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({
                 key={plan.id}
                 className={`relative rounded-xl lg:rounded-3xl border-2 transition-all duration-300 cursor-pointer transform hover:scale-105 ${
                   selectedPlan === plan.id
-                    ? 'border-indigo-500 shadow-2xl shadow-indigo-500/20 ring-4 ring-indigo-100'
-                    : 'border-gray-200 hover:border-indigo-300 hover:shadow-xl'
+                    ? 'border-neon-cyan-500 shadow-2xl shadow-neon-cyan/20 ring-4 ring-neon-cyan-100 dark:border-neon-cyan-400 dark:ring-neon-cyan-400/30'
+                    : 'border-gray-200 hover:border-neon-cyan-300 hover:shadow-xl dark:border-dark-300 dark:hover:border-neon-cyan-400'
                 } ${plan.popular ? 'ring-2 ring-green-500 ring-offset-4' : ''}`}
                 onClick={() => setSelectedPlan(plan.id)}
               >
@@ -498,31 +498,31 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({
                     >
                       {plan.tag}
                     </div>
-                    <h3 className="text-sm lg:text-xl font-bold text-gray-900 mb-2 break-words">{plan.name}</h3>
+                    <h3 className="text-sm lg:text-xl font-bold text-gray-900 dark:text-gray-100 mb-2 break-words">{plan.name}</h3>
                     <div className="text-center mb-2 lg:mb-4">
-                      <span className="text-lg lg:text-3xl font-bold text-gray-900">₹{plan.price}</span>
-                      <span className="text-gray-600 ml-1 text-xs lg:text-base">
+                      <span className="text-lg lg:text-3xl font-bold text-gray-900 dark:text-gray-100">₹{plan.price}</span>
+                      <span className="text-gray-600 dark:text-gray-400 ml-1 text-xs lg:text-base">
                         /{plan.duration.toLowerCase()}
                       </span>
                     </div>
                   </div>
-                  <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg lg:rounded-2xl p-2 lg:p-4 text-center mb-3 lg:mb-6">
-                    <div className="text-lg lg:text-2xl font-bold text-indigo-600">{plan.optimizations}</div>
-                    <div className="text-xs lg:text-sm text-gray-600">Resume Credits</div>
+                  <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg lg:rounded-2xl p-2 lg:p-4 text-center mb-3 lg:mb-6 dark:from-dark-200 dark:to-dark-300">
+                    <div className="text-lg lg:text-2xl font-bold text-indigo-600 dark:text-neon-cyan-400">{plan.optimizations}</div>
+                    <div className="text-xs lg:text-sm text-gray-600 dark:text-gray-400">Resume Credits</div>
                   </div>
                   <ul className="space-y-1 lg:space-y-3 mb-3 lg:mb-6 max-h-24 lg:max-h-none overflow-y-auto lg:overflow-visible">
                     {plan.features.slice(0, 4).map((feature: string, index: number) => (
                       <li key={index} className="flex items-start">
-                        <Check className="w-3 h-3 lg:w-5 h-5 text-emerald-500 mr-1 lg:mr-3 mt-0.5 flex-shrink-0" />
-                        <span className="text-gray-700 text-xs lg:text-sm break-words">{feature}</span>
+                        <Check className="w-3 h-3 lg:w-5 h-5 text-emerald-500 dark:text-neon-cyan-400 mr-1 lg:mr-3 mt-0.5 flex-shrink-0" />
+                        <span className="text-gray-700 dark:text-gray-300 text-xs lg:text-sm break-words">{feature}</span>
                       </li>
                     ))}
                   </ul>
                   <button
-                    className={`w-full py-2 lg:py-3 px-2 lg:px-4 rounded-lg lg:rounded-xl font-semibold transition-all duration-300 text-xs lg:text-base min-h-[44px] ${
+                    className={`w-full py-2 lg:py-3 px-2 lg:px-4 rounded-lg lg:rounded-xl font-semibold transition-all duration-300 text-xs lg:text-base min-h-[44px] shadow-lg ${
                       selectedPlan === plan.id
-                        ? `bg-gradient-to-r ${plan.gradient || ''} text-white shadow-lg transform scale-105`
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                        ? `bg-gradient-to-r from-neon-cyan-500 to-neon-blue-500 text-white shadow-neon-cyan transform scale-105`
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-dark-200 dark:text-gray-300 dark:hover:bg-dark-300'
                     }`}
                   >
                     {selectedPlan === plan.id ? (
@@ -541,26 +541,26 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({
 
           {/* Payment Summary */}
           <div className="max-w-2xl mx-auto mt-4 sm:mt-6">
-            <div className="bg-gradient-to-r from-slate-50 to-gray-50 rounded-lg sm:rounded-2xl p-3 sm:p-6 mb-3 sm:mb-6 border border-gray-200">
-              <h3 className="text-base sm:text-xl font-semibold text-gray-900 mb-3 sm:mb-4 flex items-center">
-                <Crown className="w-4 h-4 sm:w-5 h-5 mr-2 text-indigo-600" />
+            <div className="bg-gradient-to-r from-slate-50 to-gray-50 rounded-lg sm:rounded-2xl p-3 sm:p-6 mb-3 sm:mb-6 border border-gray-200 dark:from-dark-200 dark:to-dark-300 dark:border-dark-400">
+              <h3 className="text-base sm:text-xl font-semibold text-gray-900 dark:text-gray-100 mb-3 sm:mb-4 flex items-center">
+                <Crown className="w-4 h-4 sm:w-5 h-5 mr-2 text-indigo-600 dark:text-neon-cyan-400" />
                 Payment Summary
               </h3>
               <div className="space-y-2 sm:space-y-3 text-sm sm:text-base">
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-700">Selected Plan:</span>
-                  <span className="font-semibold break-words text-right">{selectedPlanData?.name}</span>
+                  <span className="text-gray-700 dark:text-gray-300">Selected Plan:</span>
+                  <span className="font-semibold break-words text-right dark:text-gray-100">{selectedPlanData?.name}</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-700">Credits:</span>
-                  <span className="font-semibold">{selectedPlanData?.optimizations} Resume Credits</span>
+                  <span className="text-gray-700 dark:text-gray-300">Credits:</span>
+                  <span className="font-semibold dark:text-gray-100">{selectedPlanData?.optimizations} Resume Credits</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-700">Duration:</span>
-                  <span className="font-semibold">{selectedPlanData?.duration}</span>
+                  <span className="text-gray-700 dark:text-gray-300">Duration:</span>
+                  <span className="font-semibold dark:text-gray-100">{selectedPlanData?.duration}</span>
                 </div>
 
-                <div className="border-t border-gray-200 pt-3 mt-3">
+                <div className="border-t border-gray-200 pt-3 mt-3 dark:border-dark-400">
                   {!appliedCoupon ? (
                     <div className="flex flex-col sm:flex-row gap-2">
                       <input
@@ -568,56 +568,56 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({
                         value={couponCode}
                         onChange={(e) => setCouponCode(e.target.value)}
                         placeholder="Enter coupon code"
-                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm min-h-[44px]"
+                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-neon-cyan-500 focus:border-neon-cyan-500 text-sm min-h-[44px] dark:bg-dark-200 dark:border-dark-300 dark:text-gray-100"
                         onKeyPress={(e) => e.key === 'Enter' && handleApplyCoupon()}
                       />
                       <button
                         onClick={handleApplyCoupon}
-                        className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg transition-colors text-sm min-h-[44px]"
+                        className="w-full sm:w-auto bg-gradient-to-r from-neon-cyan-500 to-neon-blue-500 hover:from-neon-cyan-400 hover:to-neon-blue-400 text-white font-medium py-2 px-4 rounded-lg transition-colors text-sm min-h-[44px] shadow-neon-cyan"
                       >
                         Apply Coupon
                       </button>
                     </div>
                   ) : (
-                    <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                    <div className="bg-green-50 border border-green-200 rounded-lg p-3 dark:bg-neon-cyan-500/10 dark:border-neon-cyan-400/50">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center">
-                          <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
-                          <span className="text-green-800 font-medium text-sm">
+                          <CheckCircle className="w-4 h-4 text-green-600 dark:text-neon-cyan-400 mr-2" />
+                          <span className="text-green-800 dark:text-neon-cyan-300 font-medium text-sm">
                             Coupon "{appliedCoupon.code}" applied
                           </span>
                         </div>
                         <button
                           onClick={handleRemoveCoupon}
-                          className="text-green-600 hover:text-green-800 text-sm underline"
+                          className="text-green-600 hover:text-green-800 text-sm underline dark:text-neon-cyan-400 dark:hover:text-neon-cyan-300"
                         >
                           Remove
                         </button>
                       </div>
-                      <div className="text-green-700 text-sm mt-1">
+                      <div className="text-green-700 dark:text-neon-cyan-300 text-sm mt-1">
                         You saved ₹{(appliedCoupon.discount / 100).toFixed(2)}!
                       </div>
                     </div>
                   )}
                   {couponError && (
-                    <div className="text-red-600 text-sm flex items-center mt-1">
+                    <div className="text-red-600 dark:text-red-400 text-sm flex items-center mt-1">
                       <AlertCircle className="w-4 h-4 mr-1" />
                       {couponError}
                     </div>
                   )}
                 </div>
 
-                <div className="border-t border-gray-200 pt-2 sm:pt-3 mt-3">
+                <div className="border-t border-gray-200 pt-2 sm:pt-3 mt-3 dark:border-dark-400">
                   {/* Wallet balance section, now with a disable condition */}
                   {!loadingWallet && walletBalance > 0 && (
-                    <div className={`mb-3 p-3 rounded-lg ${selectedPlan === 'addon_only_purchase' ? 'bg-gray-100 border-gray-200' : 'bg-green-50 border-green-200'}`}>
+                    <div className={`mb-3 p-3 rounded-lg ${selectedPlan === 'addon_only_purchase' ? 'bg-gray-100 border-gray-200 dark:bg-dark-200 dark:border-dark-300' : 'bg-green-50 border-green-200 dark:bg-neon-cyan-500/10 dark:border-neon-cyan-400/50'}`}>
                       <div className="flex items-center justify-between mb-2">
-                        <span className={`text-sm font-medium ${selectedPlan === 'addon_only_purchase' ? 'text-gray-500' : 'text-green-800'}`}>Use Wallet Balance</span>
+                        <span className={`text-sm font-medium ${selectedPlan === 'addon_only_purchase' ? 'text-gray-500 dark:text-gray-400' : 'text-green-800 dark:text-neon-cyan-300'}`}>Use Wallet Balance</span>
                         <button
                           onClick={() => setUseWalletBalance((prev) => !prev)}
                           disabled={selectedPlan === 'addon_only_purchase'}
                           className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                            useWalletBalance && selectedPlan !== 'addon_only_purchase' ? 'bg-green-600' : 'bg-gray-300'
+                            useWalletBalance && selectedPlan !== 'addon_only_purchase' ? 'bg-neon-cyan-500 shadow-neon-cyan' : 'bg-gray-300 dark:bg-dark-300'
                           }`}
                         >
                           <span
@@ -628,7 +628,7 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({
                         </button>
                       </div>
                       {selectedPlan !== 'addon_only_purchase' && (
-                        <div className="text-sm text-green-700">
+                        <div className="text-sm text-green-700 dark:text-neon-cyan-300">
                           Available: ₹{(walletBalance / 100).toFixed(2)}
                           {useWalletBalance && (
                             <span className="block mt-1">Using: ₹{(walletDeduction / 100).toFixed(2)}</span>
@@ -637,7 +637,7 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({
                       )}
                       {/* Added message for add-on-only plan */}
                       {selectedPlan === 'addon_only_purchase' && (
-                        <div className="text-sm text-gray-500 flex items-center mt-2">
+                        <div className="text-sm text-gray-500 dark:text-gray-400 flex items-center mt-2">
                           <Info className="w-4 h-4 mr-2" />
                           <span>Wallet balance cannot be used for add-on only purchases.</span>
                         </div>
@@ -648,27 +648,27 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({
                   {appliedCoupon && appliedCoupon.discount > 0 && (
                     <div className="flex justify-between items-center text-sm text-gray-600 mb-2">
                       <span>Original Price:</span>
-                      <span className="line-through">₹{selectedPlanData?.price}</span>
+                      <span className="line-through dark:text-gray-400">₹{selectedPlanData?.price}</span>
                     </div>
                   )}
                   {appliedCoupon && appliedCoupon.discount > 0 && (
-                    <div className="flex justify-between items-center text-sm text-green-600 mb-2">
+                    <div className="flex justify-between items-center text-sm text-green-600 dark:text-neon-cyan-400 mb-2">
                       <span>Discount:</span>
                       <span>-₹{(appliedCoupon.discount / 100).toFixed(2)}</span>
                     </div>
                   )}
                   {useWalletBalance && walletDeduction > 0 && (
-                    <div className="flex justify-between items-center text-sm text-blue-600 mb-2">
+                    <div className="flex justify-between items-center text-sm text-blue-600 dark:text-neon-blue-400 mb-2">
                       <span>Wallet Balance Applied:</span>
                       <span>-₹{(walletDeduction / 100).toFixed(2)}</span>
                     </div>
                   )}
                   <div className="flex justify-between items-center text-base sm:text-xl font-bold">
                     <span>Total Amount:</span>
-                    <span className="text-indigo-600">₹{(grandTotal / 100).toFixed(2)}</span>
+                    <span className="text-indigo-600 dark:text-neon-cyan-400">₹{(grandTotal / 100).toFixed(2)}</span>
                   </div>
                   {addOnsTotal > 0 && (
-                    <div className="text-sm text-gray-600 mt-2">
+                    <div className="text-sm text-gray-600 dark:text-gray-400 mt-2">
                       Plan: ₹{(finalPlanPrice / 100).toFixed(2)} + Add-ons: ₹{(addOnsTotal / 100).toFixed(2)}
                     </div>
                   )}
@@ -677,15 +677,15 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({
             </div>
 
             {/* Add-ons */}
-            <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg sm:rounded-2xl p-3 sm:p-6 mb-3 sm:mb-6 border border-blue-200">
+            <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg sm:rounded-2xl p-3 sm:p-6 mb-3 sm:mb-6 border border-blue-200 dark:from-dark-200 dark:to-dark-300 dark:border-dark-400">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-base sm:text-xl font-semibold text-gray-900 flex items-center">
-                  <Plus className="w-4 h-4 sm:w-5 h-5 mr-2 text-blue-600" />
+                <h3 className="text-base sm:text-xl font-semibold text-gray-900 dark:text-gray-100 flex items-center">
+                  <Plus className="w-4 h-4 sm:w-5 h-5 mr-2 text-blue-600 dark:text-neon-cyan-400" />
                   🛒 Add-Ons (Optional)
                 </h3>
                 <button
                   onClick={() => setShowAddOns((prev) => !prev)}
-                  className="text-blue-600 hover:text-blue-700 font-medium text-sm"
+                  className="text-blue-600 hover:text-blue-700 font-medium text-sm dark:text-neon-cyan-400 dark:hover:text-neon-cyan-300"
                 >
                   {showAddOns ? 'Hide' : 'Show'} Add-ons
                 </button>
@@ -695,28 +695,28 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({
                   {addOns.map((addOn) => (
                     <div
                       key={addOn.id}
-                      className="bg-white rounded-lg p-3 sm:p-4 border border-gray-200 flex flex-col"
+                      className="bg-white rounded-lg p-3 sm:p-4 border border-gray-200 flex flex-col dark:bg-dark-100 dark:border-dark-300"
                     >
                       <div className="flex items-center justify-between mb-2">
                         <div>
-                          <h4 className="font-medium text-gray-900 text-sm">{addOn.name}</h4>
-                          <p className="text-blue-600 font-semibold">₹{addOn.price}</p>
+                          <h4 className="font-medium text-gray-900 dark:text-gray-100 text-sm">{addOn.name}</h4>
+                          <p className="text-blue-600 dark:text-neon-cyan-400 font-semibold">₹{addOn.price}</p>
                         </div>
                         <div className="flex items-center space-x-2">
                           <button
                             onClick={() =>
                               handleAddOnQuantityChange(addOn.id, (selectedAddOns[addOn.id] || 0) - 1)
                             }
-                            className="w-8 h-8 bg-gray-200 hover:bg-gray-300 rounded-full flex items-center justify-center text-gray-600"
+                            className="w-8 h-8 bg-gray-200 hover:bg-gray-300 rounded-full flex items-center justify-center text-gray-600 dark:bg-dark-300 dark:hover:bg-dark-400 dark:text-gray-400"
                           >
                             -
                           </button>
-                          <span className="w-8 text-center font-medium">{selectedAddOns[addOn.id] || 0}</span>
+                          <span className="w-8 text-center font-medium dark:text-gray-100">{selectedAddOns[addOn.id] || 0}</span>
                           <button
                             onClick={() =>
                               handleAddOnQuantityChange(addOn.id, (selectedAddOns[addOn.id] || 0) + 1)
                             }
-                            className="w-8 h-8 bg-blue-600 hover:bg-blue-700 text-white rounded-full flex items-center justify-center"
+                            className="w-8 h-8 bg-gradient-to-r from-neon-cyan-500 to-neon-blue-500 hover:from-neon-cyan-400 hover:to-neon-blue-400 text-white rounded-full flex items-center justify-center shadow-neon-cyan"
                           >
                             +
                           </button>
@@ -733,10 +733,10 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({
               <button
                 onClick={handlePayment}
                 disabled={isProcessing}
-                className={`w-full max-w-md mx-auto py-3 sm:py-4 px-4 sm:px-8 rounded-lg sm:rounded-2xl font-bold text-sm sm:text-lg transition-all duration-300 flex items-center justify-center space-x-2 sm:space-x-3 min-h-[44px] ${
+                className={`w-full max-w-md mx-auto py-3 sm:py-4 px-4 sm:px-8 rounded-lg sm:rounded-2xl font-bold text-sm sm:text-lg transition-all duration-300 flex items-center justify-center space-x-2 sm:space-x-3 min-h-[44px] shadow-xl hover:shadow-2xl ${
                   isProcessing
                     ? 'bg-gray-400 cursor-not-allowed'
-                    : 'bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-xl hover:shadow-2xl transform hover:scale-105'
+                    : 'bg-gradient-to-r from-neon-cyan-500 to-neon-purple-500 hover:from-neon-cyan-400 hover:to-neon-purple-400 text-white hover:shadow-neon-cyan transform hover:scale-105'
                 }`}
               >
                 {isProcessing ? (
@@ -754,7 +754,7 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({
                   </>
                 )}
               </button>
-              <p className="text-gray-500 text-xs sm:text-sm mt-3 sm:mt-4 flex items-center justify-center break-words px-4">
+              <p className="text-gray-500 dark:text-gray-400 text-xs sm:text-sm mt-3 sm:mt-4 flex items-center justify-center break-words px-4">
                 <Info className="w-3 h-3 sm:w-4 h-4 mr-1 flex-shrink-0" />
                 <span>Secure payment powered by Razorpay • 256-bit SSL encryption</span>
               </p>

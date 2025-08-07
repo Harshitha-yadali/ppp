@@ -449,14 +449,14 @@ export const ResumePreview: React.FC<ResumePreviewProps> = ({
   };
 
   return (
-    <div className="card">
+    <div className="card dark:bg-dark-100 dark:border-dark-300">
       <div
-        className="pt-4 px-4 pb-6 sm:pt-6 sm:px-6 sm:pb-8 lg:px-8 max-h-[70vh] sm:max-h-[80vh] lg:max-h-[800px] overflow-y-auto"
+        className="pt-4 px-4 pb-6 sm:pt-6 sm:px-6 sm:pb-8 lg:px-8 max-h-[70vh] sm:max-h-[80vh] lg:max-h-[800px] overflow-y-auto dark:bg-dark-100"
         style={{
           fontFamily: exportOptions ? `${exportOptions.fontFamily}, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif` : 'Calibri, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif',
           fontSize: exportOptions ? `${ptToPx(exportOptions.bodyTextSize)}px` : '12.67px',
           lineHeight: '1.25', /* PDF_CONFIG.spacing.lineHeight */
-          color: '#000',
+          color: 'inherit',
           padding: exportOptions?.template === 'compact' ? '8px' : '15px' /* Adjust padding based on template */
         }}
       >

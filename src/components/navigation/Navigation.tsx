@@ -41,8 +41,8 @@ export const Navigation: React.FC<NavigationProps> = ({ currentPage, onPageChang
             onClick={() => handlePageChange(item.id)}
             className={`flex items-center space-x-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
               currentPage === item.id
-                ? 'bg-blue-100 text-blue-700 shadow-md'
-                : 'text-gray-700 hover:text-blue-600 hover:bg-blue-50'
+                ? 'bg-blue-100 text-blue-700 shadow-md dark:bg-neon-cyan-500/20 dark:text-neon-cyan-300'
+                : 'text-gray-700 hover:text-blue-600 hover:bg-blue-50 dark:text-gray-300 dark:hover:text-neon-cyan-400 dark:hover:bg-dark-200'
             }`}
           >
             {item.icon}
@@ -55,7 +55,7 @@ export const Navigation: React.FC<NavigationProps> = ({ currentPage, onPageChang
           <div className="relative">
             <button
               onClick={() => setShowAIToolsDropdown(!showAIToolsDropdown)}
-              className="flex items-center space-x-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 hover:bg-primary-50 hover:text-primary-700 text-gray-700"
+              className="flex items-center space-x-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 hover:bg-primary-50 hover:text-primary-700 text-gray-700 dark:text-gray-300 dark:hover:bg-dark-200 dark:hover:text-neon-cyan-400"
             >
               <Zap className="w-4 h-4" />
               <span>PRIMO Tools</span>
@@ -63,12 +63,12 @@ export const Navigation: React.FC<NavigationProps> = ({ currentPage, onPageChang
             </button>
 
             {showAIToolsDropdown && (
-              <div className="absolute top-full left-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-200 py-2 z-50">
+              <div className="absolute top-full left-0 mt-2 w-56 bg-white rounded-xl shadow-xl border border-gray-200 py-2 z-50 dark:bg-dark-100 dark:border-dark-300 dark:shadow-dark-xl">
                 {aiTools.map((tool) => (
                   <button
                     key={tool.id}
                     onClick={() => handlePageChange(tool.id)}
-                    className="w-full flex items-center space-x-3 px-4 py-3 text-left hover:bg-primary-50 transition-colors text-gray-700 hover:text-primary-700"
+                    className="w-full flex items-center space-x-3 px-4 py-3 text-left hover:bg-primary-50 transition-colors text-gray-700 hover:text-primary-700 dark:text-gray-300 dark:hover:bg-dark-200 dark:hover:text-neon-cyan-400"
                   >
                     {tool.icon}
                     <span className="font-medium">{tool.label}</span>

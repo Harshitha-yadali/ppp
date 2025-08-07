@@ -72,13 +72,13 @@ export const AlertModal: React.FC<AlertModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 backdrop-blur-sm" onClick={handleBackdropClick}>
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[95vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 backdrop-blur-sm dark:bg-black/80" onClick={handleBackdropClick}>
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[95vh] overflow-y-auto dark:bg-dark-100 dark:shadow-dark-xl">
         {/* Header */}
-        <div className={`relative bg-gradient-to-br ${getHeaderClasses()} p-6 border-b border-gray-200`}>
+        <div className={`relative bg-gradient-to-br ${getHeaderClasses()} p-6 border-b border-gray-200 dark:border-dark-300`}>
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 w-10 h-10 flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors rounded-full hover:bg-white/50 min-w-[44px] min-h-[44px]"
+            className="absolute top-4 right-4 w-10 h-10 flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors rounded-full hover:bg-white/50 min-w-[44px] min-h-[44px] dark:text-gray-500 dark:hover:text-gray-300 dark:hover:bg-dark-300/50"
           >
             <X className="w-6 h-6" />
           </button>
@@ -87,24 +87,24 @@ export const AlertModal: React.FC<AlertModalProps> = ({
             <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg`}>
               {getIcon()}
             </div>
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">{title}</h1>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">{title}</h1>
           </div>
         </div>
 
         {/* Content */}
         <div className="p-6 text-center">
-          <p className="text-gray-700 mb-6">{message}</p>
+          <p className="text-gray-700 dark:text-gray-300 mb-6">{message}</p>
           {actionText && onAction && (
             <button
               onClick={onAction}
-              className={`w-full py-3 px-6 rounded-xl font-semibold text-white transition-all duration-300 shadow-lg hover:shadow-xl ${getButtonClasses()}`}
+              className={`w-full py-3 px-6 rounded-xl font-semibold text-white transition-all duration-300 shadow-lg hover:shadow-xl ${getButtonClasses()} dark:shadow-neon-cyan`}
             >
               {actionText}
             </button>
           )}
           <button
             onClick={onClose}
-            className="w-full mt-3 py-3 px-6 rounded-xl font-semibold text-gray-700 bg-gray-200 hover:bg-gray-300 transition-colors duration-300"
+            className="w-full mt-3 py-3 px-6 rounded-xl font-semibold text-gray-700 bg-gray-200 hover:bg-gray-300 transition-colors duration-300 dark:bg-dark-200 dark:text-gray-300 dark:hover:bg-dark-300"
           >
             Close
           </button>
