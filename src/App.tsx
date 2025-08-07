@@ -17,6 +17,7 @@ import { UserProfileManagement } from './components/UserProfileManagement';
 import { SubscriptionPlans } from './components/payment/SubscriptionPlans';
 import { paymentService } from './services/paymentService';
 import { AlertModal } from './components/AlertModal'; // Import AlertModal
+import { ToolsAndPagesNavigation } from './components/pages/ToolsAndPagesNavigation'; // Import new component
 
 function App() {
   const { isAuthenticated, user, markProfilePromptSeen, isLoading } = useAuth();
@@ -48,6 +49,9 @@ function App() {
   // NEW: State for refreshing wallet balance in UserProfileManagement
   const [walletRefreshKey, setWalletRefreshKey] = useState(0);
 
+  // NEW: State to track if AuthModal was opened by URL hash (e.g., password reset)
+  const [isAuthModalOpenedByHash, setIsAuthModalOpenedByHash] = useState(false);
+
   const handleMobileMenuToggle = () => {
     setShowMobileMenu(!showMobileMenu);
   };
@@ -60,7 +64,14 @@ function App() {
     } else if (page === 'profile') {
       handleShowProfile();
       setShowMobileMenu(false);
-    } else {
+    } else if (page === 'wallet') { // Handle direct navigation to wallet from mobile menu
+      handleShowProfile('wallet');
+      setShowMobileMenu(false);
+    } else if (page === 'subscription-plans') { // Handle direct navigation to subscription plans
+      handleShowSubscriptionPlans();
+      setShowMobileMenu(false);
+    }
+    else {
       setCurrentPage(page);
       setShowMobileMenu(false);
     }
@@ -82,28 +93,6 @@ function App() {
     setIsPostSignupProfileFlow(isPostSignup); // Set the new state
     console.log('App.tsx: handleShowProfile called. showProfileManagement set to true.');
   };
-
-  // REMOVED handleProfileCompleted function entirely
-  // const handleProfileCompleted = async () => {
-  //   setShowProfileManagement(false);
-  //   setCurrentPage('new-home');
-  //   setSuccessMessage('Profile updated successfully!');
-  //   setShowSuccessNotification(true);
-  //   setTimeout(() => {
-  //     setShowSuccessNotification(false);
-  //     setSuccessMessage('');
-  //   }, 3000);
-    
-  //   if (isPostSignupProfileFlow) {
-  //     console.log('App.tsx: Post-signup profile flow detected. Closing AuthModal.');
-  //     setShowAuthModal(false);
-  //     setIsPostSignupProfileFlow(false);
-  //   }
-    
-  //   if (user) {
-  //     await markProfilePromptSeen();
-  //   }
-  // };
 
   const handleNavigateHome = () => {
     setCurrentPage('new-home');
@@ -174,12 +163,41 @@ function App() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  // Effect to detect password reset link in URL hash
   useEffect(() => {
-    console.log('App.tsx useEffect: isAuthenticated:', isAuthenticated, 'user:', user?.id, 'hasSeenProfilePrompt:', user?.hasSeenProfilePrompt, 'isLoadingAuth:', isLoading);
+    const hash = window.location.hash;
+    if (hash.includes('type=recovery')) {
+      console.log('App.tsx: Detected password recovery link in URL hash.');
+      setAuthModalInitialView('reset_password');
+      setShowAuthModal(true);
+      setIsAuthModalOpenedByHash(true); // Set the flag here
+      // Clear the hash from the URL to prevent re-triggering on refresh
+      window.history.replaceState(null, '', window.location.pathname + window.location.search);
+    }
+  }, []); // Runs once on mount
+
+  useEffect(() => {
+    console.log('App.tsx useEffect: isAuthenticated:', isAuthenticated, 'user:', user?.id, 'hasSeenProfilePrompt:', user?.hasSeenProfilePrompt, 'isLoadingAuth:', isLoading, 'isAuthModalOpenedByHash:', isAuthModalOpenedByHash);
+
     if (isLoading) {
       console.log('App.tsx useEffect: AuthContext is still loading, deferring AuthModal logic.');
       return;
     }
+
+    // NEW LOGIC: If the modal was opened by a hash, don't let this useEffect close it immediately.
+    // It should only close if the user is now authenticated AND their profile is complete.
+    if (isAuthModalOpenedByHash) {
+      if (isAuthenticated && user && user.hasSeenProfilePrompt === true) {
+        console.log('App.tsx useEffect: Hash-opened modal, user authenticated and profile complete. Closing modal.');
+        setShowAuthModal(false);
+        setIsAuthModalOpenedByHash(false); // Reset flag
+        setAuthModalInitialView('login'); // Reset view
+      }
+      // Otherwise, if opened by hash, let it remain open in its current view.
+      return;
+    }
+
+    // ORIGINAL LOGIC (only runs if not opened by hash)
     if (isAuthenticated && user) {
       if (user.hasSeenProfilePrompt === undefined) {
         console.log('App.tsx useEffect: user.hasSeenProfilePrompt is undefined, waiting for full profile load.');
@@ -199,38 +217,26 @@ function App() {
       setShowAuthModal(false);
       setAuthModalInitialView('login');
     }
-  }, [isAuthenticated, user, user?.hasSeenProfilePrompt, isLoading]);
+  }, [isAuthenticated, user, user?.hasSeenProfilePrompt, isLoading, isAuthModalOpenedByHash]); // IMPORTANT: Add isAuthModalOpenedByHash to dependencies
 
   const renderCurrentPage = (isAuthenticatedProp: boolean) => {
-    const homePageProps = {
+    const commonPageProps = {
       onPageChange: setCurrentPage,
       isAuthenticated: isAuthenticatedProp,
       onShowAuth: handleShowAuth,
       onShowSubscriptionPlans: handleShowSubscriptionPlans,
       userSubscription: userSubscription,
-      onShowAlert: handleShowAlert
+      onShowAlert: handleShowAlert,
+      refreshUserSubscription: refreshUserSubscription,
     };
+
     switch (currentPage) {
       case 'new-home':
-        return <HomePage {...homePageProps} />;
+        return <HomePage {...commonPageProps} />;
       case 'guided-builder':
-        return <GuidedResumeBuilder
-          onNavigateBack={() => setCurrentPage('new-home')}
-          userSubscription={userSubscription}
-          onShowSubscriptionPlans={handleShowSubscriptionPlans}
-          onShowAlert={handleShowAlert}
-          refreshUserSubscription={refreshUserSubscription}
-        />;
+        return <GuidedResumeBuilder {...commonPageProps} />;
       case 'score-checker':
-        return <ResumeScoreChecker
-          onNavigateBack={() => setCurrentPage('new-home')}
-          isAuthenticated={isAuthenticatedProp}
-          onShowAuth={handleShowAuth}
-          userSubscription={userSubscription}
-          onShowSubscriptionPlans={handleShowSubscriptionPlans}
-          onShowAlert={handleShowAlert}
-          refreshUserSubscription={refreshUserSubscription}
-        />;
+        return <ResumeScoreChecker {...commonPageProps} />;
       case 'optimizer':
         return (
           <main className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
@@ -240,8 +246,7 @@ function App() {
               onShowProfile={handleShowProfile}
               onNavigateBack={handleNavigateHome}
               onShowSubscriptionPlans={handleShowSubscriptionPlans}
-              onShowAlert={handleShowAlert}
-             userSubscription={userSubscription}
+              userSubscription={userSubscription}
               refreshUserSubscription={refreshUserSubscription}
             />
           </main>
@@ -253,17 +258,11 @@ function App() {
       case 'tutorials':
         return <Tutorials />;
       case 'linkedin-generator':
-        return <LinkedInMessageGenerator
-          onNavigateBack={() => setCurrentPage('new-home')}
-          isAuthenticated={isAuthenticatedProp}
-          onShowAuth={handleShowAuth}
-          userSubscription={userSubscription}
-          onShowSubscriptionPlans={handleShowSubscriptionPlans}
-          onShowAlert={handleShowAlert}
-          refreshUserSubscription={refreshUserSubscription}
-        />;
+        return <LinkedInMessageGenerator {...commonPageProps} />;
+      case 'all-tools': // NEW: Case for the new navigation page
+        return <ToolsAndPagesNavigation {...commonPageProps} />;
       default:
-        return <HomePage {...homePageProps} />;
+        return <HomePage {...commonPageProps} />;
     }
   };
 
@@ -275,7 +274,7 @@ function App() {
         </div>
       )}
       <Header onMobileMenuToggle={handleMobileMenuToggle} showMobileMenu={showMobileMenu} onShowProfile={handleShowProfile}>
-        <Navigation currentPage={currentPage} onPageChange={setCurrentPage} />
+        <Navigation currentPage={currentPage} onPageChange={handlePageChange} />
       </Header>
       {renderCurrentPage(isAuthenticated)}
       {showMobileMenu && (
@@ -311,18 +310,13 @@ function App() {
                     { id: 'about', label: 'About Us', icon: <Info className="w-5 h-5" /> },
                     { id: 'tutorials', label: 'Tutorials', icon: <BookOpen className="w-5 h-5" /> },
                     { id: 'contact', label: 'Contact', icon: <Phone className="w-5 h-5" /> },
-                    ...(isAuthenticated ? [{ id: 'referral', label: 'Referral', icon: <Wallet className="w-5 h-5" /> }] : []),
+                    { id: 'all-tools', label: 'All Tools & Pages', icon: <Sparkles className="w-5 h-5" /> }, // NEW: Link to all tools
+                    ...(isAuthenticated ? [{ id: 'wallet', label: 'Referral & Wallet', icon: <Wallet className="w-5 h-5" /> }] : []),
                   ].map((item) => (
                     <button
                       key={item.id}
                       onClick={() => {
-                        if (item.id === 'referral') {
-                          handleShowProfile('wallet');
-                          setShowMobileMenu(false);
-                        } else {
-                          setCurrentPage(item.id);
-                          setShowMobileMenu(false);
-                        }
+                        handlePageChange(item.id);
                       }}
                       className={`flex items-center space-x-3 min-h-touch px-4 py-3 rounded-xl font-medium transition-all duration-200 ${
                         currentPage === item.id
@@ -370,6 +364,7 @@ function App() {
         onClose={() => {
           setShowAuthModal(false);
           setAuthModalInitialView('login'); // Reset to default view on close
+          setIsAuthModalOpenedByHash(false); // Reset the flag when manually closed
           console.log('AuthModal closed, showAuthModal set to false');
         }}
         onProfileFillRequest={() => handleShowProfile('profile', true)} // Pass true for isPostSignup
@@ -380,6 +375,7 @@ function App() {
           }
           setShowAuthModal(false);
           setAuthModalInitialView('login'); // Reset to default view on dismiss
+          setIsAuthModalOpenedByHash(false); // Reset the flag when dismissed
         }}
       />
       <UserProfileManagement
