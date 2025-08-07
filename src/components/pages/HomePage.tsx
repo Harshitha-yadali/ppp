@@ -1,3 +1,4 @@
+// src/components/pages/HomePage.tsx
 import React, { useState, useEffect } from 'react';
 import {
   FileText,
@@ -37,15 +38,17 @@ interface Feature {
 }
 
 interface HomePageProps {
-  onPageChange: (page: string) => void;
+  // REMOVED: onPageChange: (page: string) => void;
   isAuthenticated: boolean;
   onShowAuth: () => void;
   onShowSubscriptionPlans: () => void;
   userSubscription: any; // New prop for user's subscription status
 }
 
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
+
 export const HomePage: React.FC<HomePageProps> = ({
-  onPageChange,
+  // REMOVED: onPageChange,
   isAuthenticated,
   onShowAuth,
   onShowSubscriptionPlans,
@@ -53,6 +56,7 @@ export const HomePage: React.FC<HomePageProps> = ({
 }) => {
   const [showOptimizationDropdown, setShowOptimizationDropdown] = React.useState(false);
   const [showPlanDetails, setShowPlanDetails] = React.useState(false); // New state for the dropdown
+  const navigate = useNavigate(); // Initialize useNavigate
 
   // Helper function to get plan icon based on icon string
   const getPlanIcon = (iconType: string) => {
@@ -96,11 +100,11 @@ export const HomePage: React.FC<HomePageProps> = ({
 
     if (isAuthenticated) {
       console.log('User is authenticated. Navigating to page.');
-      onPageChange(feature.id);
+      navigate(feature.id); // Use navigate
     }
     
     if (feature.id === 'optimizer') {
-      onPageChange(feature.id);
+      navigate(feature.id); // Use navigate
     }
   };
 
