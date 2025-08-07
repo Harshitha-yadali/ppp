@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { AuthModal } from './auth/AuthModal';
 import { DeviceManagement } from './security/DeviceManagement';
 import { ThemeToggle } from './ThemeToggle';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 
 interface HeaderProps {
   children?: React.ReactNode;
@@ -244,3 +245,4 @@ export const Header: React.FC<HeaderProps> = ({
     </>
   );
 };
+
