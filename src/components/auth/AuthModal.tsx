@@ -5,7 +5,7 @@ import { LoginForm } from './LoginForm';
 import { SignupForm } from './SignupForm';
 
 import { useAuth } from '../../contexts/AuthContext';
-import { ResetPasswordForm } from './ResetPasswordForm';
+
 import ForgotPasswordForm from './ForgotPasswordForm';
 
 type AuthView = 'login' | 'signup' | 'forgot-password' | 'success' | 'postSignupPrompt' | 'reset_password';
