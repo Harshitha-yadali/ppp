@@ -2,21 +2,17 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Lock, AlertCircle, CheckCircle, Loader2 } from 'lucide-react';
+import { Mail, AlertCircle, CheckCircle, Loader2 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 
-const resetPasswordSchema = z.object({
-  password: z.string().min(6, 'Password must be at least 6 characters'),
-  confirmPassword: z.string(),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords don't match",
-  path: ['confirmPassword'],
+const forgotPasswordSchema = z.object({
+  email: z.string().email('Invalid email address'),
 });
 
-type ResetPasswordData = z.infer<typeof resetPasswordSchema>;
+type ForgotPasswordData = z.infer<typeof forgotPasswordSchema>;
 
-export const ResetPasswordForm: React.FC = () => {
-  const { resetPassword } = useAuth();
+export const ForgotPasswordForm: React.FC = () => {
+  const { forgotPassword } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -25,20 +21,20 @@ export const ResetPasswordForm: React.FC = () => {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<ResetPasswordData>({
-    resolver: zodResolver(resetPasswordSchema),
+  } = useForm<ForgotPasswordData>({
+    resolver: zodResolver(forgotPasswordSchema),
   });
 
-  const onSubmit = async (data: ResetPasswordData) => {
+  const onSubmit = async (data: ForgotPasswordData) => {
     setIsLoading(true);
     setError(null);
     setSuccessMessage(null);
 
     try {
-      await resetPassword(data.password);
-      setSuccessMessage('Password reset successful! You can now sign in.');
+      await forgotPassword(data.email);
+      setSuccessMessage('Reset link sent to your email!');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to reset password.');
+      setError(err instanceof Error ? err.message : 'Something went wrong.');
     } finally {
       setIsLoading(false);
     }
@@ -47,17 +43,13 @@ export const ResetPasswordForm: React.FC = () => {
   return (
     <div className="space-y-6">
       <div className="text-center mb-6">
-        <p className="text-gray-600 leading-relaxed">
-          Enter your new password and confirm it below.
-        </p>
+        <p className="text-gray-600 leading-relaxed">Enter your email to receive a reset link.</p>
       </div>
 
       {error && (
-        <div className="p-4 bg-red-50 border border-red-200 rounded-xl">
-          <div className="flex items-start">
-            <AlertCircle className="w-5 h-5 text-red-600 mr-3 flex-shrink-0 mt-0.5" />
-            <p className="text-red-700 text-sm font-medium">{error}</p>
-          </div>
+        <div className="p-4 bg-red-50 border border-red-200 rounded-xl flex items-start">
+          <AlertCircle className="w-5 h-5 text-red-600 mr-3 mt-0.5" />
+          <p className="text-red-700 text-sm font-medium">{error}</p>
         </div>
       )}
 
@@ -69,59 +61,29 @@ export const ResetPasswordForm: React.FC = () => {
       )}
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-        {/* New Password */}
         <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
-            New Password
-          </label>
+          <label className="block text-sm font-semibold text-gray-700 mb-2">Email Address</label>
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-              <Lock className="h-5 w-5 text-gray-400" />
+              <Mail className="h-5 w-5 text-gray-400" />
             </div>
             <input
-              type="password"
-              {...register('password')}
-              placeholder="••••••••"
+              type="email"
+              {...register('email')}
+              placeholder="you@example.com"
               className={`w-full pl-12 pr-4 py-4 border-2 rounded-xl transition-all duration-200 text-gray-900 placeholder-gray-400 ${
-                errors.password ? 'border-red-300 bg-red-50' : 'border-gray-200 bg-gray-50 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 focus:bg-white hover:border-gray-300'
+                errors.email ? 'border-red-300 bg-red-50' : 'border-gray-200 bg-gray-50 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 focus:bg-white hover:border-gray-300'
               }`}
             />
           </div>
-          {errors.password && (
+          {errors.email && (
             <p className="mt-2 text-sm text-red-600 flex items-center">
               <AlertCircle className="w-4 h-4 mr-1" />
-              {errors.password.message}
+              {errors.email.message}
             </p>
           )}
         </div>
 
-        {/* Confirm Password */}
-        <div>
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
-            Confirm Password
-          </label>
-          <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-              <Lock className="h-5 w-5 text-gray-400" />
-            </div>
-            <input
-              type="password"
-              {...register('confirmPassword')}
-              placeholder="••••••••"
-              className={`w-full pl-12 pr-4 py-4 border-2 rounded-xl transition-all duration-200 text-gray-900 placeholder-gray-400 ${
-                errors.confirmPassword ? 'border-red-300 bg-red-50' : 'border-gray-200 bg-gray-50 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 focus:bg-white hover:border-gray-300'
-              }`}
-            />
-          </div>
-          {errors.confirmPassword && (
-            <p className="mt-2 text-sm text-red-600 flex items-center">
-              <AlertCircle className="w-4 h-4 mr-1" />
-              {errors.confirmPassword.message}
-            </p>
-          )}
-        </div>
-
-        {/* Submit Button */}
         <button
           type="submit"
           disabled={isLoading}
@@ -134,12 +96,12 @@ export const ResetPasswordForm: React.FC = () => {
           {isLoading ? (
             <>
               <Loader2 className="w-5 h-5 animate-spin" />
-              <span>Resetting...</span>
+              <span>Sending...</span>
             </>
           ) : (
             <>
-              <Lock className="w-5 h-5" />
-              <span>Reset Password</span>
+              <Mail className="w-5 h-5" />
+              <span>Send Reset Link</span>
             </>
           )}
         </button>
