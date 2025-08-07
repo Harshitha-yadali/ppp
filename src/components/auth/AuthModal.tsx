@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { X, CheckCircle, Sparkles, Mail, Lock, Eye, EyeOff, Loader2, AlertCircle, User as UserIcon, UserPlus } from 'lucide-react';
 import { LoginForm } from './LoginForm';
 import { SignupForm } from './SignupForm';
-import { ForgotPasswordForm } from './ForgotPasswordForm';
+
 import { useAuth } from '../../contexts/AuthContext';
 import { ResetPasswordForm } from './ResetPasswordForm';
 import ForgotPasswordForm from './ForgotPasswordForm';
