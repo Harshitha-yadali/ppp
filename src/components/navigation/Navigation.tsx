@@ -1,6 +1,6 @@
 // src/components/navigation/Navigation.tsx
 import React, { useState } from 'react';
-import { Home, Info, Phone, BookOpen, MessageCircle, ChevronDown, Target, TrendingUp, PlusCircle, Zap, Sparkles } from 'lucide-react'; // Import Sparkles
+import { Home, Info, Phone, BookOpen, MessageCircle, ChevronDown, Target, TrendingUp, PlusCircle, Zap } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 
 interface NavigationProps {
@@ -74,14 +74,6 @@ export const Navigation: React.FC<NavigationProps> = ({ currentPage, onPageChang
                     <span className="font-medium">{tool.label}</span>
                   </button>
                 ))}
-                {/* NEW: Link to all tools and pages */}
-                <button
-                  onClick={() => handlePageChange('all-tools')}
-                  className="w-full flex items-center space-x-3 px-4 py-3 text-left hover:bg-primary-50 transition-colors text-gray-700 hover:text-primary-700 dark:text-gray-300 dark:hover:bg-dark-200 dark:hover:text-neon-cyan-400 border-t border-gray-100 mt-2 pt-2"
-                >
-                  <Sparkles className="w-4 h-4" />
-                  <span className="font-medium">All Tools & Pages</span>
-                </button>
               </div>
             )}
           </div>
