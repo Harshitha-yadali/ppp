@@ -9,10 +9,12 @@ class AuthService {
   private static lastDeviceActivityLog: number = 0;
   private static readonly DEVICE_ACTIVITY_LOG_INTERVAL_MS = 5 * 60 * 1000; // 5 minutes
 
-  private isValidGmail(email: string): boolean {
-    const gmailRegex = /^[^\s@]+@gmail\.com$/;
-    return gmailRegex.test(email);
-  }
+ private isValidGmail(email: string): boolean {
+  const trimmedEmail = email.trim(); // Add this line
+  const gmailRegex = /^[^\s@]+@gmail\.com$/;
+  return gmailRegex.test(trimmedEmail); // Use trimmedEmail here
+}
+
 
   private validatePasswordStrength(password: string): { isValid: boolean; message?: string } {
     if (password.length < 8) return { isValid: false, message: 'Password must be at least 8 characters long' };
