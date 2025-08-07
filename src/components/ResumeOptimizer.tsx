@@ -1,3 +1,4 @@
+// src/components/ResumeOptimizer.tsx
 import React, { useState, useEffect } from 'react';
 
 // Supabase client and auth context
@@ -31,8 +32,8 @@ import {
   getDetailedResumeScore, reconstructResumeText
 } from '../services/scoringService';
 import { analyzeProjectAlignment } from '../services/projectAnalysisService';
-import { paymentService } from './services/paymentService'; // Corrected path
-
+import { paymentService } from '../services/paymentService'; // Corrected path
+//                                   ^^^^^^^
 // Data Types
 import { ResumeData, UserType, MatchScore, DetailedScore } from '../types/resume';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
