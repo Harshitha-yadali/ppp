@@ -92,7 +92,7 @@
   }
   
   .card-hover {
-    @apply card transition-all duration-300 hover:shadow-lg hover:scale-[1.02] cursor-pointer dark:hover:shadow-dark-xl dark:hover:shadow-neon-cyan/20;
+    @apply card transition-all duration-300 hover:shadow-lg hover:scale-[1.02] cursor-pointer dark:hover:shadow-dark-xl dark:hover:shadow-neon-cyan;
   }
   
   /* Input styles */
