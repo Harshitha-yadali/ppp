@@ -3,9 +3,10 @@ import React, { useState, useEffect } from 'react';
 import { X, CheckCircle, Sparkles, Mail, Lock, Eye, EyeOff, Loader2, AlertCircle, User as UserIcon, UserPlus } from 'lucide-react';
 import { LoginForm } from './LoginForm';
 import { SignupForm } from './SignupForm';
-import { ForgotPasswordForm } from './ForgotPasswordForm';
+import { ForgotPasswordForm } from './ForgotPasswordForm'; // Corrected import for named export
 
-import { useAuth } from '../../contexts/AuthContext';
+// You will need to create this component as a named export (e.g., export const ResetPasswordForm)
+// import { ResetPasswordForm } from './ResetPasswordForm'; 
 
 type AuthView = 'login' | 'signup' | 'forgot-password' | 'success' | 'postSignupPrompt' | 'reset_password';
 
@@ -41,7 +42,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   }, [isOpen, currentView, onPromptDismissed]);
 
   useEffect(() => {
-    // Removed `timer` variable as `setTimeout` will be removed
     console.log('AuthModal useEffect: Running. isAuthenticated:', isAuthenticated, 'user:', user, 'isOpen:', isOpen, 'currentView:', currentView);
 
     // Wait until authentication state and user profile are fully loaded
@@ -56,19 +56,17 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       // Call onProfileFillRequest to open the UserProfileManagement modal
       onProfileFillRequest('profile');
       // Immediately close this AuthModal as its job of prompting is done
-      onClose(); // Removed setTimeout
+      onClose(); 
     } else if (isAuthenticated && user && user.hasSeenProfilePrompt === true && isOpen) {
       // If user is authenticated and profile is complete, ensure AuthModal is closed
       console.log('AuthModal useEffect: User authenticated and profile complete, ensuring AuthModal is closed.');
-      onClose(); // Removed setTimeout
+      onClose(); 
     } else if (!isAuthenticated && isOpen) {
       // If user is not authenticated and modal is open, ensure it's in a login/signup state
       console.log('AuthModal useEffect: User not authenticated and modal is open. Ensuring login/signup view.');
       // No explicit action needed here, as initialView is already set by App.tsx
     }
-
-    // No cleanup for `timer` needed if `setTimeout` is removed
-  }, [isAuthenticated, user, isOpen, onClose, onProfileFillRequest]); // Removed currentView from dependencies
+  }, [isAuthenticated, user, isOpen, onClose, onProfileFillRequest]);
 
   if (!isOpen) {
     console.log('AuthModal is NOT open, returning null');
@@ -172,15 +170,27 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           )}
 
           {currentView === 'reset_password' && (
-            <form onSubmit={e => e.preventDefault()} className="space-y-4">
-              <p className="text-gray-600 text-sm mb-4">You can now set a new password.</p>
+            // You will need to create a ResetPasswordForm component as a named export
+            // import { ResetPasswordForm } from './ResetPasswordForm';
+            // Make sure to pass necessary props like onSuccess and onBackToLogin
+            // <ResetPasswordForm
+            //   onSuccess={() => {
+            //     setCurrentView('success');
+            //     setTimeout(() => onClose(), 2500);
+            //   }}
+            //   onBackToLogin={() => setCurrentView('login')}
+            // />
+            <div className="text-center py-6 sm:py-8">
+              <p className="text-gray-600 dark:text-gray-300 text-sm mb-4">
+                You can now set a new password. Please implement the `ResetPasswordForm` component.
+              </p>
               <button
                 onClick={() => setCurrentView('login')}
-                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-xl transition-colors"
+                className="w-full bg-indigo-600 hover:bg-indigo-700 dark:bg-neon-blue-500 dark:hover:bg-neon-blue-600 text-white font-semibold py-3 rounded-xl transition-colors"
               >
                 Back to Login
               </button>
-            </form>
+            </div>
           )}
 
           {currentView === 'success' && (
