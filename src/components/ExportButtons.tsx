@@ -399,7 +399,6 @@ export const ExportButtons: React.FC<ExportButtonsProps> = ({ resumeData, userTy
       </div>
       
       {/* PDF Quality Notice */}
-      <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg">
       <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg dark:bg-neon-cyan-500/10 dark:border-neon-cyan-400/50">
         <div className="flex items-start space-x-2">
           <div className="w-2 h-2 bg-green-500 rounded-full mt-2 flex-shrink-0 dark:bg-neon-cyan-400"></div>
