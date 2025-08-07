@@ -22,13 +22,6 @@ import {
   ArrowRight,
   Briefcase
 } from 'lucide-react';
-// Assuming these imports exist in the user's project
-// import { generateLinkedInMessage } from '../services/linkedinService';
-// import { useAuth } from "../contexts/AuthContext";
-// import { Subscription } from '../types/payment';
-import { paymentService } from '../services/paymentService'; // Import paymentService to get plan details
-import { useAuth } from "../contexts/AuthContext"; // Import useAuth
-
 // Mocking the imported functions and types for a self-contained example.
 // In a real application, these would be external.
 const generateLinkedInMessage = async (formData: any) => {
@@ -42,9 +35,13 @@ const generateLinkedInMessage = async (formData: any) => {
 };
 
 // Removed mock useAuth and Subscription, using actual imports
+import { paymentService } from '../services/paymentService'; // Import paymentService to get plan details
+import { useAuth } from "../contexts/AuthContext"; // Import useAuth
+import { Subscription } from '../types/payment'; // Assuming this path is correct
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 
 interface LinkedInMessageGeneratorProps {
-  onNavigateBack: () => void;
+  // REMOVED: onNavigateBack: () => void;
   isAuthenticated: boolean;
   onShowAuth: () => void;
   userSubscription: Subscription | null;
@@ -70,7 +67,7 @@ interface MessageForm {
 }
 
 export const LinkedInMessageGenerator: React.FC<LinkedInMessageGeneratorProps> = ({
-  onNavigateBack,
+  // REMOVED: onNavigateBack,
   isAuthenticated,
   onShowAuth,
   userSubscription,
@@ -96,6 +93,8 @@ export const LinkedInMessageGenerator: React.FC<LinkedInMessageGeneratorProps> =
   const [isGenerating, setIsGenerating] = useState(false);
   const [copySuccess, setCopySuccess] = useState<number | null>(null);
   const [currentStep, setCurrentStep] = useState(0);
+
+  const navigate = useNavigate(); // Initialize useNavigate
 
   // Automatically set the sender's name from the authenticated user's data
   useEffect(() => {
@@ -407,7 +406,7 @@ export const LinkedInMessageGenerator: React.FC<LinkedInMessageGeneratorProps> =
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
              <button
-              onClick={onNavigateBack}
+              onClick={() => navigate('/')} // Changed to use navigate
               className="mb-6 mt-5 bg-gradient-to-r from-neon-cyan-500 to-neon-blue-500 text-white hover:from-neon-cyan-400 hover:to-neon-blue-400 active:from-neon-cyan-600 active:to-neon-blue-600 shadow-md hover:shadow-neon-cyan py-3 px-5 rounded-xl inline-flex items-center space-x-2 transition-all duration-200"
             >
               <ArrowLeft className="w-5 h-5" />
@@ -493,7 +492,7 @@ export const LinkedInMessageGenerator: React.FC<LinkedInMessageGeneratorProps> =
             <div className="space-y-8">
               {/* Results Header */}
               <div className="bg-white rounded-3xl shadow-xl p-6 border border-gray-200 overflow-hidden dark:bg-dark-100 dark:border-dark-300 dark:shadow-dark-xl">
-                <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-2xl dark:from-dark-200 dark:to-dark-300">
+                <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-2xl dark:from-dark-200 dark:to-dark-300 dark:border-dark-400">
                   <div className="flex items-center justify-between flex-wrap gap-4">
                     <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100">
                       Messages Generated!
