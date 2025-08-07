@@ -77,7 +77,7 @@ interface GuidedResumeBuilderProps {
   userSubscription: any;
   onShowSubscriptionPlans: () => void;
   refreshUserSubscription: () => void; // Corrected prop name to match the usage in the function
-  onShowAlert: (message: string) => void; // ✅ ADD THIS
+  onShowAlert: (title: string, message: string, type?: 'info' | 'success' | 'warning' | 'error', actionText?: string, onAction?: () => void) => void;
 }
 
 export const GuidedResumeBuilder: React.FC<GuidedResumeBuilderProps> = ({
@@ -85,7 +85,7 @@ export const GuidedResumeBuilder: React.FC<GuidedResumeBuilderProps> = ({
   userSubscription,
   onShowSubscriptionPlans,
   refreshUserSubscription, // Corrected prop name here
-   onShowAlert // ✅ ADD THIS
+    onShowAlert
 }) => {
   const { user } = useAuth();
   const [currentStep, setCurrentStep] = useState(0);
@@ -269,20 +269,19 @@ export const GuidedResumeBuilder: React.FC<GuidedResumeBuilderProps> = ({
   const generateResume = async () => {
     if (!user) {
       // Handle unauthenticated user case
-      alert("You must be logged in to generate a resume.");
+      onShowAlert("Authentication Required", "You must be logged in to generate a resume.", "info");
       onNavigateBack();
       return;
     }
 
   const guidedBuildsTotal = userSubscription?.guidedBuildsTotal ?? 0;
-const guidedBuildsUsed = userSubscription?.guidedBuildsUsed ?? 0;
-const remainingGuidedBuilds = guidedBuildsTotal - guidedBuildsUsed;
+  const guidedBuildsUsed = userSubscription?.guidedBuildsUsed ?? 0;
+  const remainingGuidedBuilds = guidedBuildsTotal - guidedBuildsUsed;
 
-if (remainingGuidedBuilds <= 0) {
-  onShowAlert?.("You’ve used all your guided resume credits. Upgrade to unlock more!");
-  onShowSubscriptionPlans?.();
-  return;
-}
+  if (remainingGuidedBuilds <= 0) {
+    onShowAlert("No Credits Remaining", "You’ve used all your guided resume credits. Upgrade to unlock more!", "warning", "Upgrade Now", onShowSubscriptionPlans);
+    return;
+  }
 
     setIsGenerating(true);
     try {
@@ -318,7 +317,7 @@ if (remainingGuidedBuilds <= 0) {
       setShowPreview(true);
     } catch (error) {
       console.error('Error generating resume:', error);
-      alert('Failed to generate resume. Please try again.');
+      onShowAlert("Generation Failed", 'Failed to generate resume. Please try again.', "error");
     } finally {
       setIsGenerating(false);
     }
@@ -414,30 +413,30 @@ if (remainingGuidedBuilds <= 0) {
 
   if (showPreview && generatedResume) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 dark:from-dark-100 dark:to-dark-200">
         <div className="container-responsive py-8">
           {/* Header */}
           <div className="text-center mb-8">
-            <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-200">
+            <div className="bg-white dark:bg-dark-200 rounded-2xl shadow-lg dark:shadow-dark-xl p-6 border border-gray-200 dark:border-dark-400">
               <div className="flex items-center justify-center mb-4">
                 <CheckCircle className="w-12 h-12 text-green-600 mr-3" />
                 <div>
-                  <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Resume Generated Successfully!</h1>
-                  <p className="text-gray-600 mt-1">Your professional resume is ready for download</p>
+                  <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100">Resume Generated Successfully!</h1>
+                  <p className="text-gray-600 mt-1 dark:text-gray-300">Your professional resume is ready for download</p>
                 </div>
               </div>
 
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <button
                   onClick={() => setShowPreview(false)}
-                  className="flex items-center justify-center space-x-2 bg-gray-600 hover:bg-gray-700 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300"
+                  className="flex items-center justify-center space-x-2 bg-gray-600 hover:bg-gray-700 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 dark:bg-dark-400 dark:hover:bg-dark-500"
                 >
                   <Eye className="w-5 h-5" />
                   <span>Edit Resume</span>
                 </button>
               <button
               onClick={onNavigateBack}
-              className="mb-6 mt-15 bg-primary-600 text-white hover:bg-primary-700 active:bg-primary-800 shadow-md hover:shadow-lg py-3 px-5 rounded-xl inline-flex items-center space-x-2 transition-all duration-200"
+              className="mb-6 mt-15 bg-primary-600 text-white hover:bg-primary-700 active:bg-primary-800 shadow-md dark:shadow-dark-xl hover:shadow-lg dark:hover:shadow-dark-2xl py-3 px-5 rounded-xl inline-flex items-center space-x-2 transition-all duration-200 dark:bg-neon-blue-500 dark:hover:bg-neon-blue-600 dark:active:bg-neon-blue-700"
             >
               <ArrowLeft className="w-5 h-5" />
               <span className="hidden sm:block">Back to Home</span>
@@ -450,9 +449,9 @@ if (remainingGuidedBuilds <= 0) {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Resume Preview */}
             <div className="lg:col-span-2">
-              <div className="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
-                <div className="bg-gradient-to-r from-green-50 to-blue-50 p-4 border-b border-gray-200">
-                  <h2 className="text-xl font-semibold text-gray-900 flex items-center">
+              <div className="bg-white dark:bg-dark-200 rounded-2xl shadow-lg dark:shadow-dark-xl border border-gray-200 dark:border-dark-400 overflow-hidden">
+                <div className="bg-gradient-to-r from-green-50 to-blue-50 dark:from-dark-300 dark:to-dark-400 p-4 border-b border-gray-200 dark:border-dark-400">
+                  <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 flex items-center">
                     <FileText className="w-5 h-5 mr-2 text-green-600" />
                     Your Generated Resume
                   </h2>
@@ -477,8 +476,8 @@ if (remainingGuidedBuilds <= 0) {
         return (
           <div className="space-y-6">
             <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">What's your experience level?</h2>
-              <p className="text-gray-600">This helps us customize your resume format</p>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">What's your experience level?</h2>
+              <p className="text-gray-600 dark:text-gray-300">This helps us customize your resume format</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -492,17 +491,17 @@ if (remainingGuidedBuilds <= 0) {
                   onClick={() => updateFormData('experienceLevel', option.id as UserType)}
                   className={`p-6 rounded-2xl border-2 transition-all duration-300 text-center hover:scale-105 ${
                     formData.experienceLevel === option.id
-                      ? 'border-blue-500 bg-blue-50 shadow-lg'
-                      : 'border-gray-200 hover:border-blue-300 hover:bg-blue-50'
+                      ? 'border-blue-500 dark:border-neon-cyan-500 bg-blue-50 dark:bg-dark-300 shadow-lg dark:shadow-dark-xl'
+                      : 'border-gray-200 dark:border-dark-300 hover:border-blue-300 dark:hover:border-neon-cyan-400 hover:bg-blue-50 dark:hover:bg-dark-300'
                   }`}
                 >
                   <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 ${
-                    formData.experienceLevel === option.id ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-600'
+                    formData.experienceLevel === option.id ? 'bg-blue-500 text-white dark:bg-neon-cyan-500' : 'bg-gray-100 dark:bg-dark-300 text-gray-600 dark:text-gray-300'
                   }`}>
                     {option.icon}
                   </div>
-                  <h3 className="font-semibold text-gray-900 mb-2">{option.label}</h3>
-                  <p className="text-sm text-gray-600">{option.desc}</p>
+                  <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">{option.label}</h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-300">{option.desc}</p>
                 </button>
               ))}
             </div>
@@ -513,102 +512,102 @@ if (remainingGuidedBuilds <= 0) {
         return (
           <div className="space-y-6">
             <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Contact Information</h2>
-              <p className="text-gray-600">Tell us how employers can reach you</p>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">Contact Information</h2>
+              <p className="text-gray-600 dark:text-gray-300">Tell us how employers can reach you</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
                   Full Name *
                 </label>
                 <div className="relative">
-                  <User className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                  <User className="absolute left-3 top-3 h-5 w-5 text-gray-400 dark:text-gray-500" />
                   <input
                     type="text"
                     value={formData.contactDetails.fullName}
                     onChange={(e) => updateFormData('contactDetails', { ...formData.contactDetails, fullName: e.target.value })}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-dark-400 rounded-xl focus:ring-2 focus:ring-blue-500 dark:focus:ring-neon-cyan-500 focus:border-blue-500 dark:focus:border-neon-cyan-500 bg-white dark:bg-dark-300 text-gray-900 dark:text-gray-100"
                     placeholder="Enter your full name"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
                   Email Address *
                 </label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                  <Mail className="absolute left-3 top-3 h-5 w-5 text-gray-400 dark:text-gray-500" />
                   <input
                     type="email"
                     value={formData.contactDetails.email}
                     onChange={(e) => updateFormData('contactDetails', { ...formData.contactDetails, email: e.target.value })}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-dark-400 rounded-xl focus:ring-2 focus:ring-blue-500 dark:focus:ring-neon-cyan-500 focus:border-blue-500 dark:focus:border-neon-cyan-500 bg-white dark:bg-dark-300 text-gray-900 dark:text-gray-100"
                     placeholder="your.email@example.com"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
                   Phone Number
                 </label>
                 <div className="relative">
-                  <Phone className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                  <Phone className="absolute left-3 top-3 h-5 w-5 text-gray-400 dark:text-gray-500" />
                   <input
                     type="tel"
                     value={formData.contactDetails.phone}
                     onChange={(e) => updateFormData('contactDetails', { ...formData.contactDetails, phone: e.target.value })}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-dark-400 rounded-xl focus:ring-2 focus:ring-blue-500 dark:focus:ring-neon-cyan-500 focus:border-blue-500 dark:focus:border-neon-cyan-500 bg-white dark:bg-dark-300 text-gray-900 dark:text-gray-100"
                     placeholder="+1 (555) 123-4567"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
                   Location
                 </label>
                 <div className="relative">
-                  <MapPin className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                  <MapPin className="absolute left-3 top-3 h-5 w-5 text-gray-400 dark:text-gray-500" />
                   <input
                     type="text"
                     value={formData.contactDetails.location}
                     onChange={(e) => updateFormData('contactDetails', { ...formData.contactDetails, location: e.target.value })}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-dark-400 rounded-xl focus:ring-2 focus:ring-blue-500 dark:focus:ring-neon-cyan-500 focus:border-blue-500 dark:focus:border-neon-cyan-500 bg-white dark:bg-dark-300 text-gray-900 dark:text-gray-100"
                     placeholder="City, State"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
                   LinkedIn Profile
                 </label>
                 <div className="relative">
-                  <Linkedin className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                  <Linkedin className="absolute left-3 top-3 h-5 w-5 text-gray-400 dark:text-gray-500" />
                   <input
                     type="url"
                     value={formData.contactDetails.linkedin}
                     onChange={(e) => updateFormData('contactDetails', { ...formData.contactDetails, linkedin: e.target.value })}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-dark-400 rounded-xl focus:ring-2 focus:ring-blue-500 dark:focus:ring-neon-cyan-500 focus:border-blue-500 dark:focus:border-neon-cyan-500 bg-white dark:bg-dark-300 text-gray-900 dark:text-gray-100"
                     placeholder="https://linkedin.com/in/yourprofile"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
                   GitHub Profile
                 </label>
                 <div className="relative">
-                  <Github className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                  <Github className="absolute left-3 top-3 h-5 w-5 text-gray-400 dark:text-gray-500" />
                   <input
                     type="url"
                     value={formData.contactDetails.github}
                     onChange={(e) => updateFormData('contactDetails', { ...formData.contactDetails, github: e.target.value })}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-dark-400 rounded-xl focus:ring-2 focus:ring-blue-500 dark:focus:ring-neon-cyan-500 focus:border-blue-500 dark:focus:border-neon-cyan-500 bg-white dark:bg-dark-300 text-gray-900 dark:text-gray-100"
                     placeholder="https://github.com/yourusername"
                   />
                 </div>
@@ -621,18 +620,18 @@ if (remainingGuidedBuilds <= 0) {
         return (
           <div className="space-y-6">
             <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Education Background</h2>
-              <p className="text-gray-600">Add your educational qualifications</p>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">Education Background</h2>
+              <p className="text-gray-600 dark:text-gray-300">Add your educational qualifications</p>
             </div>
 
             {formData.education.map((edu, index) => (
-              <div key={index} className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+              <div key={index} className="bg-white dark:bg-dark-200 p-6 rounded-xl border border-gray-200 dark:border-dark-400 shadow-sm dark:shadow-dark-xl">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-semibold text-gray-900">Education #{index + 1}</h3>
+                  <h3 className="font-semibold text-gray-900 dark:text-gray-100">Education #{index + 1}</h3>
                   {formData.education.length > 1 && (
                     <button
                       onClick={() => removeArrayItem('education', index)}
-                      className="text-red-600 hover:text-red-700 p-2"
+                      className="text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 p-2"
                     >
                       <Minus className="w-4 h-4" />
                     </button>
@@ -641,56 +640,56 @@ if (remainingGuidedBuilds <= 0) {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Degree *</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">Degree *</label>
                     <input
                       type="text"
                       value={edu.degree}
                       onChange={(e) => updateArrayItem('education', index, { ...edu, degree: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-dark-400 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-neon-cyan-500 focus:border-blue-500 dark:focus:border-neon-cyan-500 bg-white dark:bg-dark-300 text-gray-900 dark:text-gray-100"
                       placeholder="e.g., Bachelor of Science in Computer Science"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">School/University *</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">School/University *</label>
                     <input
                       type="text"
                       value={edu.school}
                       onChange={(e) => updateArrayItem('education', index, { ...edu, school: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-dark-400 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-neon-cyan-500 focus:border-blue-500 dark:focus:border-neon-cyan-500 bg-white dark:bg-dark-300 text-gray-900 dark:text-gray-100"
                       placeholder="e.g., Stanford University"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Year</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">Year</label>
                     <input
                       type="text"
                       value={edu.year}
                       onChange={(e) => updateArrayItem('education', index, { ...edu, year: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-dark-400 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-neon-cyan-500 focus:border-blue-500 dark:focus:border-neon-cyan-500 bg-white dark:bg-dark-300 text-gray-900 dark:text-gray-100"
                       placeholder="e.g., 2020-2024"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">CGPA/GPA</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">CGPA/GPA</label>
                     <input
                       type="text"
                       value={edu.cgpa}
                       onChange={(e) => updateArrayItem('education', index, { ...edu, cgpa: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-dark-400 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-neon-cyan-500 focus:border-blue-500 dark:focus:border-neon-cyan-500 bg-white dark:bg-dark-300 text-gray-900 dark:text-gray-100"
                       placeholder="e.g., 3.8/4.0"
                     />
                   </div>
 
                   <div className="md:col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Location</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">Location</label>
                     <input
                       type="text"
                       value={edu.location}
                       onChange={(e) => updateArrayItem('education', index, { ...edu, location: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-dark-400 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-neon-cyan-500 focus:border-blue-500 dark:focus:border-neon-cyan-500 bg-white dark:bg-dark-300 text-gray-900 dark:text-gray-100"
                       placeholder="e.g., Stanford, CA"
                     />
                   </div>
@@ -700,7 +699,7 @@ if (remainingGuidedBuilds <= 0) {
 
             <button
               onClick={() => addArrayItem('education', { degree: '', school: '', year: '', cgpa: '', location: '' })}
-              className="w-full border-2 border-dashed border-gray-300 rounded-xl p-4 text-gray-600 hover:text-gray-800 hover:border-gray-400 transition-colors flex items-center justify-center"
+              className="w-full border-2 border-dashed border-gray-300 dark:border-dark-400 rounded-xl p-4 text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100 hover:border-gray-400 dark:hover:border-dark-300 transition-colors flex items-center justify-center"
             >
               <Plus className="w-5 h-5 mr-2" />
               Add Another Education
@@ -712,18 +711,18 @@ if (remainingGuidedBuilds <= 0) {
         return (
           <div className="space-y-6">
             <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Work Experience</h2>
-              <p className="text-gray-600">Highlight your professional work history</p>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">Work Experience</h2>
+              <p className="text-gray-600 dark:text-gray-300">Highlight your professional work history</p>
             </div>
 
             {formData.workExperience.map((experience, expIndex) => (
-              <div key={expIndex} className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+              <div key={expIndex} className="bg-white dark:bg-dark-200 p-6 rounded-xl border border-gray-200 dark:border-dark-400 shadow-sm dark:shadow-dark-xl">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-semibold text-gray-900">Work Experience #{expIndex + 1}</h3>
+                  <h3 className="font-semibold text-gray-900 dark:text-gray-100">Work Experience #{expIndex + 1}</h3>
                   {formData.workExperience.length > 1 && (
                     <button
                       onClick={() => removeArrayItem('workExperience', expIndex)}
-                      className="text-red-600 hover:text-red-700 p-2"
+                      className="text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 p-2"
                     >
                       <Minus className="w-4 h-4" />
                     </button>
@@ -732,39 +731,39 @@ if (remainingGuidedBuilds <= 0) {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Role</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">Role</label>
                     <input
                       type="text"
                       value={experience.role}
                       onChange={(e) => updateArrayItem('workExperience', expIndex, { ...experience, role: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-dark-400 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-neon-cyan-500 focus:border-blue-500 dark:focus:border-neon-cyan-500 bg-white dark:bg-dark-300 text-gray-900 dark:text-gray-100"
                       placeholder="e.g., Software Engineer"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Company</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">Company</label>
                     <input
                       type="text"
                       value={experience.company}
                       onChange={(e) => updateArrayItem('workExperience', expIndex, { ...experience, company: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-dark-400 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-neon-cyan-500 focus:border-blue-500 dark:focus:border-neon-cyan-500 bg-white dark:bg-dark-300 text-gray-900 dark:text-gray-100"
                       placeholder="e.g., Google"
                     />
                   </div>
                   <div className="md:col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Years (e.g., 2022-Present or 2020-2022)</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">Years (e.g., 2022-Present or 2020-2022)</label>
                     <input
                       type="text"
                       value={experience.year}
                       onChange={(e) => updateArrayItem('workExperience', expIndex, { ...experience, year: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-dark-400 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-neon-cyan-500 focus:border-blue-500 dark:focus:border-neon-cyan-500 bg-white dark:bg-dark-300 text-gray-900 dark:text-gray-100"
                       placeholder="e.g., 2022-Present"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Responsibilities / Achievements (Bullet Points)</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">Responsibilities / Achievements (Bullet Points)</label>
                   {experience.bullets.map((bullet, bulletIndex) => (
                     <div key={bulletIndex} className="flex items-center gap-2 mb-2">
                       <input
@@ -775,7 +774,7 @@ if (remainingGuidedBuilds <= 0) {
                           newBullets[bulletIndex] = e.target.value;
                           updateArrayItem('workExperience', expIndex, { ...experience, bullets: newBullets });
                         }}
-                        className="flex-grow px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        className="flex-grow px-3 py-2 border border-gray-300 dark:border-dark-400 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-neon-cyan-500 focus:border-blue-500 dark:focus:border-neon-cyan-500 bg-white dark:bg-dark-300 text-gray-900 dark:text-gray-100"
                         placeholder="e.g., Developed and maintained web applications"
                       />
                       {experience.bullets.length > 1 && (
@@ -784,7 +783,7 @@ if (remainingGuidedBuilds <= 0) {
                             const newBullets = experience.bullets.filter((_, i) => i !== bulletIndex);
                             updateArrayItem('workExperience', expIndex, { ...experience, bullets: newBullets });
                           }}
-                          className="text-red-500 hover:text-red-700 p-1 rounded"
+                          className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 p-1 rounded"
                         >
                           <Minus className="w-4 h-4" />
                         </button>
@@ -796,7 +795,7 @@ if (remainingGuidedBuilds <= 0) {
                       const newBullets = [...experience.bullets, ''];
                       updateArrayItem('workExperience', expIndex, { ...experience, bullets: newBullets });
                     }}
-                    className="mt-2 text-blue-600 hover:text-blue-800 flex items-center text-sm"
+                    className="mt-2 text-blue-600 hover:text-blue-800 dark:text-neon-cyan-400 dark:hover:text-neon-cyan-300 flex items-center text-sm"
                   >
                     <Plus className="w-4 h-4 mr-1" /> Add Bullet Point
                   </button>
@@ -806,7 +805,7 @@ if (remainingGuidedBuilds <= 0) {
 
             <button
               onClick={() => addArrayItem('workExperience', { role: '', company: '', year: '', bullets: [''] })}
-              className="w-full border-2 border-dashed border-gray-300 rounded-xl p-4 text-gray-600 hover:text-gray-800 hover:border-gray-400 transition-colors flex items-center justify-center"
+              className="w-full border-2 border-dashed border-gray-300 dark:border-dark-400 rounded-xl p-4 text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100 hover:border-gray-400 dark:hover:border-dark-300 transition-colors flex items-center justify-center"
             >
               <Plus className="w-5 h-5 mr-2" />
               Add Another Work Experience
@@ -818,18 +817,18 @@ if (remainingGuidedBuilds <= 0) {
         return (
           <div className="space-y-6">
             <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Projects</h2>
-              <p className="text-gray-600">Showcase your personal or academic projects</p>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">Projects</h2>
+              <p className="text-gray-600 dark:text-gray-300">Showcase your personal or academic projects</p>
             </div>
 
             {formData.projects.map((project, projIndex) => (
-              <div key={projIndex} className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+              <div key={projIndex} className="bg-white dark:bg-dark-200 p-6 rounded-xl border border-gray-200 dark:border-dark-400 shadow-sm dark:shadow-dark-xl">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-semibold text-gray-900">Project #{projIndex + 1}</h3>
+                  <h3 className="font-semibold text-gray-900 dark:text-gray-100">Project #{projIndex + 1}</h3>
                   {formData.projects.length > 1 && (
                     <button
                       onClick={() => removeArrayItem('projects', projIndex)}
-                      className="text-red-600 hover:text-red-700 p-2"
+                      className="text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 p-2"
                     >
                       <Minus className="w-4 h-4" />
                     </button>
@@ -837,18 +836,18 @@ if (remainingGuidedBuilds <= 0) {
                 </div>
 
                 <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Project Title *</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">Project Title *</label>
                   <input
                     type="text"
                     value={project.title}
                     onChange={(e) => updateArrayItem('projects', projIndex, { ...project, title: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-dark-400 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-neon-cyan-500 focus:border-blue-500 dark:focus:border-neon-cyan-500 bg-white dark:bg-dark-300 text-gray-900 dark:text-gray-100"
                     placeholder="e.g., E-commerce Platform"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Project Details (Bullet Points)</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">Project Details (Bullet Points)</label>
                   {project.bullets.map((bullet, bulletIndex) => (
                     <div key={bulletIndex} className="flex items-center gap-2 mb-2">
                       <input
@@ -859,7 +858,7 @@ if (remainingGuidedBuilds <= 0) {
                           newBullets[bulletIndex] = e.target.value;
                           updateArrayItem('projects', projIndex, { ...project, bullets: newBullets });
                         }}
-                        className="flex-grow px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        className="flex-grow px-3 py-2 border border-gray-300 dark:border-dark-400 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-neon-cyan-500 focus:border-blue-500 dark:focus:border-neon-cyan-500 bg-white dark:bg-dark-300 text-gray-900 dark:text-gray-100"
                         placeholder="e.g., Implemented user authentication with OAuth"
                       />
                       {project.bullets.length > 1 && (
@@ -868,7 +867,7 @@ if (remainingGuidedBuilds <= 0) {
                             const newBullets = project.bullets.filter((_, i) => i !== bulletIndex);
                             updateArrayItem('projects', projIndex, { ...project, bullets: newBullets });
                           }}
-                          className="text-red-500 hover:text-red-700 p-1 rounded"
+                          className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 p-1 rounded"
                         >
                           <Minus className="w-4 h-4" />
                         </button>
@@ -880,7 +879,7 @@ if (remainingGuidedBuilds <= 0) {
                       const newBullets = [...project.bullets, ''];
                       updateArrayItem('projects', projIndex, { ...project, bullets: newBullets });
                     }}
-                    className="mt-2 text-blue-600 hover:text-blue-800 flex items-center text-sm"
+                    className="mt-2 text-blue-600 hover:text-blue-800 dark:text-neon-cyan-400 dark:hover:text-neon-cyan-300 flex items-center text-sm"
                   >
                     <Plus className="w-4 h-4 mr-1" /> Add Bullet Point
                   </button>
@@ -890,7 +889,7 @@ if (remainingGuidedBuilds <= 0) {
 
             <button
               onClick={() => addArrayItem('projects', { title: '', bullets: [''] })}
-              className="w-full border-2 border-dashed border-gray-300 rounded-xl p-4 text-gray-600 hover:text-gray-800 hover:border-gray-400 transition-colors flex items-center justify-center"
+              className="w-full border-2 border-dashed border-gray-300 dark:border-dark-400 rounded-xl p-4 text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100 hover:border-gray-400 dark:hover:border-dark-300 transition-colors flex items-center justify-center"
             >
               <Plus className="w-5 h-5 mr-2" />
               Add Another Project
@@ -902,13 +901,13 @@ if (remainingGuidedBuilds <= 0) {
         return (
           <div className="space-y-6">
             <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Your Skills</h2>
-              <p className="text-gray-600">List your technical, soft, and other relevant skills</p>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">Your Skills</h2>
+              <p className="text-gray-600 dark:text-gray-300">List your technical, soft, and other relevant skills</p>
             </div>
 
             {Object.keys(formData.skills).map((category) => (
-              <div key={category} className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-                <h3 className="font-semibold text-gray-900 mb-4">{category}</h3>
+              <div key={category} className="bg-white dark:bg-dark-200 p-6 rounded-xl border border-gray-200 dark:border-dark-400 shadow-sm dark:shadow-dark-xl">
+                <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-4">{category}</h3>
                 <div className="space-y-2">
                   {formData.skills[category].map((skill, skillIndex) => (
                     <div key={skillIndex} className="flex items-center gap-2">
@@ -916,13 +915,13 @@ if (remainingGuidedBuilds <= 0) {
                         type="text"
                         value={skill}
                         onChange={(e) => updateSkills(category, skillIndex, e.target.value)}
-                        className="flex-grow px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        className="flex-grow px-3 py-2 border border-gray-300 dark:border-dark-400 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-neon-cyan-500 focus:border-blue-500 dark:focus:border-neon-cyan-500 bg-white dark:bg-dark-300 text-gray-900 dark:text-gray-100"
                         placeholder={`Add a ${category.toLowerCase().replace(' skills', '').slice(0, -1)} skill`}
                       />
                       {formData.skills[category].length > 1 && (
                         <button
                           onClick={() => removeSkill(category, skillIndex)}
-                          className="text-red-500 hover:text-red-700 p-1 rounded"
+                          className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 p-1 rounded"
                         >
                           <Minus className="w-4 h-4" />
                         </button>
@@ -931,7 +930,7 @@ if (remainingGuidedBuilds <= 0) {
                   ))}
                   <button
                     onClick={() => addSkill(category)}
-                    className="mt-2 text-blue-600 hover:text-blue-800 flex items-center text-sm"
+                    className="mt-2 text-blue-600 hover:text-blue-800 dark:text-neon-cyan-400 dark:hover:text-neon-cyan-300 flex items-center text-sm"
                   >
                     <Plus className="w-4 h-4 mr-1" /> Add Skill
                   </button>
@@ -945,15 +944,15 @@ if (remainingGuidedBuilds <= 0) {
         return (
           <div className="space-y-6">
             <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Additional Sections</h2>
-              <p className="text-gray-600">Include optional sections to enhance your resume</p>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">Additional Sections</h2>
+              <p className="text-gray-600 dark:text-gray-300">Include optional sections to enhance your resume</p>
             </div>
 
-            <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm space-y-4">
+            <div className="bg-white dark:bg-dark-200 p-6 rounded-xl border border-gray-200 dark:border-dark-400 shadow-sm dark:shadow-dark-xl space-y-4">
               {/* Certifications Toggle */}
               <div className="flex items-center justify-between">
-                <label htmlFor="includeCertifications" className="text-lg font-medium text-gray-900 flex items-center">
-                  <Award className="w-5 h-5 mr-2 text-yellow-500" />
+                <label htmlFor="includeCertifications" className="text-lg font-medium text-gray-900 dark:text-gray-100 flex items-center">
+                  <Award className="w-5 h-5 mr-2 text-yellow-500 dark:text-yellow-300" />
                   Certifications
                 </label>
                 <input
@@ -966,26 +965,26 @@ if (remainingGuidedBuilds <= 0) {
                       includeCertifications: e.target.checked,
                     })
                   }
-                  className="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                  className="h-5 w-5 text-blue-600 dark:text-neon-cyan-400 focus:ring-blue-500 dark:focus:ring-neon-cyan-500 border-gray-300 dark:border-dark-400 rounded"
                 />
               </div>
 
               {formData.additionalSections.includeCertifications && (
-                <div className="space-y-2 pt-4 border-t border-gray-200">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">List your certifications (one per line)</label>
+                <div className="space-y-2 pt-4 border-t border-gray-200 dark:border-dark-400">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">List your certifications (one per line)</label>
                   {formData.certifications.map((cert, index) => (
                     <div key={index} className="flex items-center gap-2 mb-2">
                       <input
                         type="text"
                         value={cert}
                         onChange={(e) => updateArrayItem('certifications', index, e.target.value)}
-                        className="flex-grow px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        className="flex-grow px-3 py-2 border border-gray-300 dark:border-dark-400 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-neon-cyan-500 focus:border-blue-500 dark:focus:border-neon-cyan-500 bg-white dark:bg-dark-300 text-gray-900 dark:text-gray-100"
                         placeholder="e.g., AWS Certified Solutions Architect"
                       />
                       {formData.certifications.length > 1 && (
                         <button
                           onClick={() => removeArrayItem('certifications', index)}
-                          className="text-red-500 hover:text-red-700 p-1 rounded"
+                          className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 p-1 rounded"
                         >
                           <Minus className="w-4 h-4" />
                         </button>
@@ -994,7 +993,7 @@ if (remainingGuidedBuilds <= 0) {
                   ))}
                   <button
                     onClick={() => addArrayItem('certifications', '')}
-                    className="mt-2 text-blue-600 hover:text-blue-800 flex items-center text-sm"
+                    className="mt-2 text-blue-600 hover:text-blue-800 dark:text-neon-cyan-400 dark:hover:text-neon-cyan-300 flex items-center text-sm"
                   >
                     <Plus className="w-4 h-4 mr-1" /> Add Certification
                   </button>
@@ -1002,9 +1001,9 @@ if (remainingGuidedBuilds <= 0) {
               )}
 
               {/* Achievements Toggle */}
-              <div className="flex items-center justify-between pt-4 border-t border-gray-200">
-                <label htmlFor="includeAchievements" className="text-lg font-medium text-gray-900 flex items-center">
-                  <CheckCircle className="w-5 h-5 mr-2 text-green-500" />
+              <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-dark-400">
+                <label htmlFor="includeAchievements" className="text-lg font-medium text-gray-900 dark:text-gray-100 flex items-center">
+                  <CheckCircle className="w-5 h-5 mr-2 text-green-500 dark:text-green-300" />
                   Achievements
                 </label>
                 <input
@@ -1017,26 +1016,26 @@ if (remainingGuidedBuilds <= 0) {
                       includeAchievements: e.target.checked,
                     })
                   }
-                  className="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                  className="h-5 w-5 text-blue-600 dark:text-neon-cyan-400 focus:ring-blue-500 dark:focus:ring-neon-cyan-500 border-gray-300 dark:border-dark-400 rounded"
                 />
               </div>
 
               {formData.additionalSections.includeAchievements && (
-                <div className="space-y-2 pt-4 border-t border-gray-200">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">List your key achievements (one per line)</label>
+                <div className="space-y-2 pt-4 border-t border-gray-200 dark:border-dark-400">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">List your key achievements (one per line)</label>
                   {formData.achievements.map((achievement, index) => (
                     <div key={index} className="flex items-center gap-2 mb-2">
                       <input
                         type="text"
                         value={achievement}
                         onChange={(e) => updateArrayItem('achievements', index, e.target.value)}
-                        className="flex-grow px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        className="flex-grow px-3 py-2 border border-gray-300 dark:border-dark-400 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-neon-cyan-500 focus:border-blue-500 dark:focus:border-neon-cyan-500 bg-white dark:bg-dark-300 text-gray-900 dark:text-gray-100"
                         placeholder="e.g., Awarded 'Employee of the Year' 2023"
                       />
                       {formData.achievements.length > 1 && (
                         <button
                           onClick={() => removeArrayItem('achievements', index)}
-                          className="text-red-500 hover:text-red-700 p-1 rounded"
+                          className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 p-1 rounded"
                         >
                           <Minus className="w-4 h-4" />
                         </button>
@@ -1045,7 +1044,7 @@ if (remainingGuidedBuilds <= 0) {
                   ))}
                   <button
                     onClick={() => addArrayItem('achievements', '')}
-                    className="mt-2 text-blue-600 hover:text-blue-800 flex items-center text-sm"
+                    className="mt-2 text-blue-600 hover:text-blue-800 dark:text-neon-cyan-400 dark:hover:text-neon-cyan-300 flex items-center text-sm"
                   >
                     <Plus className="w-4 h-4 mr-1" /> Add Achievement
                   </button>
@@ -1059,106 +1058,106 @@ if (remainingGuidedBuilds <= 0) {
         return (
           <div className="space-y-6">
             <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Review Your Resume Information</h2>
-              <p className="text-gray-600">Please review the details below. If everything looks good, click "Generate Resume"!</p>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">Review Your Resume Information</h2>
+              <p className="text-gray-600 dark:text-gray-300">Please review the details below. If everything looks good, click "Generate Resume"!</p>
             </div>
 
-            <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm space-y-6">
+            <div className="bg-white dark:bg-dark-200 p-6 rounded-xl border border-gray-200 dark:border-dark-400 shadow-sm dark:shadow-dark-xl space-y-6">
               {/* Contact Details Summary */}
               <div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-3 flex items-center">
-                  <Mail className="w-5 h-5 mr-2 text-blue-600" /> Contact Details
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-3 flex items-center">
+                  <Mail className="w-5 h-5 mr-2 text-blue-600 dark:text-neon-cyan-400" /> Contact Details
                 </h3>
-                <p className="text-gray-700"><strong>Full Name:</strong> {formData.contactDetails.fullName || 'N/A'}</p>
-                <p className="text-gray-700"><strong>Email:</strong> {formData.contactDetails.email || 'N/A'}</p>
-                <p className="text-gray-700"><strong>Phone:</strong> {formData.contactDetails.phone || 'N/A'}</p>
-                <p className="text-gray-700"><strong>Location:</strong> {formData.contactDetails.location || 'N/A'}</p>
-                <p className="text-gray-700"><strong>LinkedIn:</strong> {formData.contactDetails.linkedin || 'N/A'}</p>
-                <p className="text-gray-700"><strong>GitHub:</strong> {formData.contactDetails.github || 'N/A'}</p>
+                <p className="text-gray-700 dark:text-gray-200"><strong>Full Name:</strong> {formData.contactDetails.fullName || 'N/A'}</p>
+                <p className="text-gray-700 dark:text-gray-200"><strong>Email:</strong> {formData.contactDetails.email || 'N/A'}</p>
+                <p className="text-gray-700 dark:text-gray-200"><strong>Phone:</strong> {formData.contactDetails.phone || 'N/A'}</p>
+                <p className="text-gray-700 dark:text-gray-200"><strong>Location:</strong> {formData.contactDetails.location || 'N/A'}</p>
+                <p className="text-gray-700 dark:text-gray-200"><strong>LinkedIn:</strong> {formData.contactDetails.linkedin || 'N/A'}</p>
+                <p className="text-gray-700 dark:text-gray-200"><strong>GitHub:</strong> {formData.contactDetails.github || 'N/A'}</p>
               </div>
 
-              <hr className="border-t border-gray-200" />
+              <hr className="border-t border-gray-200 dark:border-dark-400" />
 
               {/* Education Summary */}
               <div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-3 flex items-center">
-                  <GraduationCap className="w-5 h-5 mr-2 text-blue-600" /> Education
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-3 flex items-center">
+                  <GraduationCap className="w-5 h-5 mr-2 text-blue-600 dark:text-neon-cyan-400" /> Education
                 </h3>
                 {formData.education.length > 0 && formData.education.some(edu => edu.degree.trim() || edu.school.trim()) ? (
                   formData.education.map((edu, index) => (
                     <div key={index} className="mb-2 last:mb-0">
-                      <p className="text-gray-700 font-medium">{edu.degree || 'N/A'} from {edu.school || 'N/A'}</p>
-                      <p className="text-gray-600 text-sm">{edu.year} {edu.cgpa && `- CGPA: ${edu.cgpa}`} {edu.location && `(${edu.location})`}</p>
+                      <p className="text-gray-700 dark:text-gray-200 font-medium">{edu.degree || 'N/A'} from {edu.school || 'N/A'}</p>
+                      <p className="text-gray-600 dark:text-gray-300 text-sm">{edu.year} {edu.cgpa && `- CGPA: ${edu.cgpa}`} {edu.location && `(${edu.location})`}</p>
                     </div>
                   ))
                 ) : (
-                  <p className="text-gray-600 italic">No education details added.</p>
+                  <p className="text-gray-600 dark:text-gray-400 italic">No education details added.</p>
                 )}
               </div>
 
-              <hr className="border-t border-gray-200" />
+              <hr className="border-t border-gray-200 dark:border-dark-400" />
 
               {/* Work Experience Summary */}
               <div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-3 flex items-center">
-                  <Briefcase className="w-5 h-5 mr-2 text-blue-600" /> Work Experience
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-3 flex items-center">
+                  <Briefcase className="w-5 h-5 mr-2 text-blue-600 dark:text-neon-cyan-400" /> Work Experience
                 </h3>
                 {formData.workExperience.length > 0 && formData.workExperience.some(exp => exp.role.trim() || exp.company.trim()) ? (
                   formData.workExperience.map((exp, index) => (
                     <div key={index} className="mb-2 last:mb-0">
-                      <p className="text-gray-700 font-medium">{exp.role || 'N/A'} at {exp.company || 'N/A'}</p>
-                      <p className="text-gray-600 text-sm mb-1">{exp.year}</p>
-                      <ul className="list-disc list-inside text-gray-700 text-sm ml-4">
+                      <p className="text-gray-700 dark:text-gray-200 font-medium">{exp.role || 'N/A'} at {exp.company || 'N/A'}</p>
+                      <p className="text-gray-600 dark:text-gray-300 text-sm mb-1">{exp.year}</p>
+                      <ul className="list-disc list-inside text-gray-700 dark:text-gray-200 text-sm ml-4">
                         {exp.bullets.filter(bullet => bullet.trim() !== '').map((bullet, bulletIndex) => (
                           <li key={bulletIndex}>{bullet}</li>
                         ))}
                       </ul>
-                      {exp.bullets.filter(bullet => bullet.trim() !== '').length === 0 && <p className="text-gray-600 text-sm italic">No bullet points provided.</p>}
+                      {exp.bullets.filter(bullet => bullet.trim() !== '').length === 0 && <p className="text-gray-600 dark:text-gray-300 text-sm italic">No bullet points provided.</p>}
                     </div>
                   ))
                 ) : (
-                  <p className="text-gray-600 italic">No work experience added.</p>
+                  <p className="text-gray-600 dark:text-gray-400 italic">No work experience added.</p>
                 )}
               </div>
 
-              <hr className="border-t border-gray-200" />
+              <hr className="border-t border-gray-200 dark:border-dark-400" />
 
               {/* Projects Summary */}
               <div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-3 flex items-center">
-                  <Code className="w-5 h-5 mr-2 text-blue-600" /> Projects
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-3 flex items-center">
+                  <Code className="w-5 h-5 mr-2 text-blue-600 dark:text-neon-cyan-400" /> Projects
                 </h3>
                 {formData.projects.length > 0 && formData.projects.some(proj => proj.title.trim()) ? (
                   formData.projects.map((proj, index) => (
                     <div key={index} className="mb-2 last:mb-0">
-                      <p className="text-gray-700 font-medium">{proj.title || 'N/A'}</p>
-                      <ul className="list-disc list-inside text-gray-700 text-sm ml-4">
+                      <p className="text-gray-700 dark:text-gray-200 font-medium">{proj.title || 'N/A'}</p>
+                      <ul className="list-disc list-inside text-gray-700 dark:text-gray-200 text-sm ml-4">
                         {proj.bullets.filter(bullet => bullet.trim() !== '').map((bullet, bulletIndex) => (
                           <li key={bulletIndex}>{bullet}</li>
                         ))}
                       </ul>
-                      {proj.bullets.filter(bullet => bullet.trim() !== '').length === 0 && <p className="text-gray-600 text-sm italic">No bullet points provided.</p>}
+                      {proj.bullets.filter(bullet => bullet.trim() !== '').length === 0 && <p className="text-gray-600 dark:text-gray-300 text-sm italic">No bullet points provided.</p>}
                     </div>
                   ))
                 ) : (
-                  <p className="text-gray-600 italic">No projects added.</p>
+                  <p className="text-gray-600 dark:text-gray-400 italic">No projects added.</p>
                 )}
               </div>
 
-              <hr className="border-t border-gray-200" />
+              <hr className="border-t border-gray-200 dark:border-dark-400" />
 
               {/* Skills Summary */}
               <div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-3 flex items-center">
-                  <Award className="w-5 h-5 mr-2 text-blue-600" /> Skills
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-3 flex items-center">
+                  <Award className="w-5 h-5 mr-2 text-blue-600 dark:text-neon-cyan-400" /> Skills
                 </h3>
                 {Object.keys(formData.skills).every(cat => formData.skills[cat].filter(s => s.trim() !== '').length === 0) ? (
-                  <p className="text-gray-600 italic">No skills added.</p>
+                  <p className="text-gray-600 dark:text-gray-400 italic">No skills added.</p>
                 ) : (
                   Object.entries(formData.skills).map(([category, skills]) => {
                     const filteredSkills = skills.filter(skill => skill.trim() !== '');
                     return filteredSkills.length > 0 && (
-                      <p key={category} className="text-gray-700 mb-1">
+                      <p key={category} className="text-gray-700 dark:text-gray-200 mb-1">
                         <strong>{category}:</strong> {filteredSkills.join(', ')}
                       </p>
                     );
@@ -1167,23 +1166,23 @@ if (remainingGuidedBuilds <= 0) {
               </div>
 
               {(formData.additionalSections.includeCertifications || formData.additionalSections.includeAchievements) && (
-                <hr className="border-t border-gray-200" />
+                <hr className="border-t border-gray-200 dark:border-dark-400" />
               )}
 
               {/* Certifications Summary */}
               {formData.additionalSections.includeCertifications && (
                 <div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-3 flex items-center">
-                    <Award className="w-5 h-5 mr-2 text-yellow-500" /> Certifications
+                  <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-3 flex items-center">
+                    <Award className="w-5 h-5 mr-2 text-yellow-500 dark:text-yellow-300" /> Certifications
                   </h3>
                   {formData.certifications.length > 0 && formData.certifications.some(cert => cert.trim() !== '') ? (
-                    <ul className="list-disc list-inside text-gray-700 text-sm ml-4">
+                    <ul className="list-disc list-inside text-gray-700 dark:text-gray-200 text-sm ml-4">
                       {formData.certifications.filter(cert => cert.trim() !== '').map((cert, index) => (
                         <li key={index}>{cert}</li>
                       ))}
                     </ul>
                   ) : (
-                    <p className="text-gray-600 italic">No certifications added.</p>
+                    <p className="text-gray-600 dark:text-gray-400 italic">No certifications added.</p>
                   )}
                 </div>
               )}
@@ -1191,17 +1190,17 @@ if (remainingGuidedBuilds <= 0) {
               {/* Achievements Summary */}
               {formData.additionalSections.includeAchievements && (
                 <div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-3 flex items-center">
-                    <CheckCircle className="w-5 h-5 mr-2 text-green-500" /> Achievements
+                  <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-3 flex items-center">
+                    <CheckCircle className="w-5 h-5 mr-2 text-green-500 dark:text-green-300" /> Achievements
                   </h3>
                   {formData.achievements.length > 0 && formData.achievements.some(ach => ach.trim() !== '') ? (
-                    <ul className="list-disc list-inside text-gray-700 text-sm ml-4">
+                    <ul className="list-disc list-inside text-gray-700 dark:text-gray-200 text-sm ml-4">
                       {formData.achievements.filter(ach => ach.trim() !== '').map((ach, index) => (
                         <li key={index}>{ach}</li>
                       ))}
                     </ul>
                   ) : (
-                    <p className="text-gray-600 italic">No achievements added.</p>
+                    <p className="text-gray-600 dark:text-gray-400 italic">No achievements added.</p>
                   )}
                 </div>
               )}
@@ -1212,22 +1211,22 @@ if (remainingGuidedBuilds <= 0) {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 dark:from-dark-100 dark:to-dark-200">
       {/* Header */}
-      <div className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-40">
+      <div className="bg-white dark:bg-dark-200 shadow-sm border-b border-gray-200 dark:border-dark-400 sticky top-0 z-40">
         <div className="container-responsive">
           <div className="flex items-center justify-between h-16">
             <button
               onClick={onNavigateBack}
-              className="mb-6 mt-6 bg-primary-600 text-white hover:bg-primary-700 active:bg-primary-800 shadow-md hover:shadow-lg py-3 px-5 rounded-xl inline-flex items-center space-x-2 transition-all duration-200"
+              className="mb-6 mt-6 bg-primary-600 text-white hover:bg-primary-700 active:bg-primary-800 shadow-md dark:shadow-dark-xl hover:shadow-lg dark:hover:shadow-dark-2xl py-3 px-5 rounded-xl inline-flex items-center space-x-2 transition-all duration-200 dark:bg-neon-blue-500 dark:hover:bg-neon-blue-600 dark:active:bg-neon-blue-700"
             >
               <ArrowLeft className="w-5 h-5" />
               <span className="hidden sm:block">Back to Home</span>
             </button>
 
-            <h1 className="text-lg font-semibold text-gray-900">Resume Builder</h1>
+            <h1 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Resume Builder</h1>
 
-            <div className="text-sm text-gray-500">
+            <div className="text-sm text-gray-500 dark:text-gray-400">
               Step {currentStep + 1} of {steps.length}
             </div>
           </div>
@@ -1235,27 +1234,27 @@ if (remainingGuidedBuilds <= 0) {
       </div>
 
       {/* Progress Bar */}
-      <div className="bg-white border-b border-gray-200">
+      <div className="bg-white dark:bg-dark-200 border-b border-gray-200 dark:border-dark-400">
         <div className="container-responsive">
           <div className="flex items-center py-4 overflow-x-auto">
             {steps.map((step, index) => (
               <div key={step.id} className="flex items-center flex-shrink-0">
                 <div className={`flex items-center space-x-2 px-3 py-2 rounded-lg ${
-                  index === currentStep ? 'bg-blue-100 text-blue-700' :
-                  index < currentStep ? 'bg-green-100 text-green-700' :
-                  'text-gray-500'
+                  index === currentStep ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-neon-cyan-300' :
+                  index < currentStep ? 'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-300' :
+                  'text-gray-500 dark:text-gray-400'
                 }`}>
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                    index === currentStep ? 'bg-blue-500 text-white' :
-                    index < currentStep ? 'bg-green-500 text-white' :
-                    'bg-gray-200'
+                    index === currentStep ? 'bg-blue-500 text-white dark:bg-neon-cyan-500' :
+                    index < currentStep ? 'bg-green-500 text-white dark:bg-green-700' :
+                    'bg-gray-200 dark:bg-dark-300'
                   }`}>
                     {index < currentStep ? <CheckCircle className="w-4 h-4" /> : step.icon}
                   </div>
                   <span className="font-medium hidden sm:block">{step.title}</span>
                 </div>
                 {index < steps.length - 1 && (
-                  <div className="w-8 h-px bg-gray-300 mx-2"></div>
+                  <div className="w-8 h-px bg-gray-300 dark:bg-dark-400 mx-2"></div>
                 )}
               </div>
             ))}
@@ -1268,19 +1267,19 @@ if (remainingGuidedBuilds <= 0) {
         <div className="max-w-4xl mx-auto">
           {/* Step Description */}
           <div className="text-center mb-8">
-            <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-200">
+            <div className="bg-white dark:bg-dark-200 rounded-2xl p-6 shadow-lg dark:shadow-dark-xl border border-gray-200 dark:border-dark-400">
               <div className="flex items-center justify-center mb-4">
                 <div className="bg-blue-100 w-12 h-12 rounded-full flex items-center justify-center text-blue-600">
                   {steps[currentStep].icon}
                 </div>
               </div>
-              <h2 className="text-xl font-semibold text-gray-900 mb-2">{steps[currentStep].title}</h2>
-              <p className="text-gray-600">{steps[currentStep].description}</p>
+              <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">{steps[currentStep].title}</h2>
+              <p className="text-gray-600 dark:text-gray-300">{steps[currentStep].description}</p>
             </div>
           </div>
 
           {/* Step Content */}
-          <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-6 sm:p-8 mb-8">
+          <div className="bg-white dark:bg-dark-200 rounded-2xl shadow-lg dark:shadow-dark-xl border border-gray-200 dark:border-dark-400 p-6 sm:p-8 mb-8">
             {renderStepContent()}
           </div>
 
@@ -1291,8 +1290,8 @@ if (remainingGuidedBuilds <= 0) {
               disabled={currentStep === 0}
               className={`flex items-center space-x-2 px-6 py-3 rounded-xl font-semibold transition-all duration-300 ${
                 currentStep === 0
-                  ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                  : 'bg-gray-600 hover:bg-gray-700 text-white shadow-lg hover:shadow-xl'
+                  ? 'bg-gray-200 dark:bg-dark-300 text-gray-400 dark:text-gray-500 cursor-not-allowed'
+                  : 'bg-gray-600 hover:bg-gray-700 text-white shadow-lg dark:shadow-dark-xl hover:shadow-xl dark:hover:shadow-dark-2xl'
               }`}
             >
               <ArrowLeft className="w-5 h-5" />
@@ -1300,8 +1299,8 @@ if (remainingGuidedBuilds <= 0) {
             </button>
 
             <div className="text-center">
-              <div className="text-sm text-gray-500 mb-1">Progress</div>
-              <div className="w-48 bg-gray-200 rounded-full h-2">
+              <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">Progress</div>
+              <div className="w-48 bg-gray-200 dark:bg-dark-300 rounded-full h-2">
                 <div
                   className="bg-gradient-to-r from-blue-500 to-green-500 h-2 rounded-full transition-all duration-300"
                   style={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
@@ -1314,10 +1313,10 @@ if (remainingGuidedBuilds <= 0) {
               disabled={!canProceedToNext() || isGenerating}
               className={`flex items-center space-x-2 px-6 py-3 rounded-xl font-semibold transition-all duration-300 ${
                 !canProceedToNext() || isGenerating
-                  ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                  ? 'bg-gray-200 dark:bg-dark-300 text-gray-400 dark:text-gray-500 cursor-not-allowed'
                   : currentStep === steps.length - 1
-                  ? 'bg-green-600 hover:bg-green-700 text-white shadow-lg hover:shadow-xl'
-                  : 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl'
+                  ? 'bg-green-600 hover:bg-green-700 text-white shadow-lg dark:shadow-dark-xl hover:shadow-xl dark:hover:shadow-dark-2xl dark:bg-neon-green-500 dark:hover:bg-neon-green-600'
+                  : 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg dark:shadow-dark-xl hover:shadow-xl dark:hover:shadow-dark-2xl dark:bg-neon-blue-500 dark:hover:bg-neon-blue-600'
               }`}
             >
               {isGenerating ? (
