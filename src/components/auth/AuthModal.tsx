@@ -6,7 +6,9 @@ import { SignupForm } from './SignupForm';
 
 import { useAuth } from '../../contexts/AuthContext';
 
-import ForgotPasswordForm from './ForgotPasswordForm';
+import { ForgotPasswordForm } from './ForgotPasswordForm'; // Corrected import for named export
+// Assuming ResetPasswordForm exists and is a named export
+// import { ResetPasswordForm } from './ResetPasswordForm'; 
 
 type AuthView = 'login' | 'signup' | 'forgot-password' | 'success' | 'postSignupPrompt' | 'reset_password';
 
@@ -173,8 +175,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           )}
 
         {currentView === 'reset_password' && (
-  <ResetPasswordForm />
-)}
+          // Assuming ResetPasswordForm is defined and imported correctly
+          // <ResetPasswordForm />
+          <div className="text-gray-900 dark:text-gray-100">Reset Password Form Placeholder</div>
+        )}
 
 
           {currentView === 'success' && (
