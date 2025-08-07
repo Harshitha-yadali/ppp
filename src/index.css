@@ -91,9 +91,10 @@
     @apply bg-white rounded-xl shadow-sm border border-secondary-200 overflow-hidden dark:bg-dark-100 dark:border-dark-300 dark:shadow-dark-lg;
   }
   
-  .card-hover {
-    @apply card transition-all duration-300 hover:shadow-lg hover:scale-[1.02] cursor-pointer dark:hover:shadow-dark-xl dark:hover:shadow-neon-cyan;
-  }
+.card-hover {
+  @apply card transition-all duration-300 hover:shadow-lg hover:scale-[1.02] cursor-pointer dark:hover:shadow-dark-xl dark:hover:shadow-neon-cyan;
+}
+
   
   /* Input styles */
   .input-base {
