@@ -3,7 +3,6 @@ import React, { useState, useEffect } from 'react';
 // Supabase client and auth context
 import { supabase } from '../lib/supabaseClient';
 import { useAuth } from '../contexts/AuthContext';
-import { authService } from '../services/authService';
 
 // Lucide React Icons
 import { FileText, Sparkles, Download, TrendingUp, Target, Award, User, Briefcase, AlertCircle, CheckCircle, Loader2, RefreshCw, Zap, Plus, Eye, EyeOff, Crown, Calendar, Clock, Users, Star, ArrowRight, Shield, Settings, LogOut, Menu, X, Upload, BarChart3, Lightbulb, ArrowLeft, StretchHorizontal as SwitchHorizontal, ChevronUp, ChevronDown } from 'lucide-react';
@@ -32,28 +31,33 @@ import {
   getDetailedResumeScore, reconstructResumeText
 } from '../services/scoringService';
 import { analyzeProjectAlignment } from '../services/projectAnalysisService';
-import { paymentService } from '../services/paymentService';
+import { paymentService } from './services/paymentService'; // Corrected path
 
 // Data Types
 import { ResumeData, UserType, MatchScore, DetailedScore } from '../types/resume';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 
 interface ResumeOptimizerProps {
   isAuthenticated: boolean;
   onShowAuth: () => void;
   onShowProfile: (mode?: 'profile' | 'wallet') => void;
-  onNavigateBack: () => void;
+  // REMOVED: onNavigateBack: () => void;
+  userSubscription: any; // Keep this as it's passed from App.tsx
+  refreshUserSubscription: () => Promise<void>; // Keep this as it's passed from App.tsx
+  onShowSubscriptionPlans: () => void; // Keep this as it's passed from App.tsx
 }
 
 const ResumeOptimizer: React.FC<ResumeOptimizerProps> = ({
   isAuthenticated,
   onShowAuth,
   onShowProfile,
-  onNavigateBack,
+  // REMOVED: onNavigateBack,
   userSubscription,
   refreshUserSubscription,
   onShowSubscriptionPlans
 }) => {
   const { user } = useAuth();
+  const navigate = useNavigate(); // Initialize useNavigate
 
   // --- State Variables ---
   // Input data state
@@ -80,13 +84,13 @@ const ResumeOptimizer: React.FC<ResumeOptimizerProps> = ({
   const [isProcessingMissingSections, setIsProcessingMissingSections] = useState(false);
   const [activeTab, setActiveTab] = useState<'resume' | 'analysis'>('resume');
   const [showOptimizationDropdown, setShowOptimizationDropdown] = useState(false);
-  const [currentStep, setCurrentStep] = useState(1);
+  const [currentStep, setCurrentStep] = useState(0); // Changed initial step to 0 for InputWizard
 
   // Modal-specific state
   const [showProjectAnalysis, setShowProjectAnalysis] = useState(false);
   const [showMissingSectionsModal, setShowMissingSectionsModal] = useState(false);
   const [missingSections, setMissingSections] = useState<string[]>([]);
-  const [showSubscriptionPlans, setShowSubscriptionPlans] = useState(false);
+  // REMOVED: [showSubscriptionPlans, setShowSubscriptionPlans] as it's now a prop
 
   // Other UI/form-related state (e.g., for manual project add)
   const [showMobileInterface, setShowMobileInterface] = useState(false);
@@ -102,6 +106,7 @@ const ResumeOptimizer: React.FC<ResumeOptimizerProps> = ({
     oneLiner: ''
   });
   const [newTechStack, setNewTechStack] = useState('');
+
   const [showProjectEnhancement, setShowProjectEnhancement] = useState(false);
 
   // Subscription and wallet state
@@ -134,7 +139,7 @@ const ResumeOptimizer: React.FC<ResumeOptimizerProps> = ({
     setNewTechStack('');
     setLowScoringProjects([]);
     setChangedSections([]);
-    setCurrentStep(1);
+    setCurrentStep(0); // Reset to first step of wizard
     setActiveTab('resume');
     setShowOptimizationDropdown(false);
     setShowMobileInterface(false);
@@ -146,8 +151,8 @@ const ResumeOptimizer: React.FC<ResumeOptimizerProps> = ({
   const checkSubscriptionStatus = async () => {
     if (!user) return;
     try {
-      const userSubscription = await paymentService.getUserSubscription(user.id);
-      setSubscription(userSubscription);
+      const userSubscriptionData = await paymentService.getUserSubscription(user.id);
+      setSubscription(userSubscriptionData);
     } catch (error) {
       console.error('Error checking subscription:', error);
     } finally {
@@ -170,8 +175,8 @@ const ResumeOptimizer: React.FC<ResumeOptimizerProps> = ({
    * Effect to auto-advance the wizard step after a resume is uploaded.
    */
   useEffect(() => {
-    if (resumeText.trim().length > 0 && currentStep === 1) {
-      setCurrentStep(2);
+    if (resumeText.trim().length > 0 && currentStep === 0) { // Changed from 1 to 0 for initial step
+      setCurrentStep(1); // Advance to next step after upload
     }
   }, [resumeText, currentStep]);
 
@@ -215,7 +220,7 @@ const ResumeOptimizer: React.FC<ResumeOptimizerProps> = ({
       console.log('handleOptimize: Optimizations remaining:', subscription ? (subscription.optimizationsTotal - subscription.optimizationsUsed) : 'N/A');
 
       if (!subscription || (subscription.optimizationsTotal - subscription.optimizationsUsed) <= 0) {
-        setShowSubscriptionPlans(true);
+        onShowSubscriptionPlans(); // Use the prop directly
         return;
       }
 
@@ -334,6 +339,7 @@ const ResumeOptimizer: React.FC<ResumeOptimizerProps> = ({
       setShowMissingSectionsModal(false);
       setMissingSections([]);
       setPendingResumeData(null);
+      setIsOptimizing(false);
       const { data: { session } } = await supabase.auth.getSession();
       await handleInitialResumeProcessing(updatedResume, session?.access_token || '');
     } catch (error) {
@@ -525,14 +531,14 @@ const ResumeOptimizer: React.FC<ResumeOptimizerProps> = ({
     } finally {
       setIsCalculatingScore(false);
     }
-  };
+  }
 
   /**
    * Handles a successful subscription purchase.
    */
   const handleSubscriptionSuccess = () => {
     checkSubscriptionStatus();
-    setShowSubscriptionPlans(false);
+    onShowSubscriptionPlans(); // Use the prop directly
     setWalletRefreshKey(prevKey => prevKey + 1);
   };
 
@@ -614,7 +620,7 @@ const ResumeOptimizer: React.FC<ResumeOptimizerProps> = ({
         {!optimizedResume ? (
           <>
             <button
-              onClick={onNavigateBack}
+              onClick={() => navigate('/')} // Changed to use navigate
               className="mb-6 bg-gradient-to-r from-neon-cyan-500 to-neon-blue-500 text-white hover:from-neon-cyan-400 hover:to-neon-blue-400 active:from-neon-cyan-600 active:to-neon-blue-600 shadow-md hover:shadow-neon-cyan py-3 px-5 rounded-xl inline-flex items-center space-x-2 transition-all duration-200"
             >
               <ArrowLeft className="w-5 h-5" />
@@ -643,7 +649,7 @@ const ResumeOptimizer: React.FC<ResumeOptimizerProps> = ({
                           You have **{subscription.optimizationsTotal - subscription.optimizationsUsed}** optimizations remaining.
                         </p>
                         <button
-                          onClick={() => { setShowSubscriptionPlans(true); setShowOptimizationDropdown(false); }}
+                          onClick={() => { onShowSubscriptionPlans(); setShowOptimizationDropdown(false); }} // Use prop directly
                           className="w-full btn-secondary py-2 px-4 rounded-lg text-sm flex items-center justify-center space-x-2 dark:hover:shadow-neon-cyan/20"
                         >
                           <Zap className="w-4 h-4" />
@@ -656,7 +662,7 @@ const ResumeOptimizer: React.FC<ResumeOptimizerProps> = ({
                           You currently do not have an active subscription plan.
                         </p>
                         <button
-                          onClick={() => { setShowSubscriptionPlans(true); setShowOptimizationDropdown(false); }}
+                          onClick={() => { onShowSubscriptionPlans(); setShowOptimizationDropdown(false); }} // Use prop directly
                           className="w-full btn-primary py-2 px-4 rounded-lg text-sm flex items-center justify-center space-x-2"
                         >
                           <Crown className="w-4 h-4" />
@@ -683,6 +689,8 @@ const ResumeOptimizer: React.FC<ResumeOptimizerProps> = ({
                 onShowAuth={onShowAuth}
                 currentStep={currentStep}
                 setCurrentStep={setCurrentStep}
+                user={user} // Pass user prop
+                onShowProfile={onShowProfile} // Pass onShowProfile prop
               />
             </div>
           </>
@@ -980,7 +988,7 @@ const ResumeOptimizer: React.FC<ResumeOptimizerProps> = ({
       {showSubscriptionPlans && (
         <SubscriptionPlans
           isOpen={showSubscriptionPlans}
-          onNavigateBack={() => setShowSubscriptionPlans(false)}
+          onNavigateBack={() => onShowSubscriptionPlans()} // Use prop directly
           onSubscriptionSuccess={handleSubscriptionSuccess}
         />
       )}
