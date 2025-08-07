@@ -986,13 +986,14 @@ const ResumeOptimizer: React.FC<ResumeOptimizerProps> = ({
         onProjectsUpdated={handleProjectsUpdated}
       />
 
-      {showSubscriptionPlans && (
+      {/* REMOVED: Conditional rendering of SubscriptionPlans modal */}
+      {/* {showSubscriptionPlans && (
         <SubscriptionPlans
           isOpen={showSubscriptionPlans}
-          onNavigateBack={() => onShowSubscriptionPlans()} // Use prop directly
+          onNavigateBack={() => onShowSubscriptionPlans()}
           onSubscriptionSuccess={handleSubscriptionSuccess}
         />
-      )}
+      )} */}
 
       <MissingSectionsModal
         isOpen={showMissingSectionsModal}
