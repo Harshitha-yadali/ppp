@@ -172,10 +172,17 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             />
           )}
 
-         {currentView === 'reset_password' && (
-  <ResetPasswordForm />
-)}
-
+          {currentView === 'reset_password' && (
+            <form onSubmit={e => e.preventDefault()} className="space-y-4">
+              <p className="text-gray-600 text-sm mb-4">You can now set a new password.</p>
+              <button
+                onClick={() => setCurrentView('login')}
+                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-xl transition-colors"
+              >
+                Back to Login
+              </button>
+            </form>
+          )}
 
           {currentView === 'success' && (
             <div className="text-center py-6 sm:py-8">
