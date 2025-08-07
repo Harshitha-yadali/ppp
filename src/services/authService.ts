@@ -10,10 +10,15 @@ class AuthService {
   private static readonly DEVICE_ACTIVITY_LOG_INTERVAL_MS = 5 * 60 * 1000; // 5 minutes
 
 private isValidGmail(email: string): boolean {
-  const trimmedEmail = (email || '').trim(); // Ensure email is a string before trimming
+  console.log('DEBUG: isValidGmail received email:', email);
+  const trimmedEmail = (email || '').trim();
+  console.log('DEBUG: isValidGmail trimmedEmail:', trimmedEmail);
   const gmailRegex = /^[^\s@]+@gmail\.com$/;
-  return gmailRegex.test(trimmedEmail);
+  const isValid = gmailRegex.test(trimmedEmail);
+  console.log('DEBUG: isValidGmail regex test result:', isValid);
+  return isValid;
 }
+
 
 
   private validatePasswordStrength(password: string): { isValid: boolean; message?: string } {
