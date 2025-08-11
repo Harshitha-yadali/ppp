@@ -16,8 +16,11 @@ export const ThemeToggle: React.FC = () => {
           isDarkMode ? 'translate-x-6' : 'translate-x-0'
         }`}
       />
-      <Sun className="absolute left-1 w-5 h-5 text-yellow-600 dark:text-yellow-300 transition-opacity duration-300" />
-      <Moon className="absolute right-1 w-5 h-5 text-indigo-200 dark:text-white transition-opacity duration-300" />
+      {isDarkMode ? (
+        <Moon className="absolute right-1 w-5 h-5 text-indigo-200 dark:text-white" />
+      ) : (
+        <Sun className="absolute left-1 w-5 h-5 text-yellow-600" />
+      )}
     </button>
   );
 };
