@@ -1,3 +1,4 @@
+// src/components/ResumePreview.tsx
 import React from 'react';
 import { ResumeData, UserType } from '../types/resume';
 import { ExportOptions } from '../types/export';
@@ -129,22 +130,32 @@ export const ResumePreview: React.FC<ResumePreviewProps> = ({
   const getSectionOrder = () => {
     if (userType === 'experienced') {
       return [
-        'summary',
-        'workExperience',
-        'projects',
-        'skills',
-        'certifications',
-        'education'
+        'summary', // Professional Summary
+        'skills', // Technical Skills
+        'workExperience', // Professional Experience
+        'projects', // Projects (only if relevant/impactful)
+        'certifications', // Certifications
+        'education' // Education (minimal)
       ];
-    } else { // Fresher or Student
+    } else if (userType === 'student') {
       return [
-        'summary', // This 'summary' case will now handle both professional summary and career objective
-        'education', // Prominent for freshers/students
-        'workExperience', // Internships & Work Experience
-        'projects', // Academic projects
-        'skills',
-        'certifications',
-        'achievementsAndExtras' // Combined section for fresher/student extras
+        'summary', // Career Objective (REQUIRED) - handled by 'summary' case
+        'skills', // Technical Skills
+        'education', // Education (PROMINENT)
+        'workExperience', // Internships & Training (if any) - handled by 'workExperience' case
+        'projects', // Academic Projects (IMPORTANT)
+        'certifications', // Certifications
+        'achievementsAndExtras' // Achievements / Leadership, Extracurricular, Languages Known (optional)
+      ];
+    } else { // 'fresher'
+      return [
+        'summary', // Career Objective (or SUMMARY if internships/strong projects) - handled by 'summary' case
+        'skills', // Technical Skills
+        'education', // Education
+        'workExperience', // Internships & Training (if any) - handled by 'workExperience' case
+        'projects', // Academic Projects
+        'certifications', // Certifications
+        'achievementsAndExtras' // Achievements / Leadership, Extracurricular, Languages Known (optional)
       ];
     }
   };
@@ -191,7 +202,7 @@ export const ResumePreview: React.FC<ResumePreviewProps> = ({
         return (
           <div style={{ marginBottom: exportOptions ? `${mmToPx(exportOptions.sectionSpacing * 0.5)}px` : '16px' }}>
             <h2 style={sectionTitleStyle}>
-              {userType === 'fresher' ? 'WORK EXPERIENCE' : 'EXPERIENCE'}
+              {userType === 'fresher' || userType === 'student' ? 'INTERNSHIPS & TRAINING' : 'PROFESSIONAL EXPERIENCE'}
             </h2>
             <div style={sectionUnderlineStyle}></div>
 
@@ -296,7 +307,7 @@ export const ResumePreview: React.FC<ResumePreviewProps> = ({
         return (
           <div style={{ marginBottom: exportOptions ? `${mmToPx(exportOptions.sectionSpacing * 0.5)}px` : '16px' }}>
             <h2 style={sectionTitleStyle}>
-              {userType === 'fresher' ? 'ACADEMIC PROJECTS' : 'PROJECTS'}
+              {userType === 'fresher' || userType === 'student' ? 'ACADEMIC PROJECTS' : 'PROJECTS'}
             </h2>
             <div style={sectionUnderlineStyle}></div>
 
@@ -312,7 +323,7 @@ export const ResumePreview: React.FC<ResumePreviewProps> = ({
                 </div>
                 {project.bullets && project.bullets.length > 0 && (
                   <ul style={{ marginLeft: exportOptions ? `${mmToPx(exportOptions.entrySpacing * 2)}px` : '15.12px', listStyleType: 'disc' }}>
-                    {project.bullets.map((bullet, bulletIndex) => (
+                    {job.bullets.map((bullet, bulletIndex) => (
                       <li key={bulletIndex} style={{ ...bodyTextStyle, marginBottom: exportOptions ? `${mmToPx(exportOptions.entrySpacing * 0.25)}px` : '1.89px' }}>
                         {typeof bullet === 'string' ? bullet : (bullet as any).description || JSON.stringify(bullet)}
                       </li>
@@ -329,7 +340,7 @@ export const ResumePreview: React.FC<ResumePreviewProps> = ({
         return (
           <div style={{ marginBottom: exportOptions ? `${mmToPx(exportOptions.sectionSpacing * 0.5)}px` : '16px' }}>
             <h2 style={sectionTitleStyle}>
-              {userType === 'student' ? 'SKILLS' : 'TECHNICAL SKILLS'}
+              TECHNICAL SKILLS
             </h2>
             <div style={sectionUnderlineStyle}></div>
 
@@ -389,7 +400,7 @@ export const ResumePreview: React.FC<ResumePreviewProps> = ({
           </div>
         );
 
-      case 'achievementsAndExtras': // Combined section for freshers
+      case 'achievementsAndExtras': // Combined section for freshers and students
         const hasAchievements = resumeData.achievements && resumeData.achievements.length > 0;
         const hasExtraCurricular = resumeData.extraCurricularActivities && resumeData.extraCurricularActivities.length > 0;
         const hasLanguages = resumeData.languagesKnown && resumeData.languagesKnown.length > 0;
@@ -400,7 +411,7 @@ export const ResumePreview: React.FC<ResumePreviewProps> = ({
         return (
           <div style={{ marginBottom: exportOptions ? `${mmToPx(exportOptions.sectionSpacing * 0.5)}px` : '16px' }}>
             <h2 style={sectionTitleStyle}>
-              ACHIEVEMENTS & EXTRAS
+              {userType === 'student' ? 'ACHIEVEMENTS & EXTRACURRICULAR' : 'ACHIEVEMENTS & EXTRAS'}
             </h2>
             <div style={sectionUnderlineStyle}></div>
 
