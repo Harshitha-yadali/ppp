@@ -338,4 +338,182 @@ export const ResumePreview: React.FC<ResumePreviewProps> = ({
       case 'skills':
         if (!resumeData.skills || resumeData.skills.length === 0) return null;
         return (
-          <div style={{ marginBottom: exportOptions ?
+          <div style={{ marginBottom: exportOptions ? `${mmToPx(exportOptions.sectionSpacing * 0.5)}px` : '16px' }}>
+            <h2 style={sectionTitleStyle}>
+              TECHNICAL SKILLS
+            </h2>
+            <div style={sectionUnderlineStyle}></div>
+
+            {resumeData.skills.map((skill, index) => (
+              <div key={index} style={{ marginBottom: exportOptions ? `${mmToPx(exportOptions.entrySpacing * 0.5)}px` : '3.78px' }}>
+                <span style={{
+                  fontSize: exportOptions ? `${ptToPx(exportOptions.bodyTextSize)}px` : '12.67px',
+                  fontFamily: exportOptions ? `${exportOptions.fontFamily}, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif` : 'Calibri, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif'
+                }}>
+                  <strong style={{ fontWeight: 'bold' }}>• {skill.category}:</strong>{' '}
+                  {skill.list && skill.list.join(', ')}
+                </span>
+              </div>
+            ))}
+          </div>
+        );
+
+      case 'certifications':
+        if (!resumeData.certifications || resumeData.certifications.length === 0) return null;
+        return (
+          <div style={{ marginBottom: exportOptions ? `${mmToPx(exportOptions.sectionSpacing * 0.5)}px` : '16px' }}>
+            <h2 style={sectionTitleStyle}>
+              CERTIFICATIONS
+            </h2>
+            <div style={sectionUnderlineStyle}></div>
+
+            <ul style={{ marginLeft: exportOptions ? `${mmToPx(exportOptions.entrySpacing * 2)}px` : '15.12px', listStyleType: 'disc' }}>
+              {resumeData.certifications.map((cert, index) => {
+                let certText = '';
+                if (typeof cert === 'string') {
+                  certText = cert;
+                } else if (cert && typeof cert === 'object') {
+                  if ('title' in cert && 'issuer' in cert) {
+                    certText = `${String(cert.title)} - ${String(cert.issuer)}`;
+                  } else if ('title' in cert && 'description' in cert) {
+                    certText = `${String(cert.title)} - ${String(cert.description)}`;
+                  } else if ('name' in cert) {
+                    certText = String(cert.name);
+                  } else if ('title' in cert) {
+                    certText = String(cert.title);
+                  } else if ('description' in cert) {
+                    certText = (cert as any).description; // Cast to 'any' to access description
+                  } else {
+                    certText = Object.values(cert).filter(Boolean).join(' - ');
+                  }
+                } else {
+                  certText = String(cert);
+                }
+
+                return (
+                  <li key={index} style={{ ...bodyTextStyle, marginBottom: exportOptions ? `${mmToPx(exportOptions.entrySpacing * 0.25)}px` : '1.89px' }}>
+                    {certText}
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
+        );
+
+      case 'achievementsAndExtras': // Combined section for freshers and students
+        const hasAchievements = resumeData.achievements && resumeData.achievements.length > 0;
+        const hasExtraCurricular = resumeData.extraCurricularActivities && resumeData.extraCurricularActivities.length > 0;
+        const hasLanguages = resumeData.languagesKnown && resumeData.languagesKnown.length > 0;
+        const hasPersonalDetails = resumeData.personalDetails && resumeData.personalDetails.trim() !== '';
+
+        if (!hasAchievements && !hasExtraCurricular && !hasLanguages && !hasPersonalDetails) return null;
+
+        return (
+          <div style={{ marginBottom: exportOptions ? `${mmToPx(exportOptions.sectionSpacing * 0.5)}px` : '16px' }}>
+            <h2 style={sectionTitleStyle}>
+              {userType === 'student' ? 'ACHIEVEMENTS & EXTRACURRICULAR' : 'ACHIEVEMENTS & EXTRAS'}
+            </h2>
+            <div style={sectionUnderlineStyle}></div>
+
+            {hasAchievements && (
+              <div style={{ marginBottom: exportOptions ? `${mmToPx(exportOptions.entrySpacing)}px` : '7.56px' }}>
+                <p style={{ ...bodyTextStyle, fontWeight: 'bold', marginBottom: exportOptions ? `${mmToPx(exportOptions.entrySpacing * 0.5)}px` : '3.78px' }}>Achievements:</p>
+                <ul style={{ marginLeft: exportOptions ? `${mmToPx(exportOptions.entrySpacing * 3)}px` : '22.68px', listStyleType: 'disc' }}>
+                  {resumeData.achievements!.map((item, index) => (
+                    <li key={index} style={{ ...bodyTextStyle, marginBottom: exportOptions ? `${mmToPx(exportOptions.entrySpacing * 0.25)}px` : '1.89px' }}>{item}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            {hasExtraCurricular && (
+              <div style={{ marginBottom: exportOptions ? `${mmToPx(exportOptions.entrySpacing)}px` : '7.56px' }}>
+                <p style={{ ...bodyTextStyle, fontWeight: 'bold', marginBottom: exportOptions ? `${mmToPx(exportOptions.entrySpacing * 0.5)}px` : '3.78px' }}>Extra-curricular Activities:</p>
+                <ul style={{ marginLeft: exportOptions ? `${mmToPx(exportOptions.entrySpacing * 3)}px` : '22.68px', listStyleType: 'disc' }}>
+                  {resumeData.extraCurricularActivities!.map((item, index) => (
+                    <li key={index} style={{ ...bodyTextStyle, marginBottom: exportOptions ? `${mmToPx(exportOptions.entrySpacing * 0.25)}px` : '1.89px' }}>{item}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            {hasLanguages && (
+              <div style={{ marginBottom: exportOptions ? `${mmToPx(exportOptions.entrySpacing)}px` : '7.56px' }}>
+                <p style={{ ...bodyTextStyle, fontWeight: 'bold', marginBottom: exportOptions ? `${mmToPx(exportOptions.entrySpacing * 0.5)}px` : '3.78px' }}>Languages Known:</p>
+                <ul style={{ marginLeft: exportOptions ? `${mmToPx(exportOptions.entrySpacing * 3)}px` : '22.68px', listStyleType: 'disc' }}>
+                  {resumeData.languagesKnown!.map((item, index) => (
+                    <li key={index} style={{ ...bodyTextStyle, marginBottom: exportOptions ? `${mmToPx(exportOptions.entrySpacing * 0.25)}px` : '1.89px' }}>{item}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            {hasPersonalDetails && (
+              <div style={{ marginBottom: exportOptions ? `${mmToPx(exportOptions.entrySpacing)}px` : '7.56px' }}>
+                <p style={{ ...bodyTextStyle, fontWeight: 'bold', marginBottom: exportOptions ? `${mmToPx(exportOptions.entrySpacing * 0.5)}px` : '3.78px' }}>Personal Details:</p>
+                <p style={{ ...bodyTextStyle, marginLeft: exportOptions ? `${mmToPx(exportOptions.entrySpacing * 3)}px` : '22.68px' }}>{resumeData.personalDetails}</p>
+              </div>
+            )}
+          </div>
+        );
+
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <div className="card dark:bg-dark-100 dark:border-dark-300">
+      <div
+        className="pt-4 px-4 pb-6 sm:pt-6 sm:px-6 sm:pb-8 lg:px-8 max-h-[70vh] sm:max-h-[80vh] lg:max-h-[800px] overflow-y-auto dark:bg-dark-100"
+        style={{
+          fontFamily: exportOptions ? `${exportOptions.fontFamily}, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif` : 'Calibri, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif',
+          fontSize: exportOptions ? `${ptToPx(exportOptions.bodyTextSize)}px` : '12.67px',
+          lineHeight: '1.25', /* PDF_CONFIG.spacing.lineHeight */
+          color: 'inherit',
+          padding: exportOptions?.template === 'compact' ? '8px' : '15px' /* Adjust padding based on template */
+        }}
+      >
+        {/* Header */}
+        <div style={{ textAlign: 'center', marginBottom: '18pt' /* Spacing after contact line */ }}>
+          <h1 style={{
+            fontSize: exportOptions ? `${ptToPx(exportOptions.nameSize)}px` : '24px', /* Default 18pt converted to px */
+            fontWeight: 'bold',
+            letterSpacing: '1pt',
+            marginBottom: exportOptions ? `${mmToPx(exportOptions.sectionSpacing * 0.4)}px` : '5.33px',
+            fontFamily: exportOptions ? `${exportOptions.fontFamily}, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif` : 'Calibri, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif',
+            textTransform: 'uppercase'
+          }}>
+            {resumeData.name}
+          </h1>
+
+          {/* Contact Information */}
+          {contactElements.length > 0 && (
+            <div style={{
+              fontSize: exportOptions ? `${ptToPx(exportOptions.bodyTextSize - 0.5)}px` : '12px', /* Contact size is slightly smaller */
+              fontFamily: exportOptions ? `${exportOptions.fontFamily}, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif` : 'Calibri, "Segoe UI", Tahoma, Geneva, Verdana, sans-serif',
+              marginBottom: exportOptions ? `${mmToPx(exportOptions.sectionSpacing * 0.6)}px` : '8px',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              flexWrap: 'wrap'
+            }}>
+              {contactElements}
+            </div>
+          )}
+
+          {/* Horizontal line under contact info */}
+          <div style={{
+            borderBottomWidth: '0.5pt', /* PDF_CONFIG line width */
+            borderColor: '#404040', /* PDF_CONFIG color */
+            height: '1px', /* Ensure line is visible */
+            margin: '0 auto', /* Center the line */
+            width: 'calc(100% - 20mm)' /* Adjust width if needed to match PDF_CONFIG line start/end */
+          }}></div>
+        </div>
+
+        {/* Dynamic sections based on user type */}
+        {sectionOrder.map((sectionName) => renderSection(sectionName))}
+
+        {/* The GitHub References Section has been removed as per requirement. */}
+      </div>
+    </div>
+  );
+};
