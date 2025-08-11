@@ -342,7 +342,8 @@ function App() {
               </div>
             </div>
           </div>
-        )}
+        </div>
+      )}
       <AuthModal
         isOpen={showAuthModal}
         onClose={() => {
@@ -464,5 +465,3 @@ const AuthButtons: React.FC<{
     </div>
   );
 };
-export default App;
-
