@@ -13,13 +13,14 @@ export const ThemeToggle: React.FC = () => {
     >
       <div
         className={`absolute left-1 top-1 w-6 h-6 bg-white rounded-full shadow-md transform transition-transform duration-300 ease-in-out ${
-          isDarkMode ? 'translate-x-6' : 'translate-x-1' // Adjusted for better visual alignment
+          isDarkMode ? 'translate-x-6' : 'translate-x-0'
         }`}
       />
-      {/* Sun icon: visible when in dark mode (to switch to light mode) */}
-      <Sun className={`absolute left-1 w-5 h-5 text-yellow-600 dark:text-yellow-300 transition-opacity duration-300 ${isDarkMode ? 'opacity-100' : 'opacity-0'}`} />
-      {/* Moon icon: visible when in light mode (to switch to dark mode) */}
-      <Moon className={`absolute right-1 w-5 h-5 text-indigo-200 dark:text-white transition-opacity duration-300 ${isDarkMode ? 'opacity-0' : 'opacity-100'}`} />
+      {isDarkMode ? (
+        <Sun className="absolute left-1 w-5 h-5 text-yellow-300" />
+      ) : (
+        <Moon className="absolute right-1 w-5 h-5 text-indigo-900" />
+      )}
     </button>
   );
 };
