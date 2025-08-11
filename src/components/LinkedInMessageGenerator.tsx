@@ -231,8 +231,8 @@ export const LinkedInMessageGenerator: React.FC<LinkedInMessageGeneratorProps> =
       component: (
         <div className="space-y-6">
           <div className="text-center mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Choose Message Type</h2>
-            <p className="text-gray-600">Select the type of LinkedIn message you want to generate</p>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">Choose Message Type</h2>
+            <p className="text-gray-600 dark:text-gray-300">Select the type of LinkedIn message you want to generate</p>
           </div>
 
           {/* Grid layout for message types, with improved interactive styling */}
@@ -243,15 +243,15 @@ export const LinkedInMessageGenerator: React.FC<LinkedInMessageGeneratorProps> =
                 onClick={() => handleInputChange('messageType', type.id)}
                 className={`p-6 rounded-2xl border-2 transition-all duration-300 text-left cursor-pointer transform hover:scale-105 ${
                   formData.messageType === type.id
-                    ? 'border-blue-500 bg-blue-50 shadow-lg ring-4 ring-blue-200'
-                    : 'border-gray-200 hover:border-blue-300 hover:bg-blue-50 shadow-md'
+                    ? 'border-blue-500 bg-blue-50 shadow-lg ring-4 ring-blue-200 dark:border-neon-cyan-500 dark:bg-neon-cyan-500/20 dark:ring-neon-cyan-500/30'
+                    : 'border-gray-200 hover:border-blue-300 hover:bg-blue-50 shadow-md dark:border-dark-300 dark:hover:border-neon-cyan-400 dark:hover:bg-dark-200'
                 }`}
               >
                 <div className={`bg-gradient-to-r ${type.color} w-14 h-14 rounded-full flex items-center justify-center text-white mb-4`}>
                   {type.icon}
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">{type.title}</h3>
-                <p className="text-gray-600 text-sm">{type.description}</p>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">{type.title}</h3>
+                <p className="text-gray-600 dark:text-gray-300 text-sm">{type.description}</p>
               </button>
             ))}
           </div>
@@ -263,14 +263,14 @@ export const LinkedInMessageGenerator: React.FC<LinkedInMessageGeneratorProps> =
       component: (
         <div className="space-y-6">
           <div className="text-center mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Recipient Information</h2>
-            <p className="text-gray-600">Tell us about the person you're reaching out to</p>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">Recipient Information</h2>
+            <p className="text-gray-600 dark:text-gray-300">Tell us about the person you're reaching out to</p>
           </div>
 
           {/* Two-column responsive layout for input fields */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 First Name *
               </label>
               <input
@@ -278,12 +278,12 @@ export const LinkedInMessageGenerator: React.FC<LinkedInMessageGeneratorProps> =
                 value={formData.recipientFirstName}
                 onChange={(e) => handleInputChange('recipientFirstName', e.target.value)}
                 placeholder="John"
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all dark:bg-dark-200 dark:border-dark-300 dark:text-gray-100 dark:placeholder-gray-400 dark:focus:border-neon-cyan-400"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Last Name
               </label>
               <input
@@ -291,12 +291,12 @@ export const LinkedInMessageGenerator: React.FC<LinkedInMessageGeneratorProps> =
                 value={formData.recipientLastName}
                 onChange={(e) => handleInputChange('recipientLastName', e.target.value)}
                 placeholder="Smith"
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all dark:bg-dark-200 dark:border-dark-300 dark:text-gray-100 dark:placeholder-gray-400 dark:focus:border-neon-cyan-400"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Company *
               </label>
               <input
@@ -304,12 +304,12 @@ export const LinkedInMessageGenerator: React.FC<LinkedInMessageGeneratorProps> =
                 value={formData.recipientCompany}
                 onChange={(e) => handleInputChange('recipientCompany', e.target.value)}
                 placeholder="TechCorp Inc."
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all dark:bg-dark-200 dark:border-dark-300 dark:text-gray-100 dark:placeholder-gray-400 dark:focus:border-neon-cyan-400"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Job Title *
               </label>
               <input
@@ -317,12 +317,12 @@ export const LinkedInMessageGenerator: React.FC<LinkedInMessageGeneratorProps> =
                 value={formData.recipientJobTitle}
                 onChange={(e) => handleInputChange('recipientJobTitle', e.target.value)}
                 placeholder="Senior Software Engineer"
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all dark:bg-dark-200 dark:border-dark-300 dark:text-gray-100 dark:placeholder-gray-400 dark:focus:border-neon-cyan-400"
               />
             </div>
 
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Industry
               </label>
               <input
@@ -330,7 +330,7 @@ export const LinkedInMessageGenerator: React.FC<LinkedInMessageGeneratorProps> =
                 value={formData.industry}
                 onChange={(e) => handleInputChange('industry', e.target.value)}
                 placeholder="Technology, Healthcare, Finance, etc."
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all dark:bg-dark-200 dark:border-dark-300 dark:text-gray-100 dark:placeholder-gray-400 dark:focus:border-neon-cyan-400"
               />
             </div>
           </div>
@@ -342,38 +342,38 @@ export const LinkedInMessageGenerator: React.FC<LinkedInMessageGeneratorProps> =
       component: (
         <div className="space-y-6">
           <div className="text-center mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Message Configuration</h2>
-            <p className="text-gray-600">Customize your message tone and purpose</p>
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">Message Configuration</h2>
+            <p className="text-gray-600 dark:text-gray-300">Customize your message tone and purpose</p>
           </div>
 
           <div className="space-y-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Message Purpose *
               </label>
               <textarea
                 value={formData.messagePurpose}
                 onChange={(e) => handleInputChange('messagePurpose', e.target.value)}
                 placeholder="Why are you reaching out? What do you want to achieve?"
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 h-24 resize-none transition-all"
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 h-24 resize-none transition-all dark:bg-dark-200 dark:border-dark-300 dark:text-gray-100 dark:placeholder-gray-400 dark:focus:border-neon-cyan-400"
               />
             </div>
 
             {/* Redesigned Tone Selection as a segmented control */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Tone
               </label>
               {/* MODIFIED: Removed p-1, added gap-1 */}
-              <div className="flex rounded-xl gap-1 bg-gray-100 border border-gray-200 shadow-inner">
+              <div className="flex rounded-xl gap-1 bg-gray-100 border border-gray-200 shadow-inner dark:bg-dark-200 dark:border-dark-300">
                 {(['professional', 'casual', 'friendly'] as MessageTone[]).map((tone) => (
                   <button
                     key={tone}
                     onClick={() => handleInputChange('tone', tone)}
                     className={`flex-1 text-center py-2 px-2 rounded-lg font-medium transition-all duration-300 capitalize ${ // px-2 is already there
                       formData.tone === tone
-                        ? 'bg-white shadow-md text-blue-700 font-bold'
-                        : 'text-gray-600 hover:text-blue-500'
+                        ? 'bg-white shadow-md text-blue-700 dark:bg-dark-100 dark:text-neon-cyan-400'
+                        : 'text-gray-600 hover:text-blue-500 dark:text-gray-300 dark:hover:text-neon-cyan-400'
                     }`}
                   >
                     {tone}
@@ -383,14 +383,14 @@ export const LinkedInMessageGenerator: React.FC<LinkedInMessageGeneratorProps> =
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Personalized Context
               </label>
               <textarea
                 value={formData.personalizedContext}
                 onChange={(e) => handleInputChange('personalizedContext', e.target.value)}
                 placeholder="Any specific details about them or shared connections/interests..."
-                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 h-24 resize-none transition-all"
+                className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 h-24 resize-none transition-all dark:bg-dark-200 dark:border-dark-300 dark:text-gray-100 dark:placeholder-gray-400 dark:focus:border-neon-cyan-400"
               />
             </div>
           </div>
