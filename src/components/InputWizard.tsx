@@ -55,7 +55,7 @@ export const InputWizard: React.FC<InputWizardProps> = ({
       title: 'Upload Resume',
       icon: <Upload className="w-6 h-6" />,
       component: (
-        <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
+        <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200 dark:bg-dark-50 dark:border-dark-400"> {/* Added dark:bg-dark-50 dark:border-dark-400 */}
           <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
             <Upload className="w-5 h-5 mr-2 text-blue-600" />
             Upload Resume
@@ -70,7 +70,7 @@ export const InputWizard: React.FC<InputWizardProps> = ({
       title: 'Job Details',
       icon: <FileText className="w-6 h-6" />,
       component: (
-        <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
+        <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200 dark:bg-dark-50 dark:border-dark-400"> {/* Added dark:bg-dark-50 dark:border-dark-400 */}
           <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
             <FileText className="w-5 h-5 mr-2 text-green-600" />
             Resume & Job Details
@@ -90,7 +90,7 @@ export const InputWizard: React.FC<InputWizardProps> = ({
       title: 'Target Role',
       icon: <User className="w-6 h-6" />,
       component: (
-        <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
+        <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200 dark:bg-dark-50 dark:border-dark-400"> {/* Added dark:bg-dark-50 dark:border-dark-400 */}
           <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
             <User className="w-5 h-5 mr-2 text-purple-600" />
             Target Role (Optional)
@@ -142,7 +142,7 @@ export const InputWizard: React.FC<InputWizardProps> = ({
       title: 'Experience Level',
       icon: <Briefcase className="w-6 h-6" />,
       component: (
-        <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
+        <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200 dark:bg-dark-50 dark:border-dark-400"> {/* Added dark:bg-dark-50 dark:border-dark-400 */}
           <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
             <Briefcase className="w-5 h-5 mr-2 text-indigo-600" />
             Experience Level
@@ -195,7 +195,7 @@ export const InputWizard: React.FC<InputWizardProps> = ({
       title: 'Optimize',
       icon: <Sparkles className="w-6 h-6" />,
       component: (
-        <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
+        <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200 dark:bg-dark-50 dark:border-dark-400"> {/* Added dark:bg-dark-50 dark:border-dark-400 */}
           <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
             <Sparkles className="w-5 h-5 mr-2 text-purple-600" />
             Ready to Optimize
@@ -308,7 +308,7 @@ export const InputWizard: React.FC<InputWizardProps> = ({
   return (
     <div className="max-w-7xl mx-auto space-y-6">
       {/* Progress Indicator */}
-      <div className="bg-white rounded-xl shadow-lg p-3 border border-gray-200">
+      <div className="bg-white rounded-xl shadow-lg p-3 border border-gray-200 dark:bg-dark-50 dark:border-dark-400"> {/* Added dark:bg-dark-50 dark:border-dark-400 */}
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-2xl font-bold text-gray-900">Resume Optimization </h1>
           <div className="text-sm text-gray-500">
@@ -363,7 +363,7 @@ export const InputWizard: React.FC<InputWizardProps> = ({
       </div>
 
       {/* Navigation Buttons */}
-      <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200">
+      <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200 dark:bg-dark-50 dark:border-dark-400"> {/* Added dark:bg-dark-50 dark:border-dark-400 */}
         <div className="flex justify-between items-center gap-2">
           <button
             onClick={handlePrevious}
