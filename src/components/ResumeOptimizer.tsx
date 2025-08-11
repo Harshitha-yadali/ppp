@@ -154,6 +154,7 @@ const ResumeOptimizer: React.FC<ResumeOptimizerProps> = ({
     try {
       const userSubscriptionData = await paymentService.getUserSubscription(user.id);
       setSubscription(userSubscriptionData);
+      console.log('ResumeOptimizer: checkSubscriptionStatus - Fetched subscription:', userSubscriptionData); // ADDED LOG
     } catch (error) {
       console.error('Error checking subscription:', error);
     } finally {
@@ -217,8 +218,8 @@ const ResumeOptimizer: React.FC<ResumeOptimizerProps> = ({
       }
       console.log('handleOptimize: Session refreshed successfully. Session is now:', session);
 
-      console.log('handleOptimize: Current subscription:', subscription);
-      console.log('handleOptimize: Optimizations remaining:', subscription ? (subscription.optimizationsTotal - subscription.optimizationsUsed) : 'N/A');
+      console.log('handleOptimize: Current subscription (before useOptimization check):', subscription); // ADDED LOG
+      console.log('handleOptimize: Optimizations remaining (before useOptimization check):', subscription ? (subscription.optimizationsTotal - subscription.optimizationsUsed) : 'N/A'); // ADDED LOG
 
       if (!subscription || (subscription.optimizationsTotal - subscription.optimizationsUsed) <= 0) {
         onShowSubscriptionPlans(); // Use the prop directly
@@ -383,10 +384,16 @@ const ResumeOptimizer: React.FC<ResumeOptimizerProps> = ({
       const sections = ['workExperience', 'education', 'projects', 'skills', 'certifications'];
       setChangedSections(sections);
 
+      console.log('ResumeOptimizer: Before useOptimization call - userSubscription:', userSubscription); // ADDED LOG
       const optimizationResult = await paymentService.useOptimization(user!.id);
+      console.log('ResumeOptimizer: After useOptimization call - optimizationResult:', optimizationResult); // ADDED LOG
+
       if (optimizationResult.success) {
-        await checkSubscriptionStatus();
+        await checkSubscriptionStatus(); // This fetches the updated subscription
         setWalletRefreshKey(prevKey => prevKey + 1);
+        console.log('ResumeOptimizer: After checkSubscriptionStatus - userSubscription:', userSubscription); // ADDED LOG
+      } else {
+        console.error('ResumeOptimizer: Failed to decrement optimization usage:', optimizationResult.error); // ADDED LOG
       }
 
       if (window.innerWidth < 768) {
@@ -1011,3 +1018,4 @@ const ResumeOptimizer: React.FC<ResumeOptimizerProps> = ({
 };
 
 export default ResumeOptimizer;
+
