@@ -165,7 +165,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({ onFileUpload }) => {
       />
 
       {/* File Format Info */}
-      <div className="bg-primary-50 border border-primary-200 rounded-xl p-4 dark:bg-dark-200 dark:border-dark-300">
+      <div className="bg-primary-50 border border-primary-200 rounded-xl p-4 dark:bg-dark-100 dark:border-dark-400"> {/* Changed dark:bg-dark-200 to dark:bg-dark-100 and dark:border-dark-300 to dark:border-dark-400 */}
         <div className="flex items-start space-x-3">
           <AlertCircle className="w-5 h-5 text-primary-600 dark:text-neon-cyan-400 mt-0.5 flex-shrink-0" />
           <div className="text-fluid-sm">
