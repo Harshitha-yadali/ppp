@@ -115,6 +115,7 @@ function App() {
     if (isAuthenticated && user) {
       const sub = await paymentService.getUserSubscription(user.id);
       setUserSubscription(sub);
+      console.log('App.tsx: fetchSubscription - Fetched subscription:', sub); // ADDED LOG
     } else {
       setUserSubscription(null);
     }
@@ -125,6 +126,7 @@ function App() {
       console.log('App.tsx: Refreshing user subscription...');
       const sub = await paymentService.getUserSubscription(user.id);
       setUserSubscription(sub);
+      console.log('App.tsx: refreshUserSubscription - Fetched subscription:', sub); // ADDED LOG
     }
   };
 
@@ -340,8 +342,7 @@ function App() {
               </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
       <AuthModal
         isOpen={showAuthModal}
         onClose={() => {
@@ -464,3 +465,4 @@ const AuthButtons: React.FC<{
   );
 };
 export default App;
+
