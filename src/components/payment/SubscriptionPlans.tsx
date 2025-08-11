@@ -358,7 +358,7 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({
                   style={{ transform: `translateX(-${currentSlide * 100}%)` }}
                 >
                   {allPlansWithAddOnOption.map((plan, index) => (
-                    <div key={plan.id} className="w-full flex-shrink-0 px-2 sm:px-4">
+                    <div key={plan.id} className="w-full flex-shrink-0 px-4 sm:px-6"> {/* Changed px-2 to px-4 for mobile */}
                       <div
                         className={`relative rounded-xl sm:rounded-3xl border-2 transition-all duration-300 ${
                           selectedPlan === plan.id
@@ -405,8 +405,8 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({
                           <ul className="space-y-1 sm:space-y-3 mb-3 sm:mb-6 max-h-32 sm:max-h-none overflow-y-auto sm:overflow-visible">
                             {plan.features.slice(0, 4).map((feature: string, fi: number) => (
                               <li key={fi} className="flex items-start">
-                                <Check className="w-3 h-3 sm:w-5 h-5 text-emerald-500 mr-2 sm:mr-3 mt-0.5 flex-shrink-0" />
-                                <span className="text-gray-700 text-xs sm:text-sm break-words">{feature}</span>
+                                <Check className="w-4 h-4 sm:w-5 h-5 text-emerald-500 mr-2 sm:mr-3 mt-0.5 flex-shrink-0" /> {/* Increased icon size slightly for better alignment with larger text */}
+                                <span className="text-gray-700 text-sm sm:text-base break-words dark:text-gray-300">{feature}</span> {/* Changed text-xs to text-sm, and sm:text-sm to sm:text-base */}
                               </li>
                             ))}
                           </ul>
