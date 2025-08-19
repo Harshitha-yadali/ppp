@@ -376,9 +376,19 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({
                         )}
                         <div className="p-3 sm:p-6">
                           <div className="text-center mb-3 sm:mb-6">
-                            {/* Plan Name */}
+                            <div
+                              className={`bg-gradient-to-r ${plan.gradient || ''} w-10 h-10 sm:w-16 sm:h-16 rounded-lg sm:rounded-2xl flex items-center justify-center mx-auto mb-2 sm:mb-4 text-white shadow-lg`}
+                            >
+                              {getPlanIcon(plan.icon || '')}
+                            </div>
+                            <div
+                              className={`inline-flex items-center px-2 sm:px-3 py-1 rounded-full text-xs font-medium border mb-2 sm:mb-3 ${
+                                plan.tagColor || ''
+                              }`}
+                            >
+                              {plan.tag}
+                            </div>
                             <h3 className="text-base sm:text-xl font-bold text-gray-900 mb-2">{plan.name}</h3>
-                            {/* Price and Duration - Adjusted for separate lines and spacing */}
                             <div className="text-center mb-4"> {/* Increased mb to push credits down */}
                               <span className="block text-xl sm:text-3xl font-bold text-gray-900"> {/* Added 'block' */}
                                 ₹{plan.price}
@@ -388,7 +398,6 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({
                               </span>
                             </div>
                           </div>
-                          {/* Resume Credits - Adjusted mb */}
                           <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg sm:rounded-2xl p-2 sm:p-4 text-center mb-4"> {/* Adjusted mb */}
                             <div className="text-lg sm:text-2xl font-bold text-indigo-600">{plan.optimizations}</div>
                             <div className="text-xs sm:text-sm text-gray-600">Resume Credits</div>
@@ -433,75 +442,4 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({
               </button>
               <button
                 onClick={nextSlide}
-                className="absolute right-1 sm:right-2 top-1/2 transform -translate-y-1/2 bg-white/90 hover:bg-white text-gray-700 p-2 rounded-full shadow-lg transition-all duration-200 z-10 min-w-[44px] min-h-[44px] flex items-center justify-center"
-              >
-                <ChevronRight className="w-4 h-4 sm:w-6 h-6" />
-              </button>
-              <div className="flex justify-center space-x-2 mt-3 sm:mt-6">
-                {allPlansWithAddOnOption.map((_, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => goToSlide(idx)}
-                    className={`w-2 h-2 sm:w-3 h-3 rounded-full transition-all duration-200 ${
-                      idx === currentSlide ? 'bg-indigo-600 scale-125' : 'bg-gray-300 hover:bg-gray-400'
-                    }`}
-                  />
-                ))}
-              </div>
-            </div>
-          </div>
-
-          {/* Desktop Grid - Apply similar adjustments */}
-          <div className="hidden md:grid grid-cols-2 lg:grid-cols-6 gap-3 lg:gap-6 mb-4 lg:mb-8">
-            {allPlansWithAddOnOption.map((plan) => (
-              <div
-                key={plan.id}
-                className={`relative rounded-xl lg:rounded-3xl border-2 transition-all duration-300 cursor-pointer transform hover:scale-105 ${
-                  selectedPlan === plan.id
-                    ? 'border-neon-cyan-500 shadow-2xl shadow-neon-cyan/20 ring-4 ring-neon-cyan-100 dark:border-neon-cyan-400 dark:ring-neon-cyan-400/30'
-                    : 'border-gray-200 hover:border-neon-cyan-300 hover:shadow-xl dark:border-dark-300 dark:hover:border-neon-cyan-400'
-                } ${plan.popular ? 'ring-2 ring-green-500 ring-offset-4' : ''}`}
-                onClick={() => setSelectedPlan(plan.id)}
-              >
-                {plan.popular && (
-                 <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-  <span
-    className="inline-flex items-center bg-gradient-to-r from-green-500 to-emerald-500 text-white px-2 lg:px-4 py-1 lg:py-2 rounded-full text-xs lg:text-sm font-bold shadow-lg"
-    style={{ fontSize: '10px', lineHeight: '1rem' }}
-  >
-    <span className="mr-1 text-sm">🏆</span> Most Popular
-  </span>
-</div>
-
-
-                )}
-                <div className="p-3 lg:p-6">
-                  <div className="text-center mb-3 lg:mb-6">
-                    {/* Plan Name */}
-                    <h3 className="text-sm lg:text-xl font-bold text-gray-900 dark:text-gray-100 mb-2 break-words">{plan.name}</h3>
-                    {/* Price and Duration - Adjusted for separate lines and spacing */}
-                    <div className="text-center mb-4"> {/* Increased mb */}
-                      <span className="block text-lg lg:text-3xl font-bold text-gray-900 dark:text-gray-100"> {/* Added 'block' */}
-                        ₹{plan.price}
-                      </span>
-                      <span className="block text-gray-600 dark:text-gray-400 text-xs lg:text-base"> {/* Added 'block', removed ml-1 */}
-                        /{plan.duration.toLowerCase()}
-                      </span>
-                    </div>
-                  </div>
-                  {/* Resume Credits - Adjusted mb */}
-                  <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg lg:rounded-2xl p-2 lg:p-4 text-center mb-4"> {/* Adjusted mb */}
-                    <div className="text-lg lg:text-2xl font-bold text-indigo-600 dark:text-neon-cyan-400">{plan.optimizations}</div>
-                    <div className="text-xs lg:text-sm text-gray-600 dark:text-gray-400">Resume Credits</div>
-                  </div>
-                  {/* ... (features and select button) ... */}
-                </div>
-              </div>
-            ))}
-          </div>
-          {/* ... (rest of the component) ... */}
-        </div>
-      </div>
-    </div>
-  );
-};
+                className="absolute right-1 sm:right-2 top-1/2 transform -translate-y-1/2 bg-white/90 hover:bg-white text-gray-7
