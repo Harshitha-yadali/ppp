@@ -376,9 +376,19 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({
                         )}
                         <div className="p-3 sm:p-6">
                           <div className="text-center mb-3 sm:mb-6">
-                            {/* Plan Name */}
+                            <div
+                              className={`bg-gradient-to-r ${plan.gradient || ''} w-10 h-10 sm:w-16 sm:h-16 rounded-lg sm:rounded-2xl flex items-center justify-center mx-auto mb-2 sm:mb-4 text-white shadow-lg`}
+                            >
+                              {getPlanIcon(plan.icon || '')}
+                            </div>
+                            <div
+                              className={`inline-flex items-center px-2 sm:px-3 py-1 rounded-full text-xs font-medium border mb-2 sm:mb-3 ${
+                                plan.tagColor || ''
+                              }`}
+                            >
+                              {plan.tag}
+                            </div>
                             <h3 className="text-base sm:text-xl font-bold text-gray-900 mb-2">{plan.name}</h3>
-                            {/* Price and Duration - Adjusted for separate lines and spacing */}
                             <div className="text-center mb-4"> {/* Increased mb to push credits down */}
                               <span className="block text-xl sm:text-3xl font-bold text-gray-900"> {/* Added 'block' */}
                                 ₹{plan.price}
@@ -388,7 +398,6 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({
                               </span>
                             </div>
                           </div>
-                          {/* Resume Credits - Adjusted mb */}
                           <div className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg sm:rounded-2xl p-2 sm:p-4 text-center mb-4"> {/* Adjusted mb */}
                             <div className="text-lg sm:text-2xl font-bold text-indigo-600">{plan.optimizations}</div>
                             <div className="text-xs sm:text-sm text-gray-600">Resume Credits</div>
@@ -451,7 +460,7 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({
             </div>
           </div>
 
-          {/* Desktop Grid - Apply similar adjustments */}
+          {/* Desktop Grid */}
           <div className="hidden md:grid grid-cols-2 lg:grid-cols-6 gap-3 lg:gap-6 mb-4 lg:mb-8">
             {allPlansWithAddOnOption.map((plan) => (
               <div
