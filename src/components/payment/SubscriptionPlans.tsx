@@ -365,7 +365,7 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({
                             ? 'border-indigo-500 shadow-2xl shadow-indigo-500/20 ring-4 ring-indigo-100'
                             : 'border-gray-200'
                         } ${plan.popular ? 'ring-2 ring-green-500 ring-offset-4' : ''}`}
-                        onClick={() => setSelectedPlan(plan.id)}
+                        // Removed onClick from here to prevent entire card from being clickable
                       >
                         {plan.popular && (
                           <div className="absolute -top-4 sm:-top-2 left-1/2 transform -translate-x-1/2">
@@ -470,7 +470,7 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({
                     ? 'border-neon-cyan-500 shadow-2xl shadow-neon-cyan/20 ring-4 ring-neon-cyan-100 dark:border-neon-cyan-400 dark:ring-neon-cyan-400/30'
                     : 'border-gray-200 hover:border-neon-cyan-300 hover:shadow-xl dark:border-dark-300 dark:hover:border-neon-cyan-400'
                 } ${plan.popular ? 'ring-2 ring-green-500 ring-offset-4' : ''}`}
-                onClick={() => setSelectedPlan(plan.id)}
+                // Removed onClick from here to prevent entire card from being clickable
               >
                 {plan.popular && (
                  <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
@@ -503,7 +503,31 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({
                     <div className="text-lg lg:text-2xl font-bold text-indigo-600 dark:text-neon-cyan-400">{plan.optimizations}</div>
                     <div className="text-xs lg:text-sm text-gray-600 dark:text-gray-400">Resume Credits</div>
                   </div>
-                  {/* ... (features and select button) ... */}
+                  <ul className="space-y-1 lg:space-y-3 mb-3 lg:mb-6 max-h-32 lg:max-h-none overflow-y-auto lg:overflow-visible">
+                    {plan.features.slice(0, 4).map((feature: string, fi: number) => (
+                      <li key={fi} className="flex items-start">
+                        <Check className="w-4 h-4 lg:w-5 h-5 text-emerald-500 mr-2 lg:mr-3 mt-0.5 flex-shrink-0" />
+                        <span className="text-sm lg:text-base text-gray-700 break-words dark:text-gray-300">{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <button
+                    onClick={() => setSelectedPlan(plan.id)}
+                    className={`w-full py-2 lg:py-3 px-2 lg:px-4 rounded-lg lg:rounded-xl font-semibold transition-all duration-300 text-sm lg:text-base min-h-[44px] mt-2 ${
+                      selectedPlan === plan.id
+                        ? `bg-gradient-to-r ${plan.gradient || ''} text-white shadow-lg transform scale-105`
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
+                  >
+                    {selectedPlan === plan.id ? (
+                      <span className="flex items-center justify-center">
+                        <Check className="w-3 h-3 lg:w-5 h-5 mr-1 lg:mr-2" />
+                        Selected
+                      </span>
+                    ) : (
+                      'Select Plan'
+                    )}
+                  </button>
                 </div>
               </div>
             ))}
