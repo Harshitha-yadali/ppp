@@ -128,6 +128,67 @@
     @apply border border-neon-cyan-500 shadow-neon-cyan;
   }
 
+  /* Resume Template Styles */
+  .resume-one-column {
+    @apply w-full;
+  }
+  
+  .resume-two-column {
+    @apply w-full;
+  }
+  
+  .resume-two-column-container {
+    @apply w-full;
+  }
+  
+  .resume-header-full {
+    @apply w-full mb-6;
+  }
+  
+  .resume-two-column-content {
+    @apply grid grid-cols-1 lg:grid-cols-3 gap-6;
+  }
+  
+  .resume-main-column {
+    @apply lg:col-span-2 space-y-4;
+  }
+  
+  .resume-sidebar-column {
+    @apply lg:col-span-1 space-y-4;
+  }
+  
+  .resume-minimalist {
+    @apply leading-relaxed;
+  }
+  
+  .resume-minimalist h1 {
+    @apply text-center mb-8;
+  }
+  
+  .resume-minimalist h2 {
+    @apply border-b border-gray-300 pb-2 mb-4;
+  }
+  
+  /* Template-specific spacing */
+  .template-chronological .work-experience {
+    @apply border-l-2 border-gray-200 pl-4;
+  }
+  
+  .template-functional .skills-section {
+    @apply grid grid-cols-1 md:grid-cols-2 gap-4;
+  }
+  
+  .template-combination .projects-section {
+    @apply bg-gray-50 p-4 rounded-lg border border-gray-200;
+  }
+  
+  .template-minimalist .section-spacing {
+    @apply mb-8;
+  }
+  
+  .template-two-column .sidebar-item {
+    @apply mb-4 p-3 bg-gray-50 rounded-lg;
+  }
 
 }
 
