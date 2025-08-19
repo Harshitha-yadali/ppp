@@ -23,6 +23,9 @@ import {
   Wrench,
   Gift,
   Plus,
+  ChevronDown, // Added for add-ons toggle
+  ChevronUp,   // Added for add-ons toggle
+  Wallet     // Added for wallet section
 } from 'lucide-react';
 import { SubscriptionPlan } from '../../types/payment';
 import { paymentService } from '../../services/paymentService';
@@ -59,6 +62,8 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({
   // MODIFIED: Change initial state to 'career_boost_plus'
   const [selectedPlan, setSelectedPlan] = useState<string>('career_boost_plus');
   const [isProcessing, setIsProcessing] = useState(false);
+  // Initial slide set to index 2 to correspond to 'career_boost_plus' if it's the 3rd plan in the array (0-indexed).
+  // This might need adjustment if the order of plans changes.
   const [currentSlide, setCurrentSlide] = useState(2);
   const [couponCode, setCouponCode] = useState('');
   const [appliedCoupon, setAppliedCoupon] = useState<AppliedCoupon | null>(null);
@@ -73,6 +78,7 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({
   const plans: SubscriptionPlan[] = paymentService.getPlans();
   const addOns: AddOn[] = paymentService.getAddOns();
 
+  // Combine regular plans with the special "Add-ons Only" option
   const allPlansWithAddOnOption = [
     ...plans,
     {
@@ -96,18 +102,19 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({
       ],
       popular: false
     },
-    
   ];
 
   // REMOVED: The useEffect block that sets selectedPlan based on currentSlide.
   // This was causing the selected plan to be overwritten by the carousel's state.
 
+  // Fetch wallet balance when the component mounts or when it becomes open/user changes
   useEffect(() => {
     if (user && isOpen) {
       fetchWalletBalance();
     }
   }, [user, isOpen]);
 
+  // Function to fetch the user's wallet balance from Supabase
   const fetchWalletBalance = async () => {
     if (!user) return;
     setLoadingWallet(true);
@@ -120,10 +127,11 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({
         console.error('Error fetching wallet balance:', error);
         return;
       }
+      // Filter for completed transactions and sum the amounts
       const completed = (transactions || []).filter((t: any) => t.status === 'completed');
       // Wallet balance is stored in Rupees in DB, convert to paise for internal use
       const balance = completed.reduce((sum: number, tr: any) => sum + parseFloat(tr.amount), 0) * 100;
-      setWalletBalance(Math.max(0, balance));
+      setWalletBalance(Math.max(0, balance)); // Ensure balance is not negative
     } catch (err) {
       console.error('Error fetching wallet data:', err);
     } finally {
@@ -133,6 +141,7 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({
 
   if (!isOpen) return null;
 
+  // Helper function to return the correct Lucide icon component based on string input
   const getPlanIcon = (iconType: string) => {
     switch (iconType) {
       case 'crown':
@@ -158,6 +167,7 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({
     }
   };
 
+  // Carousel navigation functions
   const nextSlide = () => {
     setCurrentSlide((prev) => (prev + 1) % allPlansWithAddOnOption.length);
   };
@@ -167,11 +177,11 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({
   };
 
   const goToSlide = (index: number) => {
-    // This function is currently empty, it should be implemented if you want to jump to a specific slide
-    // For now, it's not used by the current carousel navigation.
-    // If you intend to use it, you would set setCurrentSlide(index);
+    // This function can be used to directly jump to a slide (e.g., from dots)
+    setCurrentSlide(index);
   };
 
+  // Handles applying a coupon code
   const handleApplyCoupon = async () => {
     if (!couponCode.trim()) {
       setCouponError('Please enter a coupon code');
@@ -186,55 +196,58 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({
         finalAmount: result.finalAmount,
       });
       setCouponError('');
-      // ADDED: Show success alert for coupon application
+      // Show success alert for coupon application
       onShowAlert('Coupon Applied!', `Coupon "${result.couponApplied}" applied successfully. You saved ₹${(result.discount / 100).toFixed(2)}!`, 'success');
     } else {
       setCouponError(result.error || 'Invalid coupon code or not applicable to selected plan');
       setAppliedCoupon(null);
-      // ADDED: Show error alert for coupon application failure
+      // Show error alert for coupon application failure
       onShowAlert('Coupon Error', result.error || 'Invalid coupon code or not applicable to selected plan', 'warning');
     }
   };
 
+  // Handles removing an applied coupon
   const handleRemoveCoupon = () => {
     setAppliedCoupon(null);
     setCouponCode('');
     setCouponError('');
   };
 
+  // Find the currently selected plan data
   const selectedPlanData = allPlansWithAddOnOption.find((p) => p.id === selectedPlan);
 
   // Calculate add-ons total in paise
   const addOnsTotal = Object.entries(selectedAddOns).reduce((total, [addOnId, qty]) => {
     const addOn = paymentService.getAddOnById(addOnId);
-    return total + (addOn ? addOn.price * 100 * qty : 0); // Multiply addOn.price by 100
+    return total + (addOn ? addOn.price * 100 * qty : 0); // Multiply addOn.price by 100 for paise
   }, 0);
 
-  // Plan price in paise
-  let planPrice = (selectedPlanData?.price || 0) * 100; // Convert plan price to paise
+  // Initialize plan price from selected plan, convert to paise
+  let planPrice = (selectedPlanData?.price || 0) * 100;
+  // If a coupon is applied, use the final amount from the coupon calculation
   if (appliedCoupon) {
     planPrice = appliedCoupon.finalAmount; // appliedCoupon.finalAmount is already in paise
   }
 
-  // Wallet deduction in paise
+  // Calculate wallet deduction, limited by available wallet balance and plan price
   const walletDeduction = useWalletBalance ? Math.min(walletBalance, planPrice) : 0; // walletBalance is in paise
 
-  // Final plan price after wallet deduction, in paise
+  // Calculate the final plan price after wallet deduction, ensuring it's not negative
   const finalPlanPrice = Math.max(0, planPrice - walletDeduction);
 
-  // Grand total in paise
+  // Calculate the grand total including final plan price and add-ons
   const grandTotal = finalPlanPrice + addOnsTotal;
 
+  // Handles the payment process
   const handlePayment = async () => {
     if (!user || !selectedPlanData) return;
     setIsProcessing(true);
 
-    // --- NEW LOG: Log walletDeduction before processing payment ---
+    // Log walletDeduction before processing payment for debugging
     console.log('SubscriptionPlans: walletDeduction before payment processing:', walletDeduction);
-    // --- END NEW LOG ---
 
     try {
-      // Retrieve the session and access token
+      // Retrieve the session and access token for authentication
       const { data: { session }, error: sessionError } = await supabase.auth.getSession();
 
       console.log('SubscriptionPlans: session object after getSession:', session);
@@ -242,8 +255,8 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({
 
       if (sessionError || !session || !session.access_token) {
         console.error('SubscriptionPlans: No active session found for payment:', sessionError);
-        // Optionally, show an error message to the user or redirect to login
-        onShowAlert('Authentication Required', 'Please log in to complete your purchase.', 'error', 'Sign In', () => {}); // Use onShowAlert
+        // Show an authentication required message to the user
+        onShowAlert('Authentication Required', 'Please log in to complete your purchase.', 'error', 'Sign In', () => {});
         setIsProcessing(false);
         return;
       }
@@ -252,8 +265,9 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({
 
       console.log('SubscriptionPlans: Value of accessToken before calling processPayment:', accessToken);
 
+      // Handle zero-amount transactions (e.g., fully covered by wallet or free plan/coupon)
       if (grandTotal === 0) {
-        // CRITICAL FIX: For zero-amount transactions, still call processFreeSubscription with selectedAddOns
+        // Call processFreeSubscription with all relevant data
         const result = await paymentService.processFreeSubscription(
           selectedPlan,
           user.id,
@@ -264,15 +278,16 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({
           walletDeduction // Pass walletDeduction
         );
         if (result.success) {
-          // CRITICAL FIX: Refresh wallet balance after any successful payment
+          // Refresh wallet balance after any successful payment or free activation
           await fetchWalletBalance();
           onSubscriptionSuccess();
-          onShowAlert('Subscription Activated!', 'Your free plan has been activated successfully.', 'success'); // Use onShowAlert
+          onShowAlert('Subscription Activated!', 'Your free plan has been activated successfully.', 'success');
         } else {
           console.error(result.error || 'Failed to activate free plan.');
-          onShowAlert('Activation Failed', result.error || 'Failed to activate free plan.', 'error'); // Use onShowAlert
+          onShowAlert('Activation Failed', result.error || 'Failed to activate free plan.', 'error');
         }
       } else {
+        // Process paid subscription
         const paymentData = {
           planId: selectedPlan,
           amount: grandTotal, // grandTotal is already in paise
@@ -282,41 +297,43 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({
           paymentData,
           user.email,
           user.name,
-          accessToken, // Pass the access token here
+          accessToken, // Pass the access token for authentication
           appliedCoupon ? appliedCoupon.code : undefined,
           walletDeduction, // walletDeduction is already in paise
           addOnsTotal, // addOnsTotal is already in paise
-          selectedAddOns // CRITICAL FIX: Pass selectedAddOns to processPayment
+          selectedAddOns // Pass selectedAddOns to processPayment
         );
         if (result.success) {
-          // CRITICAL FIX: Refresh wallet balance after any successful payment
+          // Refresh wallet balance after any successful payment
           await fetchWalletBalance();
           onSubscriptionSuccess();
-          onShowAlert('Payment Successful!', 'Your subscription has been activated.', 'success'); // Use onShowAlert
+          onShowAlert('Payment Successful!', 'Your subscription has been activated.', 'success');
         } else {
           console.error(result.error || 'Payment failed.');
-          onShowAlert('Payment Failed', result.error || 'Payment processing failed. Please try again.', 'error'); // Use onShowAlert
+          onShowAlert('Payment Failed', result.error || 'Payment processing failed. Please try again.', 'error');
         }
       }
     } catch (error) {
       console.error('Payment process error:', error);
-      onShowAlert('Payment Error', error instanceof Error ? error.message : 'An unexpected error occurred during payment.', 'error'); // Use onShowAlert
+      onShowAlert('Payment Error', error instanceof Error ? error.message : 'An unexpected error occurred during payment.', 'error');
     } finally {
       setIsProcessing(false);
     }
   };
 
+  // Handles changing the quantity of an add-on
   const handleAddOnQuantityChange = (addOnId: string, quantity: number) => {
-    console.log('DEBUG: handleAddOnQuantityChange called for:', addOnId, 'with quantity:', quantity); // ADD THIS LINE
+    console.log('DEBUG: handleAddOnQuantityChange called for:', addOnId, 'with quantity:', quantity);
     setSelectedAddOns((prev) => ({
       ...prev,
-      [addOnId]: Math.max(0, quantity),
+      [addOnId]: Math.max(0, quantity), // Ensure quantity doesn't go below zero
     }));
   };
 
   return (
-    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-2 sm:p-4 backdrop-blur-sm dark:bg-black/80">
+    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-2 sm:p-4 backdrop-blur-sm dark:bg-black/80 flex flex-col">
       <div className="bg-white rounded-xl sm:rounded-2xl lg:rounded-3xl w-full max-w-7xl max-h-[95vh] overflow-y-auto flex flex-col dark:bg-dark-100 dark:shadow-dark-xl">
+        {/* Header Section */}
         <div className="relative bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 px-3 sm:px-6 py-4 sm:py-8 border-b border-gray-100 flex-shrink-0 dark:from-dark-200 dark:via-dark-300 dark:to-dark-400 dark:border-dark-500">
           {/* Back button */}
           <button
@@ -347,7 +364,8 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({
           </div>
         </div>
 
-        <div className="p-3 sm:p-6 lg:p-8 overflow-y-auto flex-1">
+        {/* Main Content Area */}
+        <div className="p-3 sm:p-6 lg:p-8 overflow-y-auto flex-1 flex-grow">
           {/* Mobile Carousel */}
           <div className="block md:hidden mb-4 sm:mb-8">
             <div className="relative">
@@ -411,7 +429,7 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({
                             ))}
                           </ul>
                           {/* ADDED: Select Plan button for mobile carousel */}
-                          <button
+                          <button // This button is now part of the plan card, not the sticky footer
                             onClick={() => setSelectedPlan(plan.id)}
                             className={`w-full py-2 sm:py-3 px-2 sm:px-4 rounded-lg sm:rounded-xl font-semibold transition-all duration-300 text-xs sm:text-base min-h-[44px] mt-2 ${
                               selectedPlan === plan.id
@@ -474,13 +492,13 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({
               >
                 {plan.popular && (
                  <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-  <span
-    className="inline-flex items-center bg-gradient-to-r from-green-500 to-emerald-500 text-white px-2 lg:px-4 py-1 lg:py-2 rounded-full text-xs lg:text-sm font-bold shadow-lg"
-    style={{ fontSize: '10px', lineHeight: '1rem' }}
-  >
-    <span className="mr-1 text-sm">🏆</span> Most Popular
-  </span>
-</div>
+                    <span
+                      className="inline-flex items-center bg-gradient-to-r from-green-500 to-emerald-500 text-white px-2 lg:px-4 py-1 lg:py-2 rounded-full text-xs lg:text-sm font-bold shadow-lg"
+                      style={{ fontSize: '10px', lineHeight: '1rem' }}
+                    >
+                      <span className="mr-1 text-sm">🏆</span> Most Popular
+                    </span>
+                  </div>
 
 
                 )}
@@ -512,7 +530,7 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({
                     ))}
                   </ul>
                   <button
-                    onClick={() => setSelectedPlan(plan.id)}
+                    onClick={() => setSelectedPlan(plan.id)} // This button is now part of the plan card, not the sticky footer
                     className={`w-full py-2 lg:py-3 px-2 lg:px-4 rounded-lg lg:rounded-xl font-semibold transition-all duration-300 text-sm lg:text-base min-h-[44px] mt-2 ${
                       selectedPlan === plan.id
                         ? `bg-gradient-to-r ${plan.gradient || ''} text-white shadow-lg transform scale-105`
@@ -532,7 +550,182 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({
               </div>
             ))}
           </div>
-          {/* ... (rest of the component) ... */}
+
+          {/* Add-ons Section */}
+          <div className="mb-4 lg:mb-8">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-gray-100 flex items-center">
+                <Plus className="w-5 h-5 mr-2 text-purple-600 dark:text-neon-purple-400" />
+                Add-ons
+              </h2>
+              <button
+                onClick={() => setShowAddOns(!showAddOns)}
+                className="text-sm font-medium text-blue-600 hover:text-blue-700 flex items-center space-x-1 dark:text-neon-cyan-400 dark:hover:text-neon-cyan-300"
+              >
+                <span>{showAddOns ? 'Hide' : 'Show'} Add-ons</span>
+                {showAddOns ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+              </button>
+            </div>
+            {showAddOns && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 animate-fadeIn">
+                {addOns.map((addOn) => (
+                  <div key={addOn.id} className="bg-gray-50 rounded-xl p-4 border border-gray-200 dark:bg-dark-200 dark:border-dark-300">
+                    <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-1">{addOn.name}</h3>
+                    <p className="text-sm text-gray-600 dark:text-gray-300 mb-3">₹{addOn.price}</p>
+                    <div className="flex items-center space-x-2">
+                      <button
+                        onClick={() => handleAddOnQuantityChange(addOn.id, (selectedAddOns[addOn.id] || 0) - 1)}
+                        disabled={(selectedAddOns[addOn.id] || 0) === 0}
+                        className="btn-secondary p-2 rounded-full min-w-[32px] min-h-[32px] flex items-center justify-center"
+                      >
+                        -
+                      </button>
+                      <span className="font-bold text-lg text-gray-900 dark:text-gray-100">
+                        {selectedAddOns[addOn.id] || 0}
+                      </span>
+                      <button
+                        onClick={() => handleAddOnQuantityChange(addOn.id, (selectedAddOns[addOn.id] || 0) + 1)}
+                        className="btn-secondary p-2 rounded-full min-w-[32px] min-h-[32px] flex items-center justify-center"
+                      >
+                        +
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Coupon Code Section */}
+          <div className="mb-4 lg:mb-8">
+            <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-gray-100 mb-4 flex items-center">
+              <Tag className="w-5 h-5 mr-2 text-orange-600 dark:text-orange-400" />
+              Apply Coupon Code
+            </h2>
+            <div className="flex space-x-2">
+              <input
+                type="text"
+                placeholder="Enter coupon code"
+                value={couponCode}
+                onChange={(e) => setCouponCode(e.target.value)}
+                className="input-base flex-1"
+                disabled={!!appliedCoupon}
+              />
+              {!appliedCoupon ? (
+                <button
+                  onClick={handleApplyCoupon}
+                  className="btn-primary px-4 py-2"
+                  disabled={!couponCode.trim()}
+                >
+                  Apply
+                </button>
+              ) : (
+                <button
+                  onClick={handleRemoveCoupon}
+                  className="btn-secondary px-4 py-2"
+                >
+                  Remove
+                </button>
+              )}
+            </div>
+            {couponError && (
+              <p className="text-red-600 text-sm mt-2 flex items-center">
+                <AlertCircle className="w-4 h-4 mr-1" />
+                {couponError}
+              </p>
+            )}
+            {appliedCoupon && (
+              <p className="text-green-600 text-sm mt-2 flex items-center">
+                <CheckCircle className="w-4 h-4 mr-1" />
+                Coupon "{appliedCoupon.code}" applied! You saved ₹{(appliedCoupon.discount / 100).toFixed(2)}.
+              </p>
+            )}
+          </div>
+
+          {/* Wallet Balance Section */}
+          <div className="mb-4 lg:mb-8">
+            <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-gray-100 mb-4 flex items-center">
+              <Wallet className="w-5 h-5 mr-2 text-green-600 dark:text-green-400" />
+              Wallet Balance
+            </h2>
+            {loadingWallet ? (
+              <div className="text-gray-600 dark:text-gray-300">Loading wallet...</div>
+            ) : (
+              <div className="flex items-center space-x-3">
+                <span className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                  ₹{(walletBalance / 100).toFixed(2)}
+                </span>
+                {walletBalance > 0 && (
+                  <label className="flex items-center space-x-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={useWalletBalance}
+                      onChange={(e) => setUseWalletBalance(e.target.checked)}
+                      className="form-checkbox h-5 w-5 text-blue-600 rounded focus:ring-blue-500"
+                    />
+                    <span className="text-gray-700 dark:text-gray-300 text-sm">
+                      Use wallet balance
+                    </span>
+                  </label>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Order Summary */}
+          <div className="bg-gray-50 rounded-xl p-4 lg:p-6 border border-gray-200 dark:bg-dark-200 dark:border-dark-300 mb-4 lg:mb-8">
+            <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-gray-100 mb-4 flex items-center">
+              <Info className="w-5 h-5 mr-2 text-blue-600 dark:text-blue-400" />
+              Order Summary
+            </h2>
+            <div className="space-y-2 text-gray-700 dark:text-gray-300">
+              <div className="flex justify-between">
+                <span>Plan Price:</span>
+                <span>₹{(planPrice / 100).toFixed(2)}</span>
+              </div>
+              {Object.keys(selectedAddOns).length > 0 && (
+                <div className="flex justify-between">
+                  <span>Add-ons:</span>
+                  <span>₹{(addOnsTotal / 100).toFixed(2)}</span>
+                </div>
+              )}
+              {appliedCoupon && (
+                <div className="flex justify-between text-green-600 dark:text-green-400">
+                  <span>Coupon Discount:</span>
+                  <span>- ₹{(appliedCoupon.discount / 100).toFixed(2)}</span>
+                </div>
+              )}
+              {useWalletBalance && walletDeduction > 0 && (
+                <div className="flex justify-between text-red-600 dark:text-red-400">
+                  <span>Wallet Deduction:</span>
+                  <span>- ₹{(walletDeduction / 100).toFixed(2)}</span>
+                </div>
+              )}
+              <div className="flex justify-between font-bold text-lg text-gray-900 dark:text-gray-100 border-t border-gray-300 pt-2">
+                <span>Grand Total:</span>
+                <span>₹{(grandTotal / 100).toFixed(2)}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Checkout Button */}
+          <div className="p-3 sm:p-6 lg:p-8 border-t border-gray-100 flex-shrink-0 bg-white dark:bg-dark-100 dark:border-dark-500">
+            <button
+              onClick={handlePayment}
+              disabled={isProcessing}
+              className="w-full btn-primary py-3 sm:py-4 flex items-center justify-center text-lg sm:text-xl font-semibold rounded-xl sm:rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300"
+            >
+              {isProcessing ? (
+                <span className="flex items-center">
+                  <Clock className="w-5 h-5 mr-2 animate-spin" /> Processing...
+                </span>
+              ) : (
+                <span className="flex items-center">
+                  Proceed to Checkout <ArrowRight className="w-5 h-5 ml-2" />
+                </span>
+              )}
+            </button>
+          </div>
         </div>
       </div>
     </div>
