@@ -193,8 +193,8 @@ export const ResumeScoreChecker: React.FC<ResumeScoreCheckerProps> = ({
       <div className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-40 dark:bg-dark-50 dark:border-dark-300">
         <div className="container-responsive">
           <div className="flex items-center justify-between h-16">
-            <button
-              onClick={onNavigateBack}
+           <button
+              onClick={() => navigate('/')} // Changed to use navigate
               className="mb-6 bg-gradient-to-r from-neon-cyan-500 to-neon-blue-500 text-white hover:from-neon-cyan-400 hover:to-neon-blue-400 active:from-neon-cyan-600 active:to-neon-blue-600 shadow-md hover:shadow-neon-cyan py-3 px-5 rounded-xl inline-flex items-center space-x-2 transition-all duration-200"
             >
               <ArrowLeft className="w-5 h-5" />
