@@ -610,4 +610,3 @@ export const ProjectEnhancement: React.FC<ProjectEnhancementProps> = ({
     </div>
   );
 };
-```
