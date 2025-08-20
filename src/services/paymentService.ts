@@ -10,7 +10,6 @@ class PaymentService {
       name: 'Career Pro Max',
       price: 1999,
       duration: 'One-time Purchase',
-      durationInHours: 24 * 365 * 10, // 10 years in hours
       optimizations: 50,
       scoreChecks: 50,
       linkedinMessages: Infinity,
@@ -33,7 +32,6 @@ class PaymentService {
       name: 'Career Boost+',
       price: 1499,
       duration: 'One-time Purchase',
-      durationInHours: 24 * 365 * 10, // 10 years in hours
       optimizations: 30,
       scoreChecks: 30,
       linkedinMessages: Infinity,
@@ -55,7 +53,6 @@ class PaymentService {
       name: 'Pro Resume Kit',
       price: 999,
       duration: 'One-time Purchase',
-      durationInHours: 24 * 365 * 10, // 10 years in hours
       optimizations: 20,
       scoreChecks: 20,
       linkedinMessages: 100,
@@ -77,7 +74,6 @@ class PaymentService {
       name: 'Smart Apply Pack',
       price: 499,
       duration: 'One-time Purchase',
-      durationInHours: 24 * 365 * 10, // 10 years in hours
       optimizations: 10,
       scoreChecks: 10,
       linkedinMessages: 50,
@@ -99,7 +95,6 @@ class PaymentService {
       name: 'Resume Fix Pack',
       price: 199,
       duration: 'One-time Purchase',
-      durationInHours: 24 * 365 * 10, // 10 years in hours
       optimizations: 5,
       scoreChecks: 2,
       linkedinMessages: 0,
@@ -120,8 +115,7 @@ class PaymentService {
       id: 'lite_check',
       name: 'Lite Check',
       price: 99,
-      duration: 'One-time Purchase', // Changed from 'Trial' for consistency in duration handling
-      durationInHours: 24 * 365 * 10, // 10 years in hours, ensuring valid end_date for trials
+      duration: 'One-time Purchase',
       optimizations: 2,
       scoreChecks: 2,
       linkedinMessages: 10,
@@ -442,6 +436,7 @@ class PaymentService {
         user_id: userId,
         plan_id: freePlan.id,
         status: 'active',
+        start_date: new Date().toISOString(),
         end_date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 7-day free trial
         optimizations_used: 0,
         optimizations_total: freePlan.optimizations,
