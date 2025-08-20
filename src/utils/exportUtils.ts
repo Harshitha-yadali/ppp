@@ -868,19 +868,30 @@ export function generateResumeLayout(
         ".rule{border:0;height:1px;background:#E5E7EB;margin:10px 0 14px;}",
         ".section-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#14532D;margin-top:18px;margin-bottom:8px;}",
         ".p{font-size:12px;line-height:1.5;margin-bottom:8px;}",
-        ".list{font-size:12px;line-height:1.5;list-style:disc;padding-left:18px;}",
-        ".list li{margin-bottom:6px;}",
-        ".item{margin-bottom:12px;}",
-        ".row{display:flex;justify-content:space-between;align-items:baseline;}",
+
+        /* NEW header grid for each job */
+        ".row{display:grid;grid-template-columns:1fr max-content;column-gap:16px;align-items:baseline;}",
         ".row .left{font-size:13px;font-weight:600;}",
-        ".row .right{font-size:11px;font-weight:500;color:#6B7280;margin-left:16px;white-space:nowrap;}",
+        ".row .right{font-size:11px;font-weight:500;color:#6B7280;white-space:nowrap;}",
+
+        /* NEW hanging bullets */
+        ".list{list-style:disc;margin:0;padding-left:16px;font-size:12px;line-height:1.55;}",
+        ".list li{margin:0 0 6px 0;padding-left:6px;text-indent:-6px;}",
+        ".list li::marker{font-size:12px;color:#111827;}",
+        ".list--tight li{margin-bottom:4px;}",
+
+        /* NEW rhythm + readable measure */
+        ".item{margin-bottom:14px;}",
+        ".item .row{margin-bottom:4px;}",
+        ".rail{border-left:2px solid #E5E7EB;padding-left:10px;max-width:72ch;}",
+
+        /* chips / boxes unchanged */
         ".tags{display:flex;flex-wrap:wrap;gap:6px;}",
         ".tag{font-size:11px;font-weight:600;color:#111827;background:#F3F4F6;border-radius:4px;padding:4px 8px;}",
-        ".tagbox{background:#F3F4F6;border-radius:4px;padding:8px 10px;}",
+        ".tagbox{background:#F3F4F6;border-radius:8px;padding:10px;}",
         ".tagbox .cat{font-size:12px;font-weight:700;margin-bottom:6px;}",
         ".tagbox .vals{font-size:12px;color:#111827;}",
         ".project-highlighted{background:#F3F4F6;border-radius:8px;padding:12px;border:1px solid #E5E7EB;}",
-        `.rail{border-left:${leftRailBorderPx}px solid #E5E7EB;padding-left:10px;}`,
         `.grid-container{display:grid;grid-template-columns:2fr 1fr;gap:24px;}`,
         `.main-column{display:flex;flex-direction:column;}`,
         `.sidebar-column{display:flex;flex-direction:column;}`
