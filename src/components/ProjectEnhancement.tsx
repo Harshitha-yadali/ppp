@@ -1,4 +1,3 @@
-// src/components/ProjectEnhancement.tsx
 import React, { useState, useEffect } from 'react';
 import {
   Plus,
@@ -176,6 +175,9 @@ export const ProjectEnhancement: React.FC<ProjectEnhancementProps> = ({
   const applySelectedProjects = () => {
     if (!suggestions || selectedProjects.size === 0) return;
 
+    console.log('Applying selected projects:', selectedProjects);
+    console.log('Current resume data:', currentResume);
+
     // Create new projects from selected suggestions
     const newProjects = suggestions.suggestions
       .filter(p => selectedProjects.has(p.id))
@@ -184,11 +186,15 @@ export const ProjectEnhancement: React.FC<ProjectEnhancementProps> = ({
         bullets: p.bullets && p.bullets.length > 0 ? p.bullets : [p.description]
       }));
 
+    console.log('New projects to add:', newProjects);
+
     // Create updated resume with new projects added to existing ones
     const updatedResume = {
       ...currentResume,
       projects: [...(currentResume.projects || []), ...newProjects]
     };
+
+    console.log('Updated resume with new projects:', updatedResume);
 
     // Call the callback with the complete updated resume
     onProjectsAdded(updatedResume);
