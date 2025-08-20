@@ -24,6 +24,7 @@ import {
 import { FileUpload } from './FileUpload';
 import { getDetailedResumeScore } from '../services/scoringService';
 import { DetailedScore } from '../types/resume';
+import { Navigation } from './navigation/Navigation';
 
 // Import Subscription type if it's not already globally available
 import { Subscription } from '../types/payment'; // Assuming this path is correct
