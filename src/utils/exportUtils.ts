@@ -463,8 +463,9 @@ const generateResumeHTML = (
         .company, .school { font-size: ${options.subHeaderSize}pt; }
         .date { font-size: ${options.subHeaderSize}pt; }
         .project-title { font-weight: bold; font-size: ${options.subHeaderSize}pt; margin-bottom: 4pt; }
-        ul { padding-left: 24px; list-style-position: outside; margin: 0; list-style-type: disc; }
-        li { margin-bottom: ${options.entrySpacing * 1.42}pt; font-size: ${options.bodyTextSize}pt; }
+        ul { padding-left: 30px; list-style-position: outside; margin: 0; list-style-type: disc; }
+        li { margin-bottom: ${options.entrySpacing * 1.42}pt; font-size: ${options.bodyTextSize}pt; padding-left: 12px; text-indent: -12px; line-height: 1.5; }
+
         .skills-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; }
         .skill-box { background: #f8f9fa; padding: 10px; border-radius: 4px; }
         .skill-category { font-weight: bold; margin-bottom: 4px; }
