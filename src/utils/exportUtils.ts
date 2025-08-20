@@ -1,3 +1,6 @@
+// src/utils/exportUtils.ts
+
+// Existing imports (keep them as they are)
 import jsPDF from 'jspdf';
 import { saveAs } from 'file-saver';
 import { ResumeData, UserType } from '../types/resume';
@@ -490,3 +493,401 @@ const getSectionOrderForTemplate = (template: string, userType: UserType): strin
       return ['summary', 'workExperience', 'education', 'skills', 'projects', 'achievementsAndExtras'];
   }
 };
+
+// NEW FUNCTION: generateResumeLayout
+export function generateResumeLayout(
+  templateType: TemplateType,
+  userType: UserType,
+  resumeData: ResumeData
+): any {
+  const tokens = {
+    page: { width_px: 794, pad_x_px: 28, pad_y_px: 32, bg: "#FFFFFF" },
+    font_stack: "Inter, Calibri, Segoe UI, Arial, sans-serif",
+    colors: {
+      text_primary: "#111827",
+      text_muted: "#6B7280",
+      accent: "#14532D",
+      rule: "#E5E7EB",
+      chip_bg: "#F3F4F6"
+    },
+    type: {
+      name_px: 26,
+      title_px: 14,
+      section_px: 12,
+      body_px: 12,
+      meta_px: 11,
+      line_height: 1.5,
+      letter_spacing_name_px: 0.5,
+      letter_spacing_section_px: 0.5
+    },
+    space_px: {
+      section_top: 18,
+      section_title_bottom: 8,
+      between_items: 12,
+      bullet_gap: 6,
+      contact_bottom: 14,
+      name_bottom: 6,
+      title_bottom: 10,
+      indent_list: 18,
+      left_rail_pad: 10
+    },
+    decor: {
+      show_header_rule: true,
+      left_rail_border_px: 0 // Default, will be set conditionally
+    }
+  };
+
+  let sectionOrder: string[] = [];
+  let htmlBody = '';
+  let leftRailBorderPx = 0; // Default for functional, two_column_safe
+
+  // --- Helper Functions (internal to generateResumeLayout) ---
+
+  function _generateContactLine(data: ResumeData): string {
+    const parts: string[] = [];
+    if (data.email) parts.push(data.email);
+    if (data.phone) parts.push(data.phone);
+    if (data.location) parts.push(data.location);
+    if (data.linkedin) parts.push(data.linkedin);
+    if (data.github) parts.push(data.github);
+    return parts.join(' • ');
+  }
+
+  function _generateExperienceHtml(
+    workExperience: Array<any>,
+    currentTemplateType: TemplateType
+  ): string {
+    if (!workExperience || workExperience.length === 0) return '';
+    return workExperience.map(job => {
+      let bulletsHtml = '';
+      if (job.bullets && job.bullets.length > 0) {
+        if (currentTemplateType === 'functional') {
+          // Functional: 0-2 bullets max
+          const functionalBullets = job.bullets.slice(0, 2);
+          bulletsHtml = `<ul class="list">${functionalBullets.map((b: string) => `<li>${b}</li>`).join('')}</ul>`;
+        } else {
+          // Other templates: full bullets
+          bulletsHtml = `<ul class="list">${job.bullets.map((b: string) => `<li>${b}</li>`).join('')}</ul>`;
+        }
+      }
+      return `
+        <div class="item">
+          <div class="row">
+            <div class="left">${job.role} — ${job.company}</div>
+            <div class="right">${job.year}</div>
+          </div>
+          ${bulletsHtml}
+        </div>
+      `;
+    }).join('');
+  }
+
+  function _generateEducationHtml(education: Array<any>): string {
+    if (!education || education.length === 0) return '';
+    return education.map(edu => `
+      <div class="item">
+        <div class="row">
+          <div class="left">${edu.degree}, ${edu.school}</div>
+          <div class="right">${edu.year}</div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function _generateSkillsHtml(skills: Array<any>, currentTemplateType: TemplateType): string {
+    if (!skills || skills.length === 0) return '';
+
+    if (currentTemplateType === 'functional' || currentTemplateType === 'combination') {
+      // Grouped by category in boxes
+      return skills.map(skill => `
+        <div class="tagbox">
+          <div class="cat">${skill.category}</div>
+          <div class="vals">${skill.list.join(', ')}</div>
+        </div>
+      `).join('');
+    } else {
+      // Simple list or inline chips
+      const allSkills = skills.flatMap(skill => skill.list);
+      return allSkills.map(skill => `<span class="tag">${skill}</span>`).join('');
+    }
+  }
+
+  function _generateProjectsHtml(projects: Array<any>, currentTemplateType: TemplateType): string {
+    if (!projects || projects.length === 0) return '';
+    return projects.map(project => `
+      <div class="item ${currentTemplateType === 'combination' ? 'project-highlighted' : ''}">
+        <div class="row">
+          <div class="left">${project.title}</div>
+          <div class="right">${project.year || ''}</div>
+        </div>
+        <ul class="list">${project.bullets.map((b: string) => `<li>${b}</li>`).join('')}</ul>
+      </div>
+    `).join('');
+  }
+
+  function _generateOptionalSection(sectionKey: string, items: string[], column?: 'sidebar'): string {
+    if (!items || items.length === 0) return '';
+    let title = '';
+    let content = '';
+
+    switch (sectionKey) {
+      case 'certifications':
+        title = 'Certifications';
+        content = `<ul class="list">${items.map(item => `<li>${item}</li>`).join('')}</ul>`;
+        break;
+      case 'extras':
+        title = 'Additional Information';
+        content = `<ul class="list">${items.map(item => `<li>${item}</li>`).join('')}</ul>`;
+        break;
+      case 'links':
+        title = 'Links';
+        content = `<ul class="list">${items.map(item => `<li><a href="${item}" target="_blank">${item}</a></li>`).join('')}</ul>`;
+        break;
+      default:
+        return '';
+    }
+
+    return `
+      <section class="${sectionKey}">
+        <div class="section-title">${title}</div>
+        ${content}
+      </section>
+    `;
+  }
+
+  function _getExtraItems(data: ResumeData): string[] {
+    const items: string[] = [];
+    if (data.achievements && data.achievements.length > 0) {
+      items.push(...data.achievements);
+    }
+    if (data.extraCurricularActivities && data.extraCurricularActivities.length > 0) {
+      items.push(...data.extraCurricularActivities);
+    }
+    if (data.languagesKnown && data.languagesKnown.length > 0) {
+      items.push(...data.languagesKnown);
+    }
+    if (data.personalDetails) {
+      items.push(data.personalDetails);
+    }
+    return items;
+  }
+
+  function _getLinks(data: ResumeData): string[] {
+    const links: string[] = [];
+    if (data.linkedin) links.push(data.linkedin);
+    if (data.github) links.push(data.github);
+    return links;
+  }
+
+  // --- Template-Specific Logic ---
+  switch (templateType) {
+    case 'chronological':
+      sectionOrder = ["summary", "work_experience", "education", "skills", "certifications", "extras"];
+      leftRailBorderPx = 2;
+      htmlBody = `
+        <div class="header">
+          <div class="name">${resumeData.name}</div>
+          <div class="title">${resumeData.title || ''}</div>
+          <div class="contact">${_generateContactLine(resumeData)}</div>
+          <div class="rule"></div>
+        </div>
+        <section class="summary">
+          <div class="section-title">Summary</div>
+          <p class="p">${resumeData.summary || ''}</p>
+        </section>
+        <section class="experience">
+          <div class="section-title">Work Experience</div>
+          <div class="rail">${_generateExperienceHtml(resumeData.workExperience || [], templateType)}</div>
+        </section>
+        <section class="education">
+          <div class="section-title">Education</div>
+          ${_generateEducationHtml(resumeData.education || [])}
+        </section>
+        <section class="skills">
+          <div class="section-title">Skills</div>
+          <div class="tags">${_generateSkillsHtml(resumeData.skills || [], templateType)}</div>
+        </section>
+        ${_generateOptionalSection('certifications', resumeData.certifications || [])}
+        ${_generateOptionalSection('extras', _getExtraItems(resumeData))}
+      `;
+      break;
+
+    case 'functional':
+      sectionOrder = ["summary", "skills", "projects", "work_history", "education", "certifications", "extras"];
+      leftRailBorderPx = 0;
+      htmlBody = `
+        <div class="header">
+          <div class="name">${resumeData.name}</div>
+          <div class="title">${resumeData.title || ''}</div>
+          <div class="contact">${_generateContactLine(resumeData)}</div>
+          <div class="rule"></div>
+        </div>
+        <section class="summary">
+          <div class="section-title">Professional Profile</div>
+          <p class="p">${resumeData.summary || resumeData.careerObjective || ''}</p>
+        </section>
+        <section class="skills">
+          <div class="section-title">Key Skills</div>
+          <div class="tags">${_generateSkillsHtml(resumeData.skills || [], templateType)}</div>
+        </section>
+        <section class="projects">
+          <div class="section-title">Relevant Projects</div>
+          ${_generateProjectsHtml(resumeData.projects || [], templateType)}
+        </section>
+        <section class="work">
+          <div class="section-title">Work History</div>
+          ${_generateExperienceHtml(resumeData.workExperience || [], templateType)}
+        </section>
+        <section class="education">
+          <div class="section-title">Education</div>
+          ${_generateEducationHtml(resumeData.education || [])}
+        </section>
+        ${_generateOptionalSection('certifications', resumeData.certifications || [])}
+        ${_generateOptionalSection('extras', _getExtraItems(resumeData))}
+      `;
+      break;
+
+    case 'combination':
+      sectionOrder = ["summary", "skills", "projects", "work_experience", "education", "certifications", "extras"];
+      leftRailBorderPx = 0;
+      htmlBody = `
+        <div class="header">
+          <div class="name">${resumeData.name}</div>
+          <div class="title">${resumeData.title || ''}</div>
+          <div class="contact">${_generateContactLine(resumeData)}</div>
+          <div class="rule"></div>
+        </div>
+        <section class="summary">
+          <div class="section-title">Summary</div>
+          <p class="p">${resumeData.summary || ''}</p>
+        </section>
+        <section class="skills">
+          <div class="section-title">Key Skills</div>
+          <div class="tags">${_generateSkillsHtml(resumeData.skills || [], templateType)}</div>
+        </section>
+        <section class="projects">
+          <div class="section-title">Projects</div>
+          ${_generateProjectsHtml(resumeData.projects || [], templateType)}
+        </section>
+        <section class="experience">
+          <div class="section-title">Work Experience</div>
+          ${_generateExperienceHtml(resumeData.workExperience || [], templateType)}
+        </section>
+        <section class="education">
+          <div class="section-title">Education</div>
+          ${_generateEducationHtml(resumeData.education || [])}
+        </section>
+        ${_generateOptionalSection('certifications', resumeData.certifications || [])}
+        ${_generateOptionalSection('extras', _getExtraItems(resumeData))}
+      `;
+      break;
+
+    case 'minimalist':
+      if (userType === 'fresher' || userType === 'student') {
+        sectionOrder = ["summary", "education", "projects", "skills", "work_experience", "certifications", "extras"];
+      } else { // experienced
+        sectionOrder = ["summary", "work_experience", "education", "skills", "certifications", "extras"];
+      }
+      leftRailBorderPx = 2;
+      htmlBody = `
+        <div class="header">
+          <div class="name">${resumeData.name}</div>
+          <div class="title">${resumeData.title || ''}</div>
+          <div class="contact">${_generateContactLine(resumeData)}</div>
+          <div class="rule"></div>
+        </div>
+        <section class="summary">
+          <div class="section-title">${userType === 'student' ? 'Career Objective' : 'Summary'}</div>
+          <p class="p">${resumeData.summary || resumeData.careerObjective || ''}</p>
+        </section>
+        ${sectionOrder.includes('education') ? `<section class="education"><div class="section-title">Education</div>${_generateEducationHtml(resumeData.education || [])}</section>` : ''}
+        ${sectionOrder.includes('projects') ? `<section class="projects"><div class="section-title">Projects</div>${_generateProjectsHtml(resumeData.projects || [], templateType)}</section>` : ''}
+        ${sectionOrder.includes('skills') ? `<section class="skills"><div class="section-title">Skills</div><div class="tags">${_generateSkillsHtml(resumeData.skills || [], templateType)}</div></section>` : ''}
+        ${sectionOrder.includes('work_experience') ? `<section class="experience"><div class="section-title">Work Experience</div><div class="rail">${_generateExperienceHtml(resumeData.workExperience || [], templateType)}</div></section>` : ''}
+        ${_generateOptionalSection('certifications', resumeData.certifications || [])}
+        ${_generateOptionalSection('extras', _getExtraItems(resumeData))}
+      `;
+      break;
+
+    case 'two_column_safe':
+      sectionOrder = ["summary", "main_column", "sidebar_column", "extras"];
+      leftRailBorderPx = 0;
+      htmlBody = `
+        <div class="header">
+          <div class="name">${resumeData.name}</div>
+          <div class="title">${resumeData.title || ''}</div>
+          <div class="contact">${_generateContactLine(resumeData)}</div>
+          <div class="rule"></div>
+        </div>
+        <section class="summary">
+          <div class="section-title">Summary</div>
+          <p class="p">${resumeData.summary || ''}</p>
+        </section>
+        <div class="grid-container">
+          <div class="main-column">
+            <section class="experience">
+              <div class="section-title">Work Experience</div>
+              ${_generateExperienceHtml(resumeData.workExperience || [], templateType)}
+            </section>
+            <section class="education">
+              <div class="section-title">Education</div>
+              ${_generateEducationHtml(resumeData.education || [])}
+            </section>
+          </div>
+          <div class="sidebar-column">
+            <section class="skills">
+              <div class="section-title">Skills</div>
+              <div class="tags">${_generateSkillsHtml(resumeData.skills || [], templateType)}</div>
+            </section>
+            ${_generateOptionalSection('links', _getLinks(resumeData), 'sidebar')}
+            ${_generateOptionalSection('certifications', resumeData.certifications || [], 'sidebar')}
+          </div>
+        </div>
+        ${_generateOptionalSection('extras', _getExtraItems(resumeData))}
+      `;
+      break;
+
+    default:
+      throw new Error("Invalid TEMPLATE_TYPE provided.");
+  }
+
+  // Set the left_rail_border_px in tokens
+  tokens.decor.left_rail_border_px = leftRailBorderPx;
+
+  return {
+    template_id: `${templateType}_v1`,
+    tokens: tokens,
+    section_order: sectionOrder,
+    css: {
+      root_class: "resume-root",
+      rules: [
+        ".resume-root{max-width:794px;margin:0 auto;background:#FFFFFF;color:#111827;padding:32px 28px;font-family:Inter,Calibri,'Segoe UI',Arial,sans-serif;}",
+        ".name{font-size:26px;font-weight:700;letter-spacing:.5px;margin-bottom:6px;}",
+        ".title{font-size:14px;font-weight:600;text-transform:uppercase;margin-bottom:10px;}",
+        ".contact{font-size:11px;font-weight:500;color:#6B7280;margin-bottom:14px;display:flex;flex-wrap:wrap;gap:8px;}",
+        ".rule{border:0;height:1px;background:#E5E7EB;margin:10px 0 14px;}",
+        ".section-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#14532D;margin-top:18px;margin-bottom:8px;}",
+        ".p{font-size:12px;line-height:1.5;margin-bottom:8px;}",
+        ".list{font-size:12px;line-height:1.5;list-style:disc;padding-left:18px;}",
+        ".list li{margin-bottom:6px;}",
+        ".item{margin-bottom:12px;}",
+        ".row{display:flex;justify-content:space-between;align-items:baseline;}",
+        ".row .left{font-size:13px;font-weight:600;}",
+        ".row .right{font-size:11px;font-weight:500;color:#6B7280;margin-left:16px;white-space:nowrap;}",
+        ".tags{display:flex;flex-wrap:wrap;gap:6px;}",
+        ".tag{font-size:11px;font-weight:600;color:#111827;background:#F3F4F6;border-radius:4px;padding:4px 8px;}",
+        ".tagbox{background:#F3F4F6;border-radius:4px;padding:8px 10px;}",
+        ".tagbox .cat{font-size:12px;font-weight:700;margin-bottom:6px;}",
+        ".tagbox .vals{font-size:12px;color:#111827;}",
+        ".project-highlighted{background:#F3F4F6;border-radius:8px;padding:12px;border:1px solid #E5E7EB;}",
+        `.rail{border-left:${leftRailBorderPx}px solid #E5E7EB;padding-left:10px;}`,
+        `.grid-container{display:grid;grid-template-columns:2fr 1fr;gap:24px;}`,
+        `.main-column{display:flex;flex-direction:column;}`,
+        `.sidebar-column{display:flex;flex-direction:column;}`
+      ]
+    },
+    html: {
+      body: htmlBody
+    }
+  };
+}
