@@ -1,4 +1,5 @@
 // Payment types for the application
+// src/types/payment.ts
 export interface SubscriptionPlan {
   id: string;
   name: string;
@@ -14,7 +15,9 @@ export interface SubscriptionPlan {
   icon: string;
   features: string[];
   popular?: boolean;
+  durationInHours?: number; // ADD THIS LINE
 }
+
 
 export interface PaymentData {
   planId: string;
