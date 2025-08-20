@@ -476,3 +476,4 @@ const AuthButtons: React.FC<{
     </div>
   );
 };
+export default App;
