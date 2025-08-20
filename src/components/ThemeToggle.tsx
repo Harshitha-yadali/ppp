@@ -9,17 +9,17 @@ export const ThemeToggle: React.FC = () => {
     <button
       onClick={toggleTheme}
       aria-label={`Switch to ${isDarkMode ? 'light' : 'dark'} mode`}
-      className="relative w-14 h-8 rounded-full bg-gray-800 transition-all duration-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" // Updated background and focus ring
+      className="relative w-14 h-8 rounded-full bg-gray-800 transition-all duration-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
     >
       <span
-        className={`absolute top-1 flex items-center justify-center h-6 w-6 rounded-full bg-blue-600 shadow-lg transition-transform duration-300 ease-in-out ${ // Updated background
+        className={`absolute top-1 flex items-center justify-center h-6 w-6 rounded-full bg-blue-600 shadow-lg transition-transform duration-300 ease-in-out ${
           isDarkMode ? 'translate-x-[22px]' : 'translate-x-[4px]'
         }`}
       >
         {isDarkMode ? (
-          <Sun className="h-4 w-4 text-white" /> // Updated text color
+          <Sun className="h-4 w-4 text-white" />
         ) : (
-          <Moon className="h-4 w-4 text-white" /> // Updated text color
+          <Moon className="h-4 w-4 text-white" />
         )}
       </span>
     </button>
