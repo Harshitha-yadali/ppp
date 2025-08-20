@@ -18,11 +18,12 @@ import { SubscriptionPlans } from './components/payment/SubscriptionPlans';
 import { paymentService } from './services/paymentService';
 import { AlertModal } from './components/AlertModal';
 import { ToolsAndPagesNavigation } from './components/pages/ToolsAndPagesNavigation';
-import { Routes, Route, useNavigate } from 'react-router-dom'; // Import Routes, Route, and useNavigate
+import { Routes, Route, useNavigate, useLocation } from 'react-router-dom'; // Import Routes, Route, useNavigate, and useLocation
 
 function App() {
   const { isAuthenticated, user, markProfilePromptSeen, isLoading } = useAuth();
   const navigate = useNavigate(); // Initialize useNavigate
+  const location = useLocation(); // Initialize useLocation to get current path
 
   // REMOVED: const [currentPage, setCurrentPage] = useState('new-home');
   const [showMobileMenu, setShowMobileMenu] = useState(false);
@@ -54,6 +55,15 @@ function App() {
   };
 
   const logoImage = "https://res.cloudinary.com/dlkovvlud/image/upload/w_1000,c_fill,ar_1:1,g_auto,r_max,bo_5px_solid_red,b_rgb:262c35/v1751536902/a-modern-logo-design-featuring-primoboos_XhhkS8E_Q5iOwxbAXB4CqQ_HnpCsJn4S1yrhb826jmMDw_nmycqj.jpg";
+
+  // Define paths where the header should be hidden
+  const hideHeaderPaths = [
+    '/optimizer',
+    '/score-checker',
+    '/guided-builder',
+    '/linkedin-generator'
+  ];
+  const shouldHideHeader = hideHeaderPaths.includes(location.pathname);
 
   // MODIFIED: handlePageChange now uses navigate
   const handlePageChange = (path: string) => {
@@ -221,7 +231,8 @@ function App() {
     userSubscription: userSubscription,
     onShowAlert: handleShowAlert,
     refreshUserSubscription: refreshUserSubscription,
-    // No longer passing onPageChange directly to every component, they will use useNavigate
+    // Add onNavigateBack to commonPageProps
+    onNavigateBack: handleNavigateHome,
   };
 
   return (
@@ -231,9 +242,11 @@ function App() {
           {successMessage}
         </div>
       )}
-      <Header onMobileMenuToggle={handleMobileMenuToggle} showMobileMenu={showMobileMenu} onShowProfile={handleShowProfile}>
-        <Navigation onPageChange={handlePageChange} /> {/* Pass handlePageChange to Navigation */}
-      </Header>
+      {!shouldHideHeader && (
+        <Header onMobileMenuToggle={handleMobileMenuToggle} showMobileMenu={showMobileMenu} onShowProfile={handleShowProfile}>
+          <Navigation onPageChange={handlePageChange} />
+        </Header>
+      )}
       
       {/* NEW: Routes setup */}
       <Routes>
@@ -244,7 +257,7 @@ function App() {
               isAuthenticated={isAuthenticated}
               onShowAuth={handleShowAuth}
               onShowProfile={handleShowProfile}
-              onNavigateBack={handleNavigateHome} // Use handleNavigateHome
+              onNavigateBack={handleNavigateHome} // Ensure ResumeOptimizer also receives this prop
               onShowSubscriptionPlans={handleShowSubscriptionPlans}
               userSubscription={userSubscription}
               refreshUserSubscription={refreshUserSubscription}
@@ -303,7 +316,6 @@ function App() {
                         handlePageChange(item.id);
                       }}
                       className={`flex items-center space-x-3 min-h-touch px-4 py-3 rounded-xl font-medium transition-all duration-200 ${
-                        // Check current path for active state
                         window.location.pathname === item.id
                           ? 'bg-primary-100 text-primary-700 shadow-md dark:bg-dark-200 dark:text-neon-cyan-400'
                           : 'text-secondary-700 hover:text-primary-600 hover:bg-primary-50 dark:text-gray-300 dark:hover:text-neon-cyan-400 dark:hover:bg-dark-200'
@@ -350,7 +362,6 @@ function App() {
           setShowAuthModal(false);
           setAuthModalInitialView('login');
           setIsAuthModalOpenedByHash(false);
-          console.log('AuthModal closed, showAuthModal set to false');
         }}
         onProfileFillRequest={() => handleShowProfile('profile', true)}
         initialView={authModalInitialView}
@@ -375,7 +386,7 @@ function App() {
           isOpen={showSubscriptionPlans}
           onNavigateBack={() => setShowSubscriptionPlans(false)}
           onSubscriptionSuccess={handleSubscriptionSuccess}
-          onShowAlert={handleShowAlert} 
+          onShowAlert={handleShowAlert}  
         />
       )}
       <AlertModal
@@ -390,8 +401,9 @@ function App() {
     </div>
   );
 }
+
 const AuthButtons: React.FC<{
-  onPageChange: (path: string) => void; // Changed type to path
+  onPageChange: (path: string) => void;
   onClose: () => void;
   onShowAuth: () => void;
   onShowProfile: (mode?: 'profile' | 'wallet') => void;
@@ -412,7 +424,6 @@ const AuthButtons: React.FC<{
   const handleLogin = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    console.log('Sign in button clicked - calling onShowAuth');
     onShowAuth();
   };
   return (
@@ -465,4 +476,3 @@ const AuthButtons: React.FC<{
     </div>
   );
 };
-export default App;
