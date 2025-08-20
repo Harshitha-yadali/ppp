@@ -875,8 +875,8 @@ export function generateResumeLayout(
         ".row .right{font-size:11px;font-weight:500;color:#6B7280;white-space:nowrap;}",
 
         /* NEW hanging bullets */
-        ".list{list-style:disc;margin:0;padding-left:16px;font-size:12px;line-height:1.55;}",
-        ".list li{margin:0 0 6px 0;padding-left:6px;text-indent:-6px;}",
+        ".list{list-style:disc;margin:0;padding-left:24px;font-size:12px;line-height:1.55;}",
+        ".list li{margin:0 0 6px 0;padding-left:12px;text-indent:-6px;}",
         ".list li::marker{font-size:12px;color:#111827;}",
         ".list--tight li{margin-bottom:4px;}",
 
