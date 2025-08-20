@@ -609,12 +609,12 @@ const ResumeOptimizer: React.FC<ResumeOptimizerProps> = ({
     }
 
     return (
-   <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-blue-50 p-4">
-  <div className="bg-white rounded-2xl shadow-xl p-8 text-center max-w-md w-full">
-    <Loader2 className="w-16 h-16 text-blue-600 animate-spin mx-auto mb-6" />
-    <h2 className="text-2xl font-bold text-gray-900 mb-3">{loadingMessage}</h2>
-    <p className="text-gray-600 mb-4">{subMessage}</p>
-    <p className="text-sm text-gray-500">
+   <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-blue-50 dark:from-dark-50 dark:to-dark-200 p-4">
+  <div className="bg-white rounded-2xl shadow-xl p-8 text-center max-w-md w-full dark:bg-dark-100">
+    <Loader2 className="w-16 h-16 text-blue-600 animate-spin mx-auto mb-6 dark:text-neon-cyan-400" />
+    <h2 className="text-2xl font-bold text-gray-900 mb-3 dark:text-gray-100">{loadingMessage}</h2>
+    <p className="text-gray-600 mb-4 dark:text-gray-300">{subMessage}</p>
+    <p className="text-sm text-gray-500 dark:text-gray-400">
       This may take a few moments as we process complex data and apply advanced algorithms.
     </p>
   </div>
