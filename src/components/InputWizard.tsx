@@ -9,12 +9,12 @@ import {
   ArrowRight,
   Sparkles,
   CheckCircle,
-  Edit3 // Added for profile update button
+  Edit3
 } from 'lucide-react';
 import { FileUpload } from './FileUpload';
 import { InputSection } from './InputSection';
 import { UserType } from '../types/resume';
-import { User as AuthUser } from '../types/auth'; // Import User type from auth
+import { User as AuthUser } from '../types/auth';
 
 interface InputWizardProps {
   resumeText: string;
@@ -28,8 +28,8 @@ interface InputWizardProps {
   handleOptimize: () => void;
   isAuthenticated: boolean;
   onShowAuth: () => void;
-  user: AuthUser | null; // Added user prop
-  onShowProfile: (mode?: 'profile' | 'wallet') => void; // Added onShowProfile prop
+  user: AuthUser | null;
+  onShowProfile: (mode?: 'profile' | 'wallet') => void;
 }
 
 export const InputWizard: React.FC<InputWizardProps> = ({
@@ -44,8 +44,8 @@ export const InputWizard: React.FC<InputWizardProps> = ({
   handleOptimize,
   isAuthenticated,
   onShowAuth,
-  user, // Destructure user
-  onShowProfile // Destructure onShowProfile
+  user,
+  onShowProfile
 }) => {
   const [currentStep, setCurrentStep] = useState(0);
 
@@ -55,9 +55,9 @@ export const InputWizard: React.FC<InputWizardProps> = ({
       title: 'Upload Resume',
       icon: <Upload className="w-6 h-6" />,
       component: (
-        <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200 dark:bg-dark-50 dark:border-dark-400"> {/* Added dark:bg-dark-50 dark:border-dark-400 */}
-          <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-            <Upload className="w-5 h-5 mr-2 text-blue-600" />
+        <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200 dark:bg-dark-50 dark:border-dark-400">
+          <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center dark:text-gray-100">
+            <Upload className="w-5 h-5 mr-2 text-blue-600 dark:text-blue-400" />
             Upload Resume
           </h2>
           <FileUpload onFileUpload={setResumeText} />
@@ -70,9 +70,9 @@ export const InputWizard: React.FC<InputWizardProps> = ({
       title: 'Job Details',
       icon: <FileText className="w-6 h-6" />,
       component: (
-        <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200 dark:bg-dark-50 dark:border-dark-400"> {/* Added dark:bg-dark-50 dark:border-dark-400 */}
-          <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-            <FileText className="w-5 h-5 mr-2 text-green-600" />
+        <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200 dark:bg-dark-50 dark:border-dark-400">
+          <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center dark:text-gray-100">
+            <FileText className="w-5 h-5 mr-2 text-green-600 dark:text-green-400" />
             Resume & Job Details
           </h2>
           <InputSection
@@ -90,14 +90,14 @@ export const InputWizard: React.FC<InputWizardProps> = ({
       title: 'Target Role',
       icon: <User className="w-6 h-6" />,
       component: (
-        <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200 dark:bg-dark-50 dark:border-dark-400"> {/* Added dark:bg-dark-50 dark:border-dark-400 */}
-          <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-            <User className="w-5 h-5 mr-2 text-purple-600" />
+        <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200 dark:bg-dark-50 dark:border-dark-400">
+          <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center dark:text-gray-100">
+            <User className="w-5 h-5 mr-2 text-purple-600 dark:text-purple-400" />
             Target Role (Optional)
           </h2>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2 dark:text-gray-300">
                 Role Title
               </label>
               <input
@@ -105,26 +105,25 @@ export const InputWizard: React.FC<InputWizardProps> = ({
                 value={targetRole}
                 onChange={(e) => setTargetRole(e.target.value)}
                 placeholder="e.g., Senior Software Engineer, Product Manager..."
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 dark:bg-dark-200 dark:border-dark-300 dark:text-gray-100 dark:placeholder-gray-400"
               />
-              <p className="text-xs text-gray-500 mt-2">
+              <p className="text-xs text-gray-500 mt-2 dark:text-gray-400">
                 Specify the exact role title for more targeted project recommendations
               </p>
             </div>
-            <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+            <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 dark:bg-neon-cyan-500/10 dark:border-neon-cyan-400/50">
               <div className="flex items-start space-x-3">
-                <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
-                <div className="text-sm text-blue-800">
+                <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0 dark:bg-neon-cyan-400"></div>
+                <div className="text-sm text-blue-800 dark:text-neon-cyan-300">
                   <p className="font-medium mb-1">📝 Profile Information</p>
-                  <p className="text-blue-700">
+                  <p className="text-blue-700 dark:text-gray-300">
                     Your name, email, phone, LinkedIn, and GitHub details will be automatically populated from your profile settings. You can update these in your profile settings from the user menu.
                   </p>
                 </div>
               </div>
-              {/* Updated button condition */}
               {isAuthenticated && user && (
                 <button
-                  onClick={() => onShowProfile('profile')} // Explicitly pass 'profile' mode
+                  onClick={() => onShowProfile('profile')}
                   className="mt-4 w-full flex items-center justify-center space-x-2 btn-primary py-2 px-4 rounded-lg text-sm"
                 >
                   <Edit3 className="w-4 h-4" />
@@ -135,16 +134,16 @@ export const InputWizard: React.FC<InputWizardProps> = ({
           </div>
         </div>
       ),
-      isValid: true // Optional step, always valid
+      isValid: true
     },
     {
       id: 'experience',
       title: 'Experience Level',
       icon: <Briefcase className="w-6 h-6" />,
       component: (
-        <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200 dark:bg-dark-50 dark:border-dark-400"> {/* Added dark:bg-dark-50 dark:border-dark-400 */}
-          <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-            <Briefcase className="w-5 h-5 mr-2 text-indigo-600" />
+        <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200 dark:bg-dark-50 dark:border-dark-400">
+          <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center dark:text-gray-100">
+            <Briefcase className="w-5 h-5 mr-2 text-indigo-600 dark:text-indigo-400" />
             Experience Level
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -152,87 +151,75 @@ export const InputWizard: React.FC<InputWizardProps> = ({
               onClick={() => setUserType('fresher')}
               className={`flex flex-col items-center justify-center p-6 rounded-xl border-2 transition-all cursor-pointer ${
                 userType === 'fresher'
-                  ? 'border-green-500 bg-green-50 shadow-md'
-                  : 'border-gray-200 hover:border-green-300 hover:bg-green-50'
+                  ? 'border-green-500 bg-green-50 shadow-md dark:border-green-600 dark:bg-green-900/20'
+                  : 'border-gray-200 hover:border-green-300 hover:bg-green-50 dark:border-dark-200 dark:hover:border-green-900 dark:hover:bg-green-900/10'
               }`}
             >
-              <User className={`w-8 h-8 mb-3 ${userType === 'fresher' ? 'text-green-600' : 'text-gray-500'}`} />
-              <span className="font-semibold text-lg mb-2">Fresher/New Graduate</span>
-              <span className="text-sm text-gray-500 text-center">Recent graduate or entry-level professional</span>
+              <User className={`w-8 h-8 mb-3 ${userType === 'fresher' ? 'text-green-600 dark:text-green-400' : 'text-gray-500 dark:text-gray-300'}`} />
+              <span className={`font-semibold text-lg mb-2 ${userType === 'fresher' ? 'text-green-600 dark:text-green-400' : 'text-gray-900 dark:text-gray-100'}`}>Fresher/New Graduate</span>
+              <span className={`text-sm text-gray-500 text-center dark:text-gray-300`}>Recent graduate or entry-level professional</span>
             </button>
 
-            <button
-              onClick={() => setUserType('student')}
-              className={`flex flex-col items-center justify-center p-6 rounded-xl border-2 transition-all cursor-pointer ${
-                userType === 'student'
-                  ? 'border-purple-500 bg-purple-50 shadow-md'
-                  : 'border-gray-200 hover:border-purple-300 hover:bg-purple-50'
-              }`}
-            >
-              <User className={`w-8 h-8 mb-3 ${userType === 'student' ? 'text-purple-600' : 'text-gray-500'}`} />
-              <span className="font-semibold text-lg mb-2">College Student</span>
-              <span className="text-sm text-gray-500 text-center">Current student seeking internships</span>
-            </button>
             <button
               onClick={() => setUserType('experienced')}
               className={`flex flex-col items-center justify-center p-6 rounded-xl border-2 transition-all cursor-pointer ${
                 userType === 'experienced'
-                  ? 'border-blue-500 bg-blue-50 shadow-md'
-                  : 'border-gray-200 hover:border-blue-300 hover:bg-blue-50'
+                  ? 'border-green-500 bg-green-50 shadow-md dark:border-green-600 dark:bg-green-900/20'
+                  : 'border-gray-200 hover:border-green-300 hover:bg-green-50 dark:border-dark-200 dark:hover:border-green-900 dark:hover:bg-green-900/10'
               }`}
             >
-              <Briefcase className={`w-8 h-8 mb-3 ${userType === 'experienced' ? 'text-blue-600' : 'text-gray-500'}`} />
-              <span className="font-semibold text-lg mb-2">Experienced Professional</span>
-              <span className="text-sm text-gray-500 text-center">Professional with 1+ years of work experience</span>
+              <Briefcase className={`w-8 h-8 mb-3 ${userType === 'experienced' ? 'text-green-600 dark:text-green-400' : 'text-gray-500 dark:text-gray-300'}`} />
+              <span className={`font-semibold text-lg mb-2 ${userType === 'experienced' ? 'text-green-600 dark:text-green-400' : 'text-gray-900 dark:text-gray-100'}`}>Experienced Professional</span>
+              <span className={`text-sm text-gray-500 text-center dark:text-gray-300`}>Professional with 1+ years of work experience</span>
             </button>
           </div>
         </div>
       ),
-      isValid: true // Always valid since userType has a default value
+      isValid: true
     },
     {
       id: 'optimize',
       title: 'Optimize',
       icon: <Sparkles className="w-6 h-6" />,
       component: (
-        <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200 dark:bg-dark-50 dark:border-dark-400"> {/* Added dark:bg-dark-50 dark:border-dark-400 */}
-          <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-            <Sparkles className="w-5 h-5 mr-2 text-purple-600" />
+        <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200 dark:bg-dark-50 dark:border-dark-400">
+          <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center dark:text-gray-100">
+            <Sparkles className="w-5 h-5 mr-2 text-purple-600 dark:text-purple-400" />
             Ready to Optimize
           </h2>
           <div className="text-center space-y-6">
-            <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Review Your Information</h3>
+            <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-6 dark:from-blue-900/20 dark:to-purple-900/20">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4 dark:text-gray-100">Review Your Information</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                <div className="bg-white rounded-lg p-4 border border-gray-200">
+                <div className="bg-white rounded-lg p-4 border border-gray-200 dark:bg-dark-200 dark:border-dark-300">
                   <div className="flex items-center mb-2">
-                    <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
-                    <span className="font-medium">Resume Uploaded</span>
+                    <CheckCircle className="w-4 h-4 text-green-600 mr-2 dark:text-green-400" />
+                    <span className="font-medium text-gray-900 dark:text-gray-100">Resume Uploaded</span>
                   </div>
-                  <p className="text-gray-600">{resumeText.length} characters</p>
+                  <p className="text-gray-600 dark:text-gray-300">{resumeText.length} characters</p>
                 </div>
-                <div className="bg-white rounded-lg p-4 border border-gray-200">
+                <div className="bg-white rounded-lg p-4 border border-gray-200 dark:bg-dark-200 dark:border-dark-300">
                   <div className="flex items-center mb-2">
-                    <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
-                    <span className="font-medium">Job Description</span>
+                    <CheckCircle className="w-4 h-4 text-green-600 mr-2 dark:text-green-400" />
+                    <span className="font-medium text-gray-900 dark:text-gray-100">Job Description</span>
                   </div>
-                  <p className="text-gray-600">{jobDescription.length} characters</p>
+                  <p className="text-gray-600 dark:text-gray-300">{jobDescription.length} characters</p>
                 </div>
-                <div className="bg-white rounded-lg p-4 border border-gray-200">
+                <div className="bg-white rounded-lg p-4 border border-gray-200 dark:bg-dark-200 dark:border-dark-300">
                   <div className="flex items-center mb-2">
-                    <User className="w-4 h-4 text-blue-600 mr-2" />
-                    <span className="font-medium">Experience Level</span>
+                    <User className="w-4 h-4 text-blue-600 mr-2 dark:text-blue-400" />
+                    <span className="font-medium text-gray-900 dark:text-gray-100">Experience Level</span>
                   </div>
-                  <p className="text-gray-600 capitalize">
+                  <p className="text-gray-600 capitalize dark:text-gray-300">
                     {userType === 'student' ? 'College Student' : userType}
                   </p>
                 </div>
-                <div className="bg-white rounded-lg p-4 border border-gray-200">
+                <div className="bg-white rounded-lg p-4 border border-gray-200 dark:bg-dark-200 dark:border-dark-300">
                   <div className="flex items-center mb-2">
-                    <Briefcase className="w-4 h-4 text-purple-600 mr-2" />
-                    <span className="font-medium">Target Role</span>
+                    <Briefcase className="w-4 h-4 text-purple-600 mr-2 dark:text-purple-400" />
+                    <span className="font-medium text-gray-900 dark:text-gray-100">Target Role</span>
                   </div>
-                  <p className="text-gray-600">{targetRole || 'Not specified'}</p>
+                  <p className="text-gray-600 dark:text-gray-300">{targetRole || 'Not specified'}</p>
                 </div>
               </div>
             </div>
@@ -241,7 +228,6 @@ export const InputWizard: React.FC<InputWizardProps> = ({
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                console.log('InputWizard: Optimize button clicked. isAuthenticated:', isAuthenticated, 'resumeText length:', resumeText.length, 'jobDescription length:', jobDescription.length); // ADDED LOG
                 if (isAuthenticated) {
                   handleOptimize();
                 } else {
@@ -262,7 +248,7 @@ export const InputWizard: React.FC<InputWizardProps> = ({
             </button>
 
             {!isAuthenticated && (
-              <p className="text-center text-sm text-gray-500">
+              <p className="text-center text-sm text-gray-500 dark:text-gray-400">
                 You need to be signed in to optimize your resume.
               </p>
             )}
@@ -308,10 +294,10 @@ export const InputWizard: React.FC<InputWizardProps> = ({
   return (
     <div className="max-w-7xl mx-auto space-y-6">
       {/* Progress Indicator */}
-      <div className="bg-white rounded-xl shadow-lg p-3 border border-gray-200 dark:bg-dark-50 dark:border-dark-400"> {/* Added dark:bg-dark-50 dark:border-dark-400 */}
+      <div className="bg-white rounded-xl shadow-lg p-3 border border-gray-200 dark:bg-dark-50 dark:border-dark-400">
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">Resume Optimization </h1>
-          <div className="text-sm text-gray-500">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Resume Optimization </h1>
+          <div className="text-sm text-gray-500 dark:text-gray-400">
             Step {currentStep + 1} of {steps.length}
           </div>
         </div>
@@ -331,7 +317,7 @@ export const InputWizard: React.FC<InputWizardProps> = ({
                         ? 'bg-green-500 text-white'
                         : index === currentStep
                         ? 'bg-blue-500 text-white'
-                        : 'bg-gray-200 text-gray-500'
+                        : 'bg-gray-200 text-gray-500 dark:bg-dark-200 dark:text-gray-400'
                     }`}
                   >
                     {index < currentStep ? (
@@ -341,14 +327,14 @@ export const InputWizard: React.FC<InputWizardProps> = ({
                     )}
                   </div>
                   <span className={`text-xs mt-2 font-medium text-center ${
-                    index <= currentStep ? 'text-gray-900' : 'text-gray-500'
+                    index <= currentStep ? 'text-gray-900 dark:text-gray-100' : 'text-gray-500 dark:text-gray-400'
                   }`}>
                     {step.title}
                   </span>
                 </div>
                 {index < steps.length - 1 && (
                   <div className={`flex-1 h-1 rounded-full transition-all duration-300 ${
-                    index < currentStep ? 'bg-green-500' : 'bg-gray-200'
+                    index < currentStep ? 'bg-green-500' : 'bg-gray-200 dark:bg-dark-200'
                   }`} />
                 )}
               </React.Fragment>
@@ -363,15 +349,15 @@ export const InputWizard: React.FC<InputWizardProps> = ({
       </div>
 
       {/* Navigation Buttons */}
-      <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200 dark:bg-dark-50 dark:border-dark-400"> {/* Added dark:bg-dark-50 dark:border-dark-400 */}
+      <div className="bg-white rounded-xl shadow-lg p-6 border border-gray-200 dark:bg-dark-50 dark:border-dark-400">
         <div className="flex justify-between items-center gap-2">
           <button
             onClick={handlePrevious}
             disabled={currentStep === 0}
             className={`flex items-center space-x-2 px-6 py-3 rounded-xl font-semibold transition-all duration-300 w-1/3 sm:w-auto flex-shrink-0 ${
               currentStep === 0
-                ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                : 'bg-gray-600 hover:bg-gray-700 text-white shadow-lg hover:shadow-xl'
+                ? 'bg-gray-200 text-gray-400 cursor-not-allowed dark:bg-dark-200 dark:text-gray-500'
+                : 'bg-gray-600 hover:bg-gray-700 text-white shadow-lg hover:shadow-xl dark:bg-gray-700 dark:hover:bg-gray-800'
             }`}
           >
             <ArrowLeft className="w-5 h-5" />
@@ -379,8 +365,8 @@ export const InputWizard: React.FC<InputWizardProps> = ({
           </button>
 
           <div className="text-center w-1/3 sm:w-48 flex-shrink-0">
-            <div className="text-sm text-gray-500 mb-1">Progress</div>
-            <div className="w-full bg-gray-200 rounded-full h-2">
+            <div className="text-sm text-gray-500 mb-1 dark:text-gray-400">Progress</div>
+            <div className="w-full bg-gray-200 rounded-full h-2 dark:bg-dark-200">
               <div
                 className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full transition-all duration-300"
                 style={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
@@ -394,8 +380,8 @@ export const InputWizard: React.FC<InputWizardProps> = ({
               disabled={!currentStepData.isValid}
               className={`flex items-center space-x-2 px-6 py-3 rounded-xl font-semibold transition-all duration-300 w-1/3 sm:w-auto flex-shrink-0 ${
                 !currentStepData.isValid
-                  ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                  : 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl'
+                  ? 'bg-gray-200 text-gray-400 cursor-not-allowed dark:bg-dark-200 dark:text-gray-500'
+                  : 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl dark:bg-blue-700 dark:hover:bg-blue-800'
               }`}
             >
               <span>Next</span>
