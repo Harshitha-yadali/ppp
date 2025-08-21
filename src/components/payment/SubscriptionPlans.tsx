@@ -420,8 +420,9 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({
                             <div className="text-lg sm:text-2xl font-bold text-indigo-600">{plan.optimizations}</div>
                             <div className="text-xs sm:text-sm text-gray-600">Resume Credits</div>
                           </div>
+                          {/* MODIFIED LINE BELOW */}
                           <ul className="space-y-1 sm:space-y-3 mb-3 sm:mb-6 max-h-32 sm:max-h-none overflow-y-auto sm:overflow-visible">
-                            {plan.features.slice(0, 4).map((feature: string, fi: number) => (
+                            {(plan.features || []).slice(0, 4).map((feature: string, fi: number) => (
                               <li key={fi} className="flex items-start">
                                 <Check className="w-4 h-4 sm:w-5 h-5 text-emerald-500 mr-2 sm:mr-3 mt-0.5 flex-shrink-0" /> {/* Increased icon size slightly for better alignment with larger text */}
                                 <span className="text-gray-700 text-sm sm:text-base break-words dark:text-gray-300">{feature}</span> {/* Changed text-xs to text-sm, and sm:text-sm to sm:text-base */}
@@ -521,8 +522,9 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({
                     <div className="text-lg lg:text-2xl font-bold text-indigo-600 dark:text-neon-cyan-400">{plan.optimizations}</div>
                     <div className="text-xs lg:text-sm text-gray-600 dark:text-gray-400">Resume Credits</div>
                   </div>
+                  {/* MODIFIED LINE BELOW */}
                   <ul className="space-y-1 lg:space-y-3 mb-3 lg:mb-6 max-h-32 lg:max-h-none overflow-y-auto lg:overflow-visible">
-                    {plan.features.slice(0, 4).map((feature: string, fi: number) => (
+                    {(plan.features || []).slice(0, 4).map((feature: string, fi: number) => (
                       <li key={fi} className="flex items-start">
                         <Check className="w-4 h-4 lg:w-5 h-5 text-emerald-500 mr-2 lg:mr-3 mt-0.5 flex-shrink-0" />
                         <span className="text-sm lg:text-base text-gray-700 break-words dark:text-gray-300">{feature}</span>
@@ -731,3 +733,4 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({
     </div>
   );
 };
+
