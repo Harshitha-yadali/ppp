@@ -869,7 +869,7 @@ export function generateResumeLayout(
         ".contact{font-size:11px;font-weight:500;color:#6B7280;margin-bottom:14px;display:flex;flex-wrap:wrap;gap:8px;}",
         ".rule{border:0;height:1px;background:#E5E7EB;margin:10px 0 14px;}",
         ".section-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#14532D;margin-top:18px;margin-bottom:8px;}",
-        ".p{font-size:12px;line-height:1.5;margin-bottom:8px;}",
+        ".p{font-size:12px;line-height:1.25;margin-bottom:8px;}",
 
         /* NEW header grid for each job */
         ".row{display:grid;grid-template-columns:1fr max-content;column-gap:16px;align-items:baseline;}",
