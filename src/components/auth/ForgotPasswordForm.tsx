@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Mail, AlertCircle, CheckCircle, Loader2, ArrowLeft } from 'lucide-react'; // Added ArrowLeft for back button
+import { Mail, AlertCircle, CheckCircle, Loader2, ArrowLeft } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 
 const forgotPasswordSchema = z.object({
@@ -37,9 +37,9 @@ export const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ onBackTo
     setSuccessMessage(null);
 
     try {
-      await forgotPassword(data.email);
+      await forgotPassword({ email: data.email });
       setSuccessMessage('Reset link sent to your email!');
-      onSuccess(); // Trigger the success callback in AuthModal
+      onSuccess();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong.');
     } finally {

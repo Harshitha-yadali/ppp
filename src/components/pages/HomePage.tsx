@@ -100,7 +100,7 @@ export const HomePage: React.FC<HomePageProps> = ({
 
     // If authenticated, check if credits are available. If not, show plan selection.
     if (isAuthenticated && feature.requiresAuth && !isFeatureAvailable(feature.id)) {
-      onShowSubscriptionPlans(); // MODIFIED: Call the new plan selection handler
+      onShowSubscriptionPlans(feature.id); // Pass feature ID for context-specific modal
       return;
     }
 

@@ -16,6 +16,7 @@ export const Navigation: React.FC<NavigationProps> = ({ onPageChange }) => { // 
 
   const navigationItems = [
     { id: '/', label: 'Home', icon: <Home className="w-4 h-4" /> }, // MODIFIED: id to path
+    { id: '/pricing', label: 'Pricing', icon: <Crown className="w-4 h-4" /> },
     { id: '/about', label: 'About Us', icon: <Info className="w-4 h-4" /> }, // MODIFIED: id to path
     { id: '/tutorials', label: 'Tutorials', icon: <BookOpen className="w-4 h-4" /> }, // MODIFIED: id to path
     { id: '/contact', label: 'Contact', icon: <Phone className="w-4 h-4" /> }, // MODIFIED: id to path

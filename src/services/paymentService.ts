@@ -154,6 +154,22 @@ class PaymentService {
       type: 'guided_build',
       quantity: 1,
     },
+    // NEW ADD-ON: Single Resume Score Check Purchase
+    {
+      id: 'resume_score_check_single_purchase',
+      name: 'Resume Score Check (1 Use)',
+      price: 19,
+      type: 'score_check',
+      quantity: 1,
+    },
+    // NEW ADD-ON: LinkedIn Messages 50 Purchase
+    {
+      id: 'linkedin_messages_50_purchase',
+      name: 'LinkedIn Messages (50 Uses)',
+      price: 29,
+      type: 'linkedin_messages',
+      quantity: 50,
+    },
   ];
 
   getPlans(): SubscriptionPlan[] {
@@ -380,6 +396,57 @@ class PaymentService {
     }
   }
 
+  async useGuidedBuild(userId: string): Promise<{ success: boolean; remaining?: number; error?: string }> {
+    console.log('PaymentService: Attempting to use guided build for userId:', userId);
+    try {
+      const { data: currentSubscription, error: fetchError } = await supabase
+        .from('subscriptions')
+        .select('id, guided_builds_used, guided_builds_total')
+        .eq('user_id', userId)
+        .eq('status', 'active')
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (fetchError) {
+        console.error('PaymentService: Error fetching current subscription for useGuidedBuild:', fetchError);
+        return { success: false, error: 'Failed to fetch current subscription.' };
+      }
+
+      if (!currentSubscription) {
+        console.warn('PaymentService: No active subscription found for useGuidedBuild for userId:', userId);
+        return { success: false, error: 'No active subscription found.' };
+      }
+
+      const newGuidedBuildsUsed = currentSubscription.guided_builds_used + 1;
+      const remaining = currentSubscription.guided_builds_total - newGuidedBuildsUsed;
+
+      if (remaining < 0 && currentSubscription.guided_builds_total !== Infinity) {
+        console.warn('PaymentService: Guided build credits exhausted for userId:', userId);
+        return { success: false, error: 'Guided build credits exhausted.' };
+      }
+
+      console.log(`PaymentService: Updating guided_builds_used for subscription ${currentSubscription.id} from ${currentSubscription.guided_builds_used} to ${newGuidedBuildsUsed}`);
+      const { error: updateError } = await supabase
+        .from('subscriptions')
+        .update({
+          guided_builds_used: newGuidedBuildsUsed,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', currentSubscription.id);
+
+      if (updateError) {
+        console.error('PaymentService: Error updating guided_builds_used:', updateError);
+        return { success: false, error: 'Failed to update guided build usage.' };
+      }
+
+      console.log(`PaymentService: Successfully used guided build for userId: ${userId}. Remaining: ${remaining}`);
+      return { success: true, remaining: remaining };
+    } catch (error) {
+      console.error('PaymentService: Unexpected error in useGuidedBuild:', error);
+      return { success: false, error: 'An unexpected error occurred while using guided build.' };
+    }
+  }
   async activateFreeTrial(userId: string): Promise<void> {
     console.log('PaymentService: Attempting to activate free trial for userId:', userId);
     try {

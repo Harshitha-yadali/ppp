@@ -24,11 +24,13 @@ import {
 export const Tutorials: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
-  const [showOverlay, setShowOverlay] = useState(false);
+  const [showOverlay, setShowOverlay] = useState(true);
 
   const categories = [
     { id: 'all', name: 'All Tutorials', count: 1 },
-    { id: 'getting-started', name: 'Getting Started', count: 1 }
+    { id: 'getting-started', name: 'Getting Started', count: 1 },
+    { id: 'optimization', name: 'Optimization', count: 1 },
+    { id: 'analysis', name: 'Analysis', count: 1 }
   ];
 
   const tutorials = [
@@ -42,7 +44,33 @@ export const Tutorials: React.FC = () => {
       thumbnail: 'https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg?auto=compress&cs=tinysrgb&w=600',
       views: '12.5K',
       rating: 4.9,
-      videoUrl: '#',
+      videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', // Placeholder YouTube URL
+      isPopular: true
+    },
+    {
+      id: 2,
+      title: 'JD-Based Resume Optimization',
+      description: 'Master the art of tailoring your resume to specific job descriptions.',
+      duration: '8:45',
+      difficulty: 'Intermediate',
+      category: 'optimization',
+      thumbnail: 'https://images.pexels.com/photos/3184465/pexels-photo-3184465.jpeg?auto=compress&cs=tinysrgb&w=600',
+      views: '8.2K',
+      rating: 4.8,
+      videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', // Placeholder YouTube URL
+      isPopular: false
+    },
+    {
+      id: 3,
+      title: 'Resume Score Analysis Deep Dive',
+      description: 'Understand how our AI scores your resume and what each metric means.',
+      duration: '6:20',
+      difficulty: 'Beginner',
+      category: 'analysis',
+      thumbnail: 'https://images.pexels.com/photos/3184339/pexels-photo-3184339.jpeg?auto=compress&cs=tinysrgb&w=600',
+      views: '15.1K',
+      rating: 4.9,
+      videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', // Placeholder YouTube URL
       isPopular: true
     }
   ];

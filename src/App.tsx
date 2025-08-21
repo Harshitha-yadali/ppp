@@ -20,6 +20,7 @@ import { AlertModal } from './components/AlertModal';
 import { ToolsAndPagesNavigation } from './components/pages/ToolsAndPagesNavigation';
 import { Routes, Route, useNavigate } from 'react-router-dom'; // Import Routes, Route, and useNavigate
 import { PlanSelectionModal } from './components/payment/PlanSelectionModal'; // NEW: Import PlanSelectionModal
+import { PricingPage } from './components/pages/PricingPage';
 
 function App() {
   const { isAuthenticated, user, markProfilePromptSeen, isLoading } = useAuth();
@@ -52,6 +53,7 @@ function App() {
 
   // NEW: State for PlanSelectionModal
   const [showPlanSelectionModal, setShowPlanSelectionModal] = useState(false);
+  const [planSelectionFeatureId, setPlanSelectionFeatureId] = useState<string | undefined>(undefined);
 
   const handleMobileMenuToggle = () => {
     setShowMobileMenu(!showMobileMenu);
@@ -101,7 +103,8 @@ function App() {
   };
 
   // MODIFIED: This function now opens the PlanSelectionModal
-  const handleShowPlanSelection = () => {
+  const handleShowPlanSelection = (featureId?: string) => {
+    setPlanSelectionFeatureId(featureId);
     setShowPlanSelectionModal(true);
   };
 
@@ -278,6 +281,7 @@ function App() {
         <Route path="/contact" element={<Contact />} />
         <Route path="/tutorials" element={<Tutorials />} />
         <Route path="/all-tools" element={<ToolsAndPagesNavigation {...commonPageProps} />} />
+        <Route path="/pricing" element={<PricingPage onShowAuth={handleShowAuth} onShowSubscriptionPlans={handleShowPlanSelection} />} />
         {/* Add more routes as needed */}
       </Routes>
 
@@ -405,6 +409,7 @@ function App() {
         onSelectCareerPlans={handleSelectCareerPlans}
         onSubscriptionSuccess={handleSubscriptionSuccess} // Pass this to refresh subscription after direct purchase
         onShowAlert={handleShowAlert}
+        triggeredByFeatureId={planSelectionFeatureId}
       />
       <AlertModal
         isOpen={showAlertModal}

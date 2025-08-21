@@ -1,1340 +1,1102 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
+// src/components/GuidedResumeBuilder.tsx
+import React, { useState, useEffect } from 'react';
 import {
   ArrowLeft,
-  ArrowRight,
+  PlusCircle,
   User,
-  GraduationCap,
   Briefcase,
+  GraduationCap,
   Code,
   Award,
-  Plus,
-  Minus,
-  Mail,
-  Phone,
+  Save,
+  Download,
+  Loader2,
+  CheckCircle,
+  AlertCircle,
+  Sparkles,
+  Target,
+  FileText,
+  Calendar,
   MapPin,
+  Phone,
+  Mail,
   Linkedin,
   Github,
-  CheckCircle,
-  Loader2,
-  FileText,
+  Plus,
+  X,
+  ArrowRight,
   Eye
 } from 'lucide-react';
-import { paymentService } from '../services/paymentService';
-
-import { UserType, ResumeData } from '../types/resume';
-import { optimizeResume } from '../services/geminiService';
 import { useAuth } from '../contexts/AuthContext';
+import { ResumeData, UserType } from '../types/resume';
 import { ResumePreview } from './ResumePreview';
 import { ExportButtons } from './ExportButtons';
- // Import the payment service
-
-interface ContactDetails {
-  fullName: string;
-  email: string;
-  phone: string;
-  location: string;
-  linkedin: string;
-  github: string;
-}
-
-interface Education {
-  degree: string;
-  school: string;
-  year: string;
-  cgpa: string;
-  location: string;
-}
-
-interface WorkExperience {
-  role: string;
-  company: string;
-  year: string;
-  bullets: string[];
-}
-
-interface Project {
-  title: string;
-  bullets: string[];
-}
-
-interface FormData {
-  experienceLevel: UserType;
-  contactDetails: ContactDetails;
-  education: Education[];
-  workExperience: WorkExperience[];
-  projects: Project[];
-  skills: { [category: string]: string[] };
-  certifications: string[];
-  achievements: string[];
-  additionalSections: {
-    includeCertifications: boolean;
-    includeAchievements: boolean;
-  };
-}
+import { paymentService } from '../services/paymentService';
+import { useNavigate } from 'react-router-dom';
 
 interface GuidedResumeBuilderProps {
-  // onNavigateBack: () => void; // Removed this prop
+  onNavigateBack: () => void;
+  isAuthenticated: boolean;
+  onShowAuth: () => void;
   userSubscription: any;
-  onShowSubscriptionPlans: () => void;
-  refreshUserSubscription: () => void;
+  onShowPlanSelection: (featureId?: string) => void;
   onShowAlert: (title: string, message: string, type?: 'info' | 'success' | 'warning' | 'error', actionText?: string, onAction?: () => void) => void;
+  refreshUserSubscription: () => Promise<void>;
 }
 
 export const GuidedResumeBuilder: React.FC<GuidedResumeBuilderProps> = ({
-  // onNavigateBack, // Removed from destructuring
+  onNavigateBack,
+  isAuthenticated,
+  onShowAuth,
   userSubscription,
-  onShowSubscriptionPlans,
+  onShowPlanSelection,
+  onShowAlert,
   refreshUserSubscription,
-  onShowAlert
 }) => {
   const { user } = useAuth();
-  const navigate = useNavigate(); // Initialize useNavigate
+  const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(0);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [generatedResume, setGeneratedResume] = useState<ResumeData | null>(null);
+  const [resumeData, setResumeData] = useState<ResumeData>({
+    name: '',
+    phone: '',
+    email: '',
+    linkedin: '',
+    github: '',
+    location: '',
+    targetRole: '',
+    summary: '',
+    education: [],
+    workExperience: [],
+    projects: [],
+    skills: [],
+    certifications: []
+  });
+  const [userType, setUserType] = useState<UserType>('fresher');
   const [showPreview, setShowPreview] = useState(false);
 
-  const [formData, setFormData] = useState<FormData>({
-    experienceLevel: 'fresher',
-    contactDetails: {
-      fullName: user?.name || '',
-      email: user?.email || '',
-      phone: user?.phone || '',
-      location: '',
-      linkedin: user?.linkedin || '',
-      github: user?.github || ''
-    },
-    education: [{
-      degree: '',
-      school: '',
-      year: '',
-      cgpa: '',
-      location: ''
-    }],
-    workExperience: [{
-      role: '',
-      company: '',
-      year: '',
-      bullets: ['']
-    }],
-    projects: [{
-      title: '',
-      bullets: ['']
-    }],
-    skills: {
-      'Programming Languages': [''],
-      'Frameworks & Libraries': [''],
-      'Tools & Technologies': [''],
-      'Soft Skills': ['']
-    },
-    certifications: [''],
-    achievements: [''],
-    additionalSections: {
-      includeCertifications: false,
-      includeAchievements: false
+  useEffect(() => {
+    if (user) {
+      setResumeData(prev => ({
+        ...prev,
+        name: user.name || '',
+        email: user.email || '',
+        phone: user.phone || '',
+        linkedin: user.linkedin || '',
+        github: user.github || ''
+      }));
     }
-  });
+  }, [user]);
 
   const steps = [
     {
-      id: 'experience',
-      title: 'Experience Level',
-      icon: (<User className="w-5 h-5" />),
-      description: 'Tell us about your professional background'
+      id: 'personal',
+      title: 'Personal Information',
+      icon: <User className="w-6 h-6" />,
+      component: <PersonalInfoStep resumeData={resumeData} setResumeData={setResumeData} />
     },
     {
-      id: 'contact',
-      title: 'Contact Details',
-      icon: (<Mail className="w-5 h-5" />),
-      description: 'Your basic information and contact details'
+      id: 'experience',
+      title: 'Experience Level',
+      icon: <Briefcase className="w-6 h-6" />,
+      component: <ExperienceLevelStep userType={userType} setUserType={setUserType} />
     },
     {
       id: 'education',
       title: 'Education',
-      icon: (<GraduationCap className="w-5 h-5" />),
-      description: 'Your academic background and qualifications'
+      icon: <GraduationCap className="w-6 h-6" />,
+      component: <EducationStep resumeData={resumeData} setResumeData={setResumeData} />
     },
     {
-      id: 'experience-work',
+      id: 'work',
       title: 'Work Experience',
-      icon: (<Briefcase className="w-5 h-5" />),
-      description: 'Your professional experience and internships'
+      icon: <Briefcase className="w-6 h-6" />,
+      component: <WorkExperienceStep resumeData={resumeData} setResumeData={setResumeData} userType={userType} />
     },
     {
       id: 'projects',
       title: 'Projects',
-      icon: (<Code className="w-5 h-5" />),
-      description: 'Your personal and academic projects'
+      icon: <Code className="w-6 h-6" />,
+      component: <ProjectsStep resumeData={resumeData} setResumeData={setResumeData} />
     },
     {
       id: 'skills',
       title: 'Skills',
-      icon: (<Award className="w-5 h-5" />),
-      description: 'Your technical and soft skills'
-    },
-    {
-      id: 'additional',
-      title: 'Additional Sections',
-      icon: (<Plus className="w-5 h-5" />),
-      description: 'Optional sections like certifications and achievements'
+      icon: <Target className="w-6 h-6" />,
+      component: <SkillsStep resumeData={resumeData} setResumeData={setResumeData} />
     },
     {
       id: 'review',
       title: 'Review & Generate',
-      icon: (<CheckCircle className="w-5 h-5" />),
-      description: 'Review your information and generate your resume'
+      icon: <Eye className="w-6 h-6" />,
+      component: <ReviewStep resumeData={resumeData} userType={userType} onGenerate={handleGenerate} isGenerating={isGenerating} />
     }
   ];
 
-  const updateFormData = (section: keyof FormData, data: any) => {
-    setFormData(prev => ({
-      ...prev,
-      [section]: data
-    }));
-  };
-
-  const addArrayItem = (section: keyof FormData, item: any) => {
-    setFormData(prev => ({
-      ...prev,
-      [section]: [...(prev[section] as any[]), item]
-    }));
-  };
-
-  const removeArrayItem = (section: keyof FormData, index: number) => {
-    setFormData(prev => ({
-      ...prev,
-      [section]: (prev[section] as any[]).filter((_, i) => i !== index)
-    }));
-  };
-
-  const updateArrayItem = (section: keyof FormData, index: number, data: any) => {
-    setFormData(prev => ({
-      ...prev,
-      [section]: (prev[section] as any[]).map((item, i) => i === index ? data : item)
-    }));
-  };
-
-  const updateSkills = (category: string, index: number, value: string) => {
-    setFormData(prev => ({
-      ...prev,
-      skills: {
-        ...prev.skills,
-        [category]: prev.skills[category].map((skill, i) => i === index ? value : skill)
-      }
-    }));
-  };
-
-  const addSkill = (category: string) => {
-    setFormData(prev => ({
-      ...prev,
-      skills: {
-        ...prev.skills,
-        [category]: [...prev.skills[category], '']
-      }
-    }));
-  };
-
-  const removeSkill = (category: string, index: number) => {
-    setFormData(prev => ({
-      ...prev,
-      skills: {
-        ...prev.skills,
-        [category]: prev.skills[category].filter((_, i) => i !== index)
-      }
-    }));
-  };
-
-  const canProceedToNext = () => {
-    switch (currentStep) {
-      case 0: // Experience Level
-        return formData.experienceLevel !== '';
-      case 1: // Contact Details
-        return formData.contactDetails.fullName && formData.contactDetails.email;
-      case 2: // Education
-        return formData.education.some(edu => edu.degree && edu.school);
-      case 3: // Work Experience
-        return true;
-      case 4: // Projects
-        return true;
-      case 5: // Skills
-        return Object.values(formData.skills).some(skillArray => skillArray.some(skill => skill.trim() !== ''));
-      case 6: // Additional Sections
-        return true;
-      case 7: // Review & Generate - always can proceed to generate once here
-        return true;
-      default:
-        return true;
-    }
-  };
-
-  const generateResume = async () => {
-    if (!user) {
-      // Handle unauthenticated user case
-      onShowAlert("Authentication Required", "You must be logged in to generate a resume.", "info");
-      navigate('/'); // Use navigate instead of onNavigateBack
+  async function handleGenerate() {
+    if (!isAuthenticated) {
+      onShowAlert('Authentication Required', 'Please sign in to generate your resume.', 'error', 'Sign In', onShowAuth);
       return;
     }
 
-  const guidedBuildsTotal = userSubscription?.guidedBuildsTotal ?? 0;
-  const guidedBuildsUsed = userSubscription?.guidedBuildsUsed ?? 0;
-  const remainingGuidedBuilds = guidedBuildsTotal - guidedBuildsUsed;
-
-  if (remainingGuidedBuilds <= 0) {
-    onShowAlert("No Credits Remaining", "You’ve used all your guided resume credits. Upgrade to unlock more!", "warning", "Upgrade Now", onShowSubscriptionPlans);
-    return;
-  }
+    // Check subscription and guided build credits
+    if (!userSubscription || (userSubscription.guidedBuildsTotal - userSubscription.guidedBuildsUsed) <= 0) {
+      onShowPlanSelection('guided-builder');
+      return;
+    }
 
     setIsGenerating(true);
     try {
-      // Use the service to decrement the guided build count
-      const useBuildResult = await paymentService.useGuidedBuild(user.id);
-      if (!useBuildResult.success) {
-        throw new Error(useBuildResult.error || 'Failed to use guided build credit.');
-      }
+      // Simulate AI generation
+      await new Promise(resolve => setTimeout(resolve, 3000));
       
-      // NEW: Call the refresh function to update the subscription state in the parent component
-      refreshUserSubscription();
-
-      // Construct a basic resume text from form data
-      const resumeText = constructResumeText(formData);
-
-      // Use a generic job description for formatting
-      const genericJobDescription = "We are looking for a motivated individual with strong technical skills and good communication abilities. The ideal candidate should have relevant education and experience in their field.";
-
-      const result = await optimizeResume(
-        resumeText,
-        genericJobDescription,
-        formData.experienceLevel,
-        formData.contactDetails.fullName,
-        formData.contactDetails.email,
-        formData.contactDetails.phone,
-        formData.contactDetails.linkedin,
-        formData.contactDetails.github,
-        '', // No LinkedIn URL provided as a separate argument to the function anymore
-        '' // No GitHub URL provided as a separate argument to the function anymore
-      );
-
-      setGeneratedResume(result);
-      setShowPreview(true);
+      // Use guided build credit
+      const usageResult = await paymentService.useGuidedBuild(user!.id);
+      if (usageResult.success) {
+        await refreshUserSubscription();
+        setShowPreview(true);
+        onShowAlert('Resume Generated!', 'Your professional resume has been created successfully.', 'success');
+      } else {
+        onShowAlert('Credit Usage Failed', 'Failed to record guided build usage. Please contact support.', 'error');
+      }
     } catch (error) {
-      console.error('Error generating resume:', error);
-      onShowAlert("Generation Failed", 'Failed to generate resume. Please try again.', "error");
+      onShowAlert('Generation Failed', 'Failed to generate resume. Please try again.', 'error');
     } finally {
       setIsGenerating(false);
     }
-  };
+  }
 
-  const constructResumeText = (data: FormData): string => {
-    let text = `Name: ${data.contactDetails.fullName}\n`;
-    text += `Email: ${data.contactDetails.email}\n`;
-    text += `Phone: ${data.contactDetails.phone}\n`;
-    if (data.contactDetails.location) text += `Location: ${data.contactDetails.location}\n`;
-    if (data.contactDetails.linkedin) text += `LinkedIn: ${data.contactDetails.linkedin}\n`;
-    if (data.contactDetails.github) text += `GitHub: ${data.contactDetails.github}\n`;
-
-    // Education
-    text += '\nEDUCATION:\n';
-    data.education.forEach(edu => {
-      if (edu.degree.trim() && edu.school.trim()) {
-        text += `${edu.degree} from ${edu.school} (${edu.year})`;
-        if (edu.cgpa.trim()) text += ` - CGPA: ${edu.cgpa}`;
-        if (edu.location.trim()) text += ` - ${edu.location}`;
-        text += '\n';
-      }
-    });
-
-    // Work Experience
-    if (data.workExperience.some(exp => exp.role.trim() && exp.company.trim())) {
-      text += '\nWORK EXPERIENCE:\n';
-      data.workExperience.forEach(exp => {
-        if (exp.role.trim() && exp.company.trim()) {
-          text += `${exp.role} at ${exp.company} (${exp.year})\n`;
-          exp.bullets.forEach(bullet => {
-            if (bullet.trim()) text += `• ${bullet}\n`;
-          });
-        }
-      });
-    }
-
-    // Projects
-    if (data.projects.some(proj => proj.title.trim())) {
-      text += '\nPROJECTS:\n';
-      data.projects.forEach(proj => {
-        if (proj.title.trim()) {
-          text += `${proj.title}\n`;
-          proj.bullets.forEach(bullet => {
-            if (bullet.trim()) text += `• ${bullet}\n`;
-          });
-        }
-      });
-    }
-
-    // Skills
-    text += '\nSKILLS:\n';
-    Object.entries(data.skills).forEach(([category, skills]) => {
-      const filteredSkills = skills.filter(skill => skill.trim() !== '');
-      if (filteredSkills.length > 0) {
-        text += `${category}: ${filteredSkills.join(', ')}\n`;
-      }
-    });
-
-    // Certifications
-    if (data.additionalSections.includeCertifications && data.certifications.some(cert => cert.trim())) {
-      text += '\nCERTIFICATIONS:\n';
-      data.certifications.forEach(cert => {
-        if (cert.trim()) text += `• ${cert}\n`;
-      });
-    }
-
-    // Achievements
-    if (data.additionalSections.includeAchievements && data.achievements.some(ach => ach.trim())) {
-      text += '\nACHIEVEMENTS:\n';
-      data.achievements.forEach(ach => {
-        if (ach.trim()) text += `• ${ach}\n`;
-      });
-    }
-
-    return text;
-  };
-
-  const nextStep = () => {
+  const handleNext = () => {
     if (currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1);
-    } else if (currentStep === steps.length - 1) {
-      // This is the "Review & Generate" step
-      generateResume();
     }
   };
 
-  const prevStep = () => {
+  const handlePrevious = () => {
     if (currentStep > 0) {
       setCurrentStep(currentStep - 1);
     }
   };
 
-  if (showPreview && generatedResume) {
+  if (showPreview) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 dark:from-dark-100 dark:to-dark-200">
-        <div className="container-responsive py-8">
-          {/* Header */}
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 dark:from-dark-50 dark:to-dark-200 px-4 py-8">
+        <div className="max-w-7xl mx-auto">
           <div className="text-center mb-8">
-            <div className="bg-white dark:bg-dark-200 rounded-2xl shadow-lg dark:shadow-dark-xl p-6 border border-gray-200 dark:border-dark-400">
-              <div className="flex items-center justify-center mb-4">
-                <CheckCircle className="w-12 h-12 text-green-600 mr-3" />
-                <div>
-                  <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-gray-100">Resume Generated Successfully!</h1>
-                  <p className="text-gray-600 mt-1 dark:text-gray-300">Your professional resume is ready for download</p>
-                </div>
-              </div>
-
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <button
-                  onClick={() => setShowPreview(false)}
-                  className="flex items-center justify-center space-x-2 bg-gray-600 hover:bg-gray-700 text-white font-semibold py-3 px-6 rounded-xl transition-all duration-300 dark:bg-dark-400 dark:hover:bg-dark-500"
-                >
-                  <Eye className="w-5 h-5" />
-                  <span>Edit Resume</span>
-                </button>
-              <button
-              onClick={() => navigate('/')} // Use navigate instead of onNavigateBack
-              className="mb-6 mt-15 bg-primary-600 text-white hover:bg-primary-700 active:bg-primary-800 shadow-md dark:shadow-dark-xl hover:shadow-lg dark:hover:shadow-dark-2xl py-3 px-5 rounded-xl inline-flex items-center space-x-2 transition-all duration-200 dark:bg-neon-blue-500 dark:hover:bg-neon-blue-600 dark:active:bg-neon-blue-700"
+            <button
+              onClick={() => setShowPreview(false)}
+              className="mb-6 bg-gradient-to-r from-neon-cyan-500 to-neon-blue-500 text-white hover:from-neon-cyan-400 hover:to-neon-blue-400 shadow-md hover:shadow-neon-cyan py-3 px-5 rounded-xl inline-flex items-center space-x-2 transition-all duration-200"
             >
               <ArrowLeft className="w-5 h-5" />
-              <span className="hidden sm:block">Back to Home</span>
+              <span>Back to Builder</span>
             </button>
-              </div>
-            </div>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4">Your Professional Resume</h1>
+            <p className="text-gray-600 dark:text-gray-300">Review and download your AI-generated resume</p>
           </div>
 
-          {/* Resume Preview and Export */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Resume Preview */}
-            <div className="lg:col-span-2">
-              <div className="bg-white dark:bg-dark-200 rounded-2xl shadow-lg dark:shadow-dark-xl border border-gray-200 dark:border-dark-400 overflow-hidden">
-                <div className="bg-gradient-to-r from-green-50 to-blue-50 dark:from-dark-300 dark:to-dark-400 p-4 border-b border-gray-200 dark:border-dark-400">
-                  <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 flex items-center">
-                    <FileText className="w-5 h-5 mr-2 text-green-600" />
-                    Your Generated Resume
-                  </h2>
-                </div>
-                <ResumePreview resumeData={generatedResume} userType={formData.experienceLevel} />
-              </div>
-            </div>
-
-            {/* Export Options */}
-            <div className="lg:col-span-1">
-              <ExportButtons resumeData={generatedResume} userType={formData.experienceLevel} />
-            </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <ResumePreview resumeData={resumeData} userType={userType} />
+            <ExportButtons resumeData={resumeData} userType={userType} />
           </div>
         </div>
       </div>
     );
   }
 
-  const renderStepContent = () => {
-    switch (currentStep) {
-      case 0: // Experience Level
-        return (
-          <div className="space-y-6">
-            <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">What's your experience level?</h2>
-              <p className="text-gray-600 dark:text-gray-300">This helps us customize your resume format</p>
-            </div>
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 dark:from-dark-50 dark:to-dark-200 px-4 py-8">
+      <div className="max-w-4xl mx-auto">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <button
+            onClick={() => navigate('/')}
+            className="mb-6 bg-gradient-to-r from-neon-cyan-500 to-neon-blue-500 text-white hover:from-neon-cyan-400 hover:to-neon-blue-400 shadow-md hover:shadow-neon-cyan py-3 px-5 rounded-xl inline-flex items-center space-x-2 transition-all duration-200"
+          >
+            <ArrowLeft className="w-5 h-5" />
+            <span>Back to Home</span>
+          </button>
+          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-gray-100 mb-4">
+            Guided Resume Builder
+          </h1>
+          <p className="text-lg text-gray-600 dark:text-gray-300">
+            Create a professional resume step-by-step with AI assistance
+          </p>
+        </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {[
-                { id: 'fresher', label: 'Fresher/New Graduate', desc: 'Just graduated or starting career', icon: (<GraduationCap className="w-8 h-8" />) },
-                { id: 'student', label: 'Student', desc: 'Currently studying, seeking internships', icon: (<User className="w-8 h-8" />) },
-                { id: 'experienced', label: 'Experienced Professional', desc: '1+ years of work experience', icon: (<Briefcase className="w-8 h-8" />) }
-              ].map((option) => (
-                <button
-                  key={option.id}
-                  onClick={() => updateFormData('experienceLevel', option.id as UserType)}
-                  className={`p-6 rounded-2xl border-2 transition-all duration-300 text-center hover:scale-105 ${
-                    formData.experienceLevel === option.id
-                      ? 'border-blue-500 dark:border-neon-cyan-500 bg-blue-50 dark:bg-dark-300 shadow-lg dark:shadow-dark-xl'
-                      : 'border-gray-200 dark:border-dark-300 hover:border-blue-300 dark:hover:border-neon-cyan-400 hover:bg-blue-50 dark:hover:bg-dark-300'
-                  }`}
-                >
-                  <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 ${
-                    formData.experienceLevel === option.id ? 'bg-blue-500 text-white dark:bg-neon-cyan-500' : 'bg-gray-100 dark:bg-dark-300 text-gray-600 dark:text-gray-300'
+        {/* Progress Bar */}
+        <div className="bg-white rounded-xl shadow-lg p-6 mb-8 border border-gray-200 dark:bg-dark-100 dark:border-dark-300">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">Step {currentStep + 1} of {steps.length}</h2>
+            <div className="text-sm text-gray-500 dark:text-gray-400">
+              {steps[currentStep].title}
+            </div>
+          </div>
+
+          <div className="flex items-center space-x-4 mb-6">
+            {steps.map((step, index) => (
+              <React.Fragment key={step.id}>
+                <div className="flex flex-col items-center">
+                  <div
+                    className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 ${
+                      index < currentStep
+                        ? 'bg-green-500 text-white'
+                        : index === currentStep
+                        ? 'bg-blue-500 text-white'
+                        : 'bg-gray-200 text-gray-500 dark:bg-dark-200 dark:text-gray-400'
+                    }`}
+                  >
+                    {index < currentStep ? (
+                      <CheckCircle className="w-6 h-6" />
+                    ) : (
+                      step.icon
+                    )}
+                  </div>
+                  <span className={`text-xs mt-2 font-medium text-center ${
+                    index <= currentStep ? 'text-gray-900 dark:text-gray-100' : 'text-gray-500 dark:text-gray-400'
                   }`}>
-                    {option.icon}
-                  </div>
-                  <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">{option.label}</h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-300">{option.desc}</p>
-                </button>
-              ))}
-            </div>
-          </div>
-        );
-
-      case 1: // Contact Details
-        return (
-          <div className="space-y-6">
-            <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">Contact Information</h2>
-              <p className="text-gray-600 dark:text-gray-300">Tell us how employers can reach you</p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
-                  Full Name *
-                </label>
-                <div className="relative">
-                  <User className="absolute left-3 top-3 h-5 w-5 text-gray-400 dark:text-gray-500" />
-                  <input
-                    type="text"
-                    value={formData.contactDetails.fullName}
-                    onChange={(e) => updateFormData('contactDetails', { ...formData.contactDetails, fullName: e.target.value })}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-dark-400 rounded-xl focus:ring-2 focus:ring-blue-500 dark:focus:ring-neon-cyan-500 focus:border-blue-500 dark:focus:border-neon-cyan-500 bg-white dark:bg-dark-300 text-gray-900 dark:text-gray-100"
-                    placeholder="Enter your full name"
-                  />
+                    {step.title}
+                  </span>
                 </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
-                  Email Address *
-                </label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-3 h-5 w-5 text-gray-400 dark:text-gray-500" />
-                  <input
-                    type="email"
-                    value={formData.contactDetails.email}
-                    onChange={(e) => updateFormData('contactDetails', { ...formData.contactDetails, email: e.target.value })}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-dark-400 rounded-xl focus:ring-2 focus:ring-blue-500 dark:focus:ring-neon-cyan-500 focus:border-blue-500 dark:focus:border-neon-cyan-500 bg-white dark:bg-dark-300 text-gray-900 dark:text-gray-100"
-                    placeholder="your.email@example.com"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
-                  Phone Number
-                </label>
-                <div className="relative">
-                  <Phone className="absolute left-3 top-3 h-5 w-5 text-gray-400 dark:text-gray-500" />
-                  <input
-                    type="tel"
-                    value={formData.contactDetails.phone}
-                    onChange={(e) => updateFormData('contactDetails', { ...formData.contactDetails, phone: e.target.value })}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-dark-400 rounded-xl focus:ring-2 focus:ring-blue-500 dark:focus:ring-neon-cyan-500 focus:border-blue-500 dark:focus:border-neon-cyan-500 bg-white dark:bg-dark-300 text-gray-900 dark:text-gray-100"
-                    placeholder="+1 (555) 123-4567"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
-                  Location
-                </label>
-                <div className="relative">
-                  <MapPin className="absolute left-3 top-3 h-5 w-5 text-gray-400 dark:text-gray-500" />
-                  <input
-                    type="text"
-                    value={formData.contactDetails.location}
-                    onChange={(e) => updateFormData('contactDetails', { ...formData.contactDetails, location: e.target.value })}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-dark-400 rounded-xl focus:ring-2 focus:ring-blue-500 dark:focus:ring-neon-cyan-500 focus:border-blue-500 dark:focus:border-neon-cyan-500 bg-white dark:bg-dark-300 text-gray-900 dark:text-gray-100"
-                    placeholder="City, State"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
-                  LinkedIn Profile
-                </label>
-                <div className="relative">
-                  <Linkedin className="absolute left-3 top-3 h-5 w-5 text-gray-400 dark:text-gray-500" />
-                  <input
-                    type="url"
-                    value={formData.contactDetails.linkedin}
-                    onChange={(e) => updateFormData('contactDetails', { ...formData.contactDetails, linkedin: e.target.value })}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-dark-400 rounded-xl focus:ring-2 focus:ring-blue-500 dark:focus:ring-neon-cyan-500 focus:border-blue-500 dark:focus:border-neon-cyan-500 bg-white dark:bg-dark-300 text-gray-900 dark:text-gray-100"
-                    placeholder="https://linkedin.com/in/yourprofile"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
-                  GitHub Profile
-                </label>
-                <div className="relative">
-                  <Github className="absolute left-3 top-3 h-5 w-5 text-gray-400 dark:text-gray-500" />
-                  <input
-                    type="url"
-                    value={formData.contactDetails.github}
-                    onChange={(e) => updateFormData('contactDetails', { ...formData.contactDetails, github: e.target.value })}
-                    className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-dark-400 rounded-xl focus:ring-2 focus:ring-blue-500 dark:focus:ring-neon-cyan-500 focus:border-blue-500 dark:focus:border-neon-cyan-500 bg-white dark:bg-dark-300 text-gray-900 dark:text-gray-100"
-                    placeholder="https://github.com/yourusername"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-        );
-
-      case 2: // Education
-        return (
-          <div className="space-y-6">
-            <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">Education Background</h2>
-              <p className="text-gray-600 dark:text-gray-300">Add your educational qualifications</p>
-            </div>
-
-            {formData.education.map((edu, index) => (
-              <div key={index} className="bg-white dark:bg-dark-200 p-6 rounded-xl border border-gray-200 dark:border-dark-400 shadow-sm dark:shadow-dark-xl">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-semibold text-gray-900 dark:text-gray-100">Education #{index + 1}</h3>
-                  {formData.education.length > 1 && (
-                    <button
-                      onClick={() => removeArrayItem('education', index)}
-                      className="text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 p-2"
-                    >
-                      <Minus className="w-4 h-4" />
-                    </button>
-                  )}
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">Degree *</label>
-                    <input
-                      type="text"
-                      value={edu.degree}
-                      onChange={(e) => updateArrayItem('education', index, { ...edu, degree: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-dark-400 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-neon-cyan-500 focus:border-blue-500 dark:focus:border-neon-cyan-500 bg-white dark:bg-dark-300 text-gray-900 dark:text-gray-100"
-                      placeholder="e.g., Bachelor of Science in Computer Science"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">School/University *</label>
-                    <input
-                      type="text"
-                      value={edu.school}
-                      onChange={(e) => updateArrayItem('education', index, { ...edu, school: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-dark-400 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-neon-cyan-500 focus:border-blue-500 dark:focus:border-neon-cyan-500 bg-white dark:bg-dark-300 text-gray-900 dark:text-gray-100"
-                      placeholder="e.g., Stanford University"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">Year</label>
-                    <input
-                      type="text"
-                      value={edu.year}
-                      onChange={(e) => updateArrayItem('education', index, { ...edu, year: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-dark-400 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-neon-cyan-500 focus:border-blue-500 dark:focus:border-neon-cyan-500 bg-white dark:bg-dark-300 text-gray-900 dark:text-gray-100"
-                      placeholder="e.g., 2020-2024"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">CGPA/GPA</label>
-                    <input
-                      type="text"
-                      value={edu.cgpa}
-                      onChange={(e) => updateArrayItem('education', index, { ...edu, cgpa: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-dark-400 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-neon-cyan-500 focus:border-blue-500 dark:focus:border-neon-cyan-500 bg-white dark:bg-dark-300 text-gray-900 dark:text-gray-100"
-                      placeholder="e.g., 3.8/4.0"
-                    />
-                  </div>
-
-                  <div className="md:col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">Location</label>
-                    <input
-                      type="text"
-                      value={edu.location}
-                      onChange={(e) => updateArrayItem('education', index, { ...edu, location: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-dark-400 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-neon-cyan-500 focus:border-blue-500 dark:focus:border-neon-cyan-500 bg-white dark:bg-dark-300 text-gray-900 dark:text-gray-100"
-                      placeholder="e.g., Stanford, CA"
-                    />
-                  </div>
-                </div>
-              </div>
+                {index < steps.length - 1 && (
+                  <div className={`flex-1 h-1 rounded-full transition-all duration-300 ${
+                    index < currentStep ? 'bg-green-500' : 'bg-gray-200 dark:bg-dark-200'
+                  }`} />
+                )}
+              </React.Fragment>
             ))}
+          </div>
+        </div>
 
+        {/* Current Step Content */}
+        <div className="bg-white rounded-xl shadow-lg p-6 mb-8 border border-gray-200 dark:bg-dark-100 dark:border-dark-300">
+          {steps[currentStep].component}
+        </div>
+
+        {/* Navigation */}
+        <div className="flex justify-between items-center">
+          <button
+            onClick={handlePrevious}
+            disabled={currentStep === 0}
+            className={`flex items-center space-x-2 px-6 py-3 rounded-xl font-semibold transition-all duration-300 ${
+              currentStep === 0
+                ? 'bg-gray-200 text-gray-400 cursor-not-allowed dark:bg-dark-200 dark:text-gray-500'
+                : 'bg-gray-600 hover:bg-gray-700 text-white shadow-lg hover:shadow-xl'
+            }`}
+          >
+            <ArrowLeft className="w-5 h-5" />
+            <span>Previous</span>
+          </button>
+
+          {currentStep < steps.length - 1 ? (
             <button
-              onClick={() => addArrayItem('education', { degree: '', school: '', year: '', cgpa: '', location: '' })}
-              className="w-full border-2 border-dashed border-gray-300 dark:border-dark-400 rounded-xl p-4 text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100 hover:border-gray-400 dark:hover:border-dark-300 transition-colors flex items-center justify-center"
+              onClick={handleNext}
+              className="flex items-center space-x-2 px-6 py-3 rounded-xl font-semibold transition-all duration-300 bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl"
             >
-              <Plus className="w-5 h-5 mr-2" />
-              Add Another Education
+              <span>Next</span>
+              <ArrowRight className="w-5 h-5" />
             </button>
-          </div>
-        );
+          ) : null}
+        </div>
+      </div>
+    </div>
+  );
+};
 
-      case 3: // Work Experience
-        return (
-          <div className="space-y-6">
-            <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">Work Experience</h2>
-              <p className="text-gray-600 dark:text-gray-300">Highlight your professional work history</p>
+// Step Components
+const PersonalInfoStep: React.FC<{ resumeData: ResumeData; setResumeData: React.Dispatch<React.SetStateAction<ResumeData>> }> = ({
+  resumeData,
+  setResumeData
+}) => {
+  const updateField = (field: keyof ResumeData, value: string) => {
+    setResumeData(prev => ({ ...prev, [field]: value }));
+  };
+
+  return (
+    <div className="space-y-6">
+      <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">Personal Information</h3>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Full Name *
+          </label>
+          <input
+            type="text"
+            value={resumeData.name}
+            onChange={(e) => updateField('name', e.target.value)}
+            placeholder="John Doe"
+            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-dark-200 dark:border-dark-300 dark:text-gray-100"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Email Address *
+          </label>
+          <input
+            type="email"
+            value={resumeData.email}
+            onChange={(e) => updateField('email', e.target.value)}
+            placeholder="john@example.com"
+            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-dark-200 dark:border-dark-300 dark:text-gray-100"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Phone Number *
+          </label>
+          <input
+            type="tel"
+            value={resumeData.phone}
+            onChange={(e) => updateField('phone', e.target.value)}
+            placeholder="+1 (555) 123-4567"
+            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-dark-200 dark:border-dark-300 dark:text-gray-100"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Location
+          </label>
+          <input
+            type="text"
+            value={resumeData.location || ''}
+            onChange={(e) => updateField('location', e.target.value)}
+            placeholder="City, State"
+            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-dark-200 dark:border-dark-300 dark:text-gray-100"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            LinkedIn Profile
+          </label>
+          <input
+            type="url"
+            value={resumeData.linkedin}
+            onChange={(e) => updateField('linkedin', e.target.value)}
+            placeholder="https://linkedin.com/in/johndoe"
+            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-dark-200 dark:border-dark-300 dark:text-gray-100"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            GitHub Profile
+          </label>
+          <input
+            type="url"
+            value={resumeData.github}
+            onChange={(e) => updateField('github', e.target.value)}
+            placeholder="https://github.com/johndoe"
+            className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-dark-200 dark:border-dark-300 dark:text-gray-100"
+          />
+        </div>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          Target Role
+        </label>
+        <input
+          type="text"
+          value={resumeData.targetRole || ''}
+          onChange={(e) => updateField('targetRole', e.target.value)}
+          placeholder="Software Engineer, Product Manager, etc."
+          className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-dark-200 dark:border-dark-300 dark:text-gray-100"
+        />
+      </div>
+    </div>
+  );
+};
+
+const ExperienceLevelStep: React.FC<{ userType: UserType; setUserType: React.Dispatch<React.SetStateAction<UserType>> }> = ({
+  userType,
+  setUserType
+}) => {
+  return (
+    <div className="space-y-6">
+      <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">Experience Level</h3>
+      
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {[
+          { id: 'student', title: 'Student', description: 'Currently studying or recent graduate', icon: <GraduationCap className="w-8 h-8" /> },
+          { id: 'fresher', title: 'Fresher', description: 'New graduate or entry-level professional', icon: <User className="w-8 h-8" /> },
+          { id: 'experienced', title: 'Experienced', description: 'Professional with 1+ years of experience', icon: <Briefcase className="w-8 h-8" /> }
+        ].map((type) => (
+          <button
+            key={type.id}
+            onClick={() => setUserType(type.id as UserType)}
+            className={`p-6 rounded-xl border-2 transition-all duration-300 ${
+              userType === type.id
+                ? 'border-blue-500 bg-blue-50 shadow-lg dark:border-neon-cyan-500 dark:bg-neon-cyan-500/20'
+                : 'border-gray-200 hover:border-blue-300 hover:bg-blue-50 dark:border-dark-300 dark:hover:border-neon-cyan-400'
+            }`}
+          >
+            <div className={`mb-4 ${userType === type.id ? 'text-blue-600 dark:text-neon-cyan-400' : 'text-gray-500'}`}>
+              {type.icon}
+            </div>
+            <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">{type.title}</h4>
+            <p className="text-gray-600 dark:text-gray-300 text-sm">{type.description}</p>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+const EducationStep: React.FC<{ resumeData: ResumeData; setResumeData: React.Dispatch<React.SetStateAction<ResumeData>> }> = ({
+  resumeData,
+  setResumeData
+}) => {
+  const addEducation = () => {
+    setResumeData(prev => ({
+      ...prev,
+      education: [...prev.education, { degree: '', school: '', year: '', cgpa: '', location: '' }]
+    }));
+  };
+
+  const updateEducation = (index: number, field: string, value: string) => {
+    setResumeData(prev => ({
+      ...prev,
+      education: prev.education.map((edu, i) => 
+        i === index ? { ...edu, [field]: value } : edu
+      )
+    }));
+  };
+
+  const removeEducation = (index: number) => {
+    setResumeData(prev => ({
+      ...prev,
+      education: prev.education.filter((_, i) => i !== index)
+    }));
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Education</h3>
+        <button
+          onClick={addEducation}
+          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors"
+        >
+          <Plus className="w-4 h-4" />
+          <span>Add Education</span>
+        </button>
+      </div>
+
+      {resumeData.education.length === 0 && (
+        <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+          <GraduationCap className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+          <p>No education added yet. Click "Add Education" to get started.</p>
+        </div>
+      )}
+
+      {resumeData.education.map((edu, index) => (
+        <div key={index} className="border border-gray-200 rounded-xl p-6 space-y-4 dark:border-dark-300">
+          <div className="flex items-center justify-between">
+            <h4 className="font-medium text-gray-900 dark:text-gray-100">Education #{index + 1}</h4>
+            {resumeData.education.length > 1 && (
+              <button
+                onClick={() => removeEducation(index)}
+                className="text-red-600 hover:text-red-700 p-2"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            )}
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Degree *</label>
+              <input
+                type="text"
+                value={edu.degree}
+                onChange={(e) => updateEducation(index, 'degree', e.target.value)}
+                placeholder="Bachelor of Technology"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-dark-200 dark:border-dark-300 dark:text-gray-100"
+              />
             </div>
 
-            {formData.workExperience.map((experience, expIndex) => (
-              <div key={expIndex} className="bg-white dark:bg-dark-200 p-6 rounded-xl border border-gray-200 dark:border-dark-400 shadow-sm dark:shadow-dark-xl">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-semibold text-gray-900 dark:text-gray-100">Work Experience #{expIndex + 1}</h3>
-                  {formData.workExperience.length > 1 && (
-                    <button
-                      onClick={() => removeArrayItem('workExperience', expIndex)}
-                      className="text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 p-2"
-                    >
-                      <Minus className="w-4 h-4" />
-                    </button>
-                  )}
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">Role</label>
-                    <input
-                      type="text"
-                      value={experience.role}
-                      onChange={(e) => updateArrayItem('workExperience', expIndex, { ...experience, role: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-dark-400 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-neon-cyan-500 focus:border-blue-500 dark:focus:border-neon-cyan-500 bg-white dark:bg-dark-300 text-gray-900 dark:text-gray-100"
-                      placeholder="e.g., Software Engineer"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">Company</label>
-                    <input
-                      type="text"
-                      value={experience.company}
-                      onChange={(e) => updateArrayItem('workExperience', expIndex, { ...experience, company: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-dark-400 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-neon-cyan-500 focus:border-blue-500 dark:focus:border-neon-cyan-500 bg-white dark:bg-dark-300 text-gray-900 dark:text-gray-100"
-                      placeholder="e.g., Google"
-                    />
-                  </div>
-                  <div className="md:col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">Years (e.g., 2022-Present or 2020-2022)</label>
-                    <input
-                      type="text"
-                      value={experience.year}
-                      onChange={(e) => updateArrayItem('workExperience', expIndex, { ...experience, year: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-dark-400 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-neon-cyan-500 focus:border-blue-500 dark:focus:border-neon-cyan-500 bg-white dark:bg-dark-300 text-gray-900 dark:text-gray-100"
-                      placeholder="e.g., 2022-Present"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">Responsibilities / Achievements (Bullet Points)</label>
-                  {experience.bullets.map((bullet, bulletIndex) => (
-                    <div key={bulletIndex} className="flex items-center gap-2 mb-2">
-                      <input
-                        type="text"
-                        value={bullet}
-                        onChange={(e) => {
-                          const newBullets = [...experience.bullets];
-                          newBullets[bulletIndex] = e.target.value;
-                          updateArrayItem('workExperience', expIndex, { ...experience, bullets: newBullets });
-                        }}
-                        className="flex-grow px-3 py-2 border border-gray-300 dark:border-dark-400 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-neon-cyan-500 focus:border-blue-500 dark:focus:border-neon-cyan-500 bg-white dark:bg-dark-300 text-gray-900 dark:text-gray-100"
-                        placeholder="e.g., Developed and maintained web applications"
-                      />
-                      {experience.bullets.length > 1 && (
-                        <button
-                          onClick={() => {
-                            const newBullets = experience.bullets.filter((_, i) => i !== bulletIndex);
-                            updateArrayItem('workExperience', expIndex, { ...experience, bullets: newBullets });
-                          }}
-                          className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 p-1 rounded"
-                        >
-                          <Minus className="w-4 h-4" />
-                        </button>
-                      )}
-                    </div>
-                  ))}
-                  <button
-                    onClick={() => {
-                      const newBullets = [...experience.bullets, ''];
-                      updateArrayItem('workExperience', expIndex, { ...experience, bullets: newBullets });
-                    }}
-                    className="mt-2 text-blue-600 hover:text-blue-800 dark:text-neon-cyan-400 dark:hover:text-neon-cyan-300 flex items-center text-sm"
-                  >
-                    <Plus className="w-4 h-4 mr-1" /> Add Bullet Point
-                  </button>
-                </div>
-              </div>
-            ))}
-
-            <button
-              onClick={() => addArrayItem('workExperience', { role: '', company: '', year: '', bullets: [''] })}
-              className="w-full border-2 border-dashed border-gray-300 dark:border-dark-400 rounded-xl p-4 text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100 hover:border-gray-400 dark:hover:border-dark-300 transition-colors flex items-center justify-center"
-            >
-              <Plus className="w-5 h-5 mr-2" />
-              Add Another Work Experience
-            </button>
-          </div>
-        );
-
-      case 4: // Projects
-        return (
-          <div className="space-y-6">
-            <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">Projects</h2>
-              <p className="text-gray-600 dark:text-gray-300">Showcase your personal or academic projects</p>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Institution *</label>
+              <input
+                type="text"
+                value={edu.school}
+                onChange={(e) => updateEducation(index, 'school', e.target.value)}
+                placeholder="University Name"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-dark-200 dark:border-dark-300 dark:text-gray-100"
+              />
             </div>
 
-            {formData.projects.map((project, projIndex) => (
-              <div key={projIndex} className="bg-white dark:bg-dark-200 p-6 rounded-xl border border-gray-200 dark:border-dark-400 shadow-sm dark:shadow-dark-xl">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-semibold text-gray-900 dark:text-gray-100">Project #{projIndex + 1}</h3>
-                  {formData.projects.length > 1 && (
-                    <button
-                      onClick={() => removeArrayItem('projects', projIndex)}
-                      className="text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 p-2"
-                    >
-                      <Minus className="w-4 h-4" />
-                    </button>
-                  )}
-                </div>
-
-                <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">Project Title *</label>
-                  <input
-                    type="text"
-                    value={project.title}
-                    onChange={(e) => updateArrayItem('projects', projIndex, { ...project, title: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-dark-400 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-neon-cyan-500 focus:border-blue-500 dark:focus:border-neon-cyan-500 bg-white dark:bg-dark-300 text-gray-900 dark:text-gray-100"
-                    placeholder="e.g., E-commerce Platform"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">Project Details (Bullet Points)</label>
-                  {project.bullets.map((bullet, bulletIndex) => (
-                    <div key={bulletIndex} className="flex items-center gap-2 mb-2">
-                      <input
-                        type="text"
-                        value={bullet}
-                        onChange={(e) => {
-                          const newBullets = [...project.bullets];
-                          newBullets[bulletIndex] = e.target.value;
-                          updateArrayItem('projects', projIndex, { ...project, bullets: newBullets });
-                        }}
-                        className="flex-grow px-3 py-2 border border-gray-300 dark:border-dark-400 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-neon-cyan-500 focus:border-blue-500 dark:focus:border-neon-cyan-500 bg-white dark:bg-dark-300 text-gray-900 dark:text-gray-100"
-                        placeholder="e.g., Implemented user authentication with OAuth"
-                      />
-                      {project.bullets.length > 1 && (
-                        <button
-                          onClick={() => {
-                            const newBullets = project.bullets.filter((_, i) => i !== bulletIndex);
-                            updateArrayItem('projects', projIndex, { ...project, bullets: newBullets });
-                          }}
-                          className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 p-1 rounded"
-                        >
-                          <Minus className="w-4 h-4" />
-                        </button>
-                      )}
-                    </div>
-                  ))}
-                  <button
-                    onClick={() => {
-                      const newBullets = [...project.bullets, ''];
-                      updateArrayItem('projects', projIndex, { ...project, bullets: newBullets });
-                    }}
-                    className="mt-2 text-blue-600 hover:text-blue-800 dark:text-neon-cyan-400 dark:hover:text-neon-cyan-300 flex items-center text-sm"
-                  >
-                    <Plus className="w-4 h-4 mr-1" /> Add Bullet Point
-                  </button>
-                </div>
-              </div>
-            ))}
-
-            <button
-              onClick={() => addArrayItem('projects', { title: '', bullets: [''] })}
-              className="w-full border-2 border-dashed border-gray-300 dark:border-dark-400 rounded-xl p-4 text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100 hover:border-gray-400 dark:hover:border-dark-300 transition-colors flex items-center justify-center"
-            >
-              <Plus className="w-5 h-5 mr-2" />
-              Add Another Project
-            </button>
-          </div>
-        );
-
-      case 5: // Skills
-        return (
-          <div className="space-y-6">
-            <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">Your Skills</h2>
-              <p className="text-gray-600 dark:text-gray-300">List your technical, soft, and other relevant skills</p>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Year *</label>
+              <input
+                type="text"
+                value={edu.year}
+                onChange={(e) => updateEducation(index, 'year', e.target.value)}
+                placeholder="2020-2024"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-dark-200 dark:border-dark-300 dark:text-gray-100"
+              />
             </div>
 
-            {Object.keys(formData.skills).map((category) => (
-              <div key={category} className="bg-white dark:bg-dark-200 p-6 rounded-xl border border-gray-200 dark:border-dark-400 shadow-sm dark:shadow-dark-xl">
-                <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-4">{category}</h3>
-                <div className="space-y-2">
-                  {formData.skills[category].map((skill, skillIndex) => (
-                    <div key={skillIndex} className="flex items-center gap-2">
-                      <input
-                        type="text"
-                        value={skill}
-                        onChange={(e) => updateSkills(category, skillIndex, e.target.value)}
-                        className="flex-grow px-3 py-2 border border-gray-300 dark:border-dark-400 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-neon-cyan-500 focus:border-blue-500 dark:focus:border-neon-cyan-500 bg-white dark:bg-dark-300 text-gray-900 dark:text-gray-100"
-                        placeholder={`Add a ${category.toLowerCase().replace(' skills', '').slice(0, -1)} skill`}
-                      />
-                      {formData.skills[category].length > 1 && (
-                        <button
-                          onClick={() => removeSkill(category, skillIndex)}
-                          className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 p-1 rounded"
-                        >
-                          <Minus className="w-4 h-4" />
-                        </button>
-                      )}
-                    </div>
-                  ))}
-                  <button
-                    onClick={() => addSkill(category)}
-                    className="mt-2 text-blue-600 hover:text-blue-800 dark:text-neon-cyan-400 dark:hover:text-neon-cyan-300 flex items-center text-sm"
-                  >
-                    <Plus className="w-4 h-4 mr-1" /> Add Skill
-                  </button>
-                </div>
-              </div>
-            ))}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">CGPA/GPA</label>
+              <input
+                type="text"
+                value={edu.cgpa || ''}
+                onChange={(e) => updateEducation(index, 'cgpa', e.target.value)}
+                placeholder="8.5/10"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-dark-200 dark:border-dark-300 dark:text-gray-100"
+              />
+            </div>
           </div>
-        );
+        </div>
+      ))}
 
-      case 6: // Additional Sections
-        return (
-          <div className="space-y-6">
-            <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">Additional Sections</h2>
-              <p className="text-gray-600 dark:text-gray-300">Include optional sections to enhance your resume</p>
+      {resumeData.education.length === 0 && (
+        <button
+          onClick={addEducation}
+          className="w-full border-2 border-dashed border-gray-300 rounded-xl p-8 text-gray-600 hover:text-gray-800 hover:border-gray-400 transition-colors flex flex-col items-center"
+        >
+          <Plus className="w-8 h-8 mb-2" />
+          <span>Add Your First Education</span>
+        </button>
+      )}
+    </div>
+  );
+};
+
+const WorkExperienceStep: React.FC<{ 
+  resumeData: ResumeData; 
+  setResumeData: React.Dispatch<React.SetStateAction<ResumeData>>;
+  userType: UserType;
+}> = ({ resumeData, setResumeData, userType }) => {
+  const addWorkExperience = () => {
+    setResumeData(prev => ({
+      ...prev,
+      workExperience: [...prev.workExperience, { role: '', company: '', year: '', bullets: [''] }]
+    }));
+  };
+
+  const updateWorkExperience = (index: number, field: string, value: any) => {
+    setResumeData(prev => ({
+      ...prev,
+      workExperience: prev.workExperience.map((work, i) => 
+        i === index ? { ...work, [field]: value } : work
+      )
+    }));
+  };
+
+  const removeWorkExperience = (index: number) => {
+    setResumeData(prev => ({
+      ...prev,
+      workExperience: prev.workExperience.filter((_, i) => i !== index)
+    }));
+  };
+
+  const addBullet = (workIndex: number) => {
+    const updated = [...resumeData.workExperience];
+    updated[workIndex].bullets.push('');
+    setResumeData(prev => ({ ...prev, workExperience: updated }));
+  };
+
+  const updateBullet = (workIndex: number, bulletIndex: number, value: string) => {
+    const updated = [...resumeData.workExperience];
+    updated[workIndex].bullets[bulletIndex] = value;
+    setResumeData(prev => ({ ...prev, workExperience: updated }));
+  };
+
+  const removeBullet = (workIndex: number, bulletIndex: number) => {
+    const updated = [...resumeData.workExperience];
+    if (updated[workIndex].bullets.length > 1) {
+      updated[workIndex].bullets.splice(bulletIndex, 1);
+      setResumeData(prev => ({ ...prev, workExperience: updated }));
+    }
+  };
+
+  const sectionTitle = userType === 'student' ? 'Internships & Training' : 
+                     userType === 'fresher' ? 'Internships & Work Experience' : 
+                     'Professional Experience';
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100">{sectionTitle}</h3>
+        <button
+          onClick={addWorkExperience}
+          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors"
+        >
+          <Plus className="w-4 h-4" />
+          <span>Add Experience</span>
+        </button>
+      </div>
+
+      {resumeData.workExperience.length === 0 && (
+        <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+          <Briefcase className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+          <p>No work experience added yet. {userType === 'student' ? 'Add internships or training programs.' : 'Add your professional experience.'}</p>
+        </div>
+      )}
+
+      {resumeData.workExperience.map((work, index) => (
+        <div key={index} className="border border-gray-200 rounded-xl p-6 space-y-4 dark:border-dark-300">
+          <div className="flex items-center justify-between">
+            <h4 className="font-medium text-gray-900 dark:text-gray-100">Experience #{index + 1}</h4>
+            {resumeData.workExperience.length > 1 && (
+              <button
+                onClick={() => removeWorkExperience(index)}
+                className="text-red-600 hover:text-red-700 p-2"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            )}
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Job Title *</label>
+              <input
+                type="text"
+                value={work.role}
+                onChange={(e) => updateWorkExperience(index, 'role', e.target.value)}
+                placeholder="Software Engineer"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-dark-200 dark:border-dark-300 dark:text-gray-100"
+              />
             </div>
 
-            <div className="bg-white dark:bg-dark-200 p-6 rounded-xl border border-gray-200 dark:border-dark-400 shadow-sm dark:shadow-dark-xl space-y-4">
-              {/* Certifications Toggle */}
-              <div className="flex items-center justify-between">
-                <label htmlFor="includeCertifications" className="text-lg font-medium text-gray-900 dark:text-gray-100 flex items-center">
-                  <Award className="w-5 h-5 mr-2 text-yellow-500 dark:text-yellow-300" />
-                  Certifications
-                </label>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Company *</label>
+              <input
+                type="text"
+                value={work.company}
+                onChange={(e) => updateWorkExperience(index, 'company', e.target.value)}
+                placeholder="TechCorp Inc."
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-dark-200 dark:border-dark-300 dark:text-gray-100"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Duration *</label>
+            <input
+              type="text"
+              value={work.year}
+              onChange={(e) => updateWorkExperience(index, 'year', e.target.value)}
+              placeholder="Jan 2023 - Present"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-dark-200 dark:border-dark-300 dark:text-gray-100"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Key Responsibilities</label>
+            {work.bullets.map((bullet, bulletIndex) => (
+              <div key={bulletIndex} className="flex gap-2 mb-2">
                 <input
-                  type="checkbox"
-                  id="includeCertifications"
-                  checked={formData.additionalSections.includeCertifications}
-                  onChange={(e) =>
-                    updateFormData('additionalSections', {
-                      ...formData.additionalSections,
-                      includeCertifications: e.target.checked,
-                    })
-                  }
-                  className="h-5 w-5 text-blue-600 dark:text-neon-cyan-400 focus:ring-blue-500 dark:focus:ring-neon-cyan-500 border-gray-300 dark:border-dark-400 rounded"
+                  type="text"
+                  value={bullet}
+                  onChange={(e) => updateBullet(index, bulletIndex, e.target.value)}
+                  placeholder="Describe your responsibility/achievement"
+                  className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-dark-200 dark:border-dark-300 dark:text-gray-100"
                 />
-              </div>
-
-              {formData.additionalSections.includeCertifications && (
-                <div className="space-y-2 pt-4 border-t border-gray-200 dark:border-dark-400">
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">List your certifications (one per line)</label>
-                  {formData.certifications.map((cert, index) => (
-                    <div key={index} className="flex items-center gap-2 mb-2">
-                      <input
-                        type="text"
-                        value={cert}
-                        onChange={(e) => updateArrayItem('certifications', index, e.target.value)}
-                        className="flex-grow px-3 py-2 border border-gray-300 dark:border-dark-400 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-neon-cyan-500 focus:border-blue-500 dark:focus:border-neon-cyan-500 bg-white dark:bg-dark-300 text-gray-900 dark:text-gray-100"
-                        placeholder="e.g., AWS Certified Solutions Architect"
-                      />
-                      {formData.certifications.length > 1 && (
-                        <button
-                          onClick={() => removeArrayItem('certifications', index)}
-                          className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 p-1 rounded"
-                        >
-                          <Minus className="w-4 h-4" />
-                        </button>
-                      )}
-                    </div>
-                  ))}
+                {work.bullets.length > 1 && (
                   <button
-                    onClick={() => addArrayItem('certifications', '')}
-                    className="mt-2 text-blue-600 hover:text-blue-800 dark:text-neon-cyan-400 dark:hover:text-neon-cyan-300 flex items-center text-sm"
+                    onClick={() => removeBullet(index, bulletIndex)}
+                    className="text-red-600 hover:text-red-700 p-2"
                   >
-                    <Plus className="w-4 h-4 mr-1" /> Add Certification
+                    <X className="w-5 h-5" />
                   </button>
-                </div>
-              )}
-
-              {/* Achievements Toggle */}
-              <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-dark-400">
-                <label htmlFor="includeAchievements" className="text-lg font-medium text-gray-900 dark:text-gray-100 flex items-center">
-                  <CheckCircle className="w-5 h-5 mr-2 text-green-500 dark:text-green-300" />
-                  Achievements
-                </label>
-                <input
-                  type="checkbox"
-                  id="includeAchievements"
-                  checked={formData.additionalSections.includeAchievements}
-                  onChange={(e) =>
-                    updateFormData('additionalSections', {
-                      ...formData.additionalSections,
-                      includeAchievements: e.target.checked,
-                    })
-                  }
-                  className="h-5 w-5 text-blue-600 dark:text-neon-cyan-400 focus:ring-blue-500 dark:focus:ring-neon-cyan-500 border-gray-300 dark:border-dark-400 rounded"
-                />
+                )}
               </div>
-
-              {formData.additionalSections.includeAchievements && (
-                <div className="space-y-2 pt-4 border-t border-gray-200 dark:border-dark-400">
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">List your key achievements (one per line)</label>
-                  {formData.achievements.map((achievement, index) => (
-                    <div key={index} className="flex items-center gap-2 mb-2">
-                      <input
-                        type="text"
-                        value={achievement}
-                        onChange={(e) => updateArrayItem('achievements', index, e.target.value)}
-                        className="flex-grow px-3 py-2 border border-gray-300 dark:border-dark-400 rounded-lg focus:ring-2 focus:ring-blue-500 dark:focus:ring-neon-cyan-500 focus:border-blue-500 dark:focus:border-neon-cyan-500 bg-white dark:bg-dark-300 text-gray-900 dark:text-gray-100"
-                        placeholder="e.g., Awarded 'Employee of the Year' 2023"
-                      />
-                      {formData.achievements.length > 1 && (
-                        <button
-                          onClick={() => removeArrayItem('achievements', index)}
-                          className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 p-1 rounded"
-                        >
-                          <Minus className="w-4 h-4" />
-                        </button>
-                      )}
-                    </div>
-                  ))}
-                  <button
-                    onClick={() => addArrayItem('achievements', '')}
-                    className="mt-2 text-blue-600 hover:text-blue-800 dark:text-neon-cyan-400 dark:hover:text-neon-cyan-300 flex items-center text-sm"
-                  >
-                    <Plus className="w-4 h-4 mr-1" /> Add Achievement
-                  </button>
-                </div>
-              )}
-            </div>
+            ))}
+            <button
+              onClick={() => addBullet(index)}
+              className="text-blue-600 hover:text-blue-700 text-sm font-medium flex items-center"
+            >
+              <Plus className="w-4 h-4 mr-1" />
+              Add Responsibility
+            </button>
           </div>
-        );
+        </div>
+      ))}
 
-      default:
-        return (
-          <div className="space-y-6">
-            <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">Review Your Resume Information</h2>
-              <p className="text-gray-600 dark:text-gray-300">Please review the details below. If everything looks good, click "Generate Resume"!</p>
-            </div>
+      {resumeData.workExperience.length === 0 && (
+        <button
+          onClick={addWorkExperience}
+          className="w-full border-2 border-dashed border-gray-300 rounded-xl p-8 text-gray-600 hover:text-gray-800 hover:border-gray-400 transition-colors flex flex-col items-center"
+        >
+          <Plus className="w-8 h-8 mb-2" />
+          <span>Add Your First Experience</span>
+        </button>
+      )}
+    </div>
+  );
+};
 
-            <div className="bg-white dark:bg-dark-200 p-6 rounded-xl border border-gray-200 dark:border-dark-400 shadow-sm dark:shadow-dark-xl space-y-6">
-              {/* Contact Details Summary */}
-              <div>
-                <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-3 flex items-center">
-                  <Mail className="w-5 h-5 mr-2 text-blue-600 dark:text-neon-cyan-400" /> Contact Details
-                </h3>
-                <p className="text-gray-700 dark:text-gray-200"><strong>Full Name:</strong> {formData.contactDetails.fullName || 'N/A'}</p>
-                <p className="text-gray-700 dark:text-gray-200"><strong>Email:</strong> {formData.contactDetails.email || 'N/A'}</p>
-                <p className="text-gray-700 dark:text-gray-200"><strong>Phone:</strong> {formData.contactDetails.phone || 'N/A'}</p>
-                <p className="text-gray-700 dark:text-gray-200"><strong>Location:</strong> {formData.contactDetails.location || 'N/A'}</p>
-                <p className="text-gray-700 dark:text-gray-200"><strong>LinkedIn:</strong> {formData.contactDetails.linkedin || 'N/A'}</p>
-                <p className="text-gray-700 dark:text-gray-200"><strong>GitHub:</strong> {formData.contactDetails.github || 'N/A'}</p>
-              </div>
+const ProjectsStep: React.FC<{ resumeData: ResumeData; setResumeData: React.Dispatch<React.SetStateAction<ResumeData>> }> = ({
+  resumeData,
+  setResumeData
+}) => {
+  const addProject = () => {
+    setResumeData(prev => ({
+      ...prev,
+      projects: [...prev.projects, { title: '', bullets: [''] }]
+    }));
+  };
 
-              <hr className="border-t border-gray-200 dark:border-dark-400" />
+  const updateProject = (index: number, field: string, value: any) => {
+    setResumeData(prev => ({
+      ...prev,
+      projects: prev.projects.map((project, i) => 
+        i === index ? { ...project, [field]: value } : project
+      )
+    }));
+  };
 
-              {/* Education Summary */}
-              <div>
-                <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-3 flex items-center">
-                  <GraduationCap className="w-5 h-5 mr-2 text-blue-600 dark:text-neon-cyan-400" /> Education
-                </h3>
-                {formData.education.length > 0 && formData.education.some(edu => edu.degree.trim() || edu.school.trim()) ? (
-                  formData.education.map((edu, index) => (
-                    <div key={index} className="mb-2 last:mb-0">
-                      <p className="text-gray-700 dark:text-gray-200 font-medium">{edu.degree || 'N/A'} from {edu.school || 'N/A'}</p>
-                      <p className="text-gray-600 dark:text-gray-300 text-sm">{edu.year} {edu.cgpa && `- CGPA: ${edu.cgpa}`} {edu.location && `(${edu.location})`}</p>
-                    </div>
-                  ))
-                ) : (
-                  <p className="text-gray-600 dark:text-gray-400 italic">No education details added.</p>
-                )}
-              </div>
+  const removeProject = (index: number) => {
+    setResumeData(prev => ({
+      ...prev,
+      projects: prev.projects.filter((_, i) => i !== index)
+    }));
+  };
 
-              <hr className="border-t border-gray-200 dark:border-dark-400" />
+  const addBullet = (projectIndex: number) => {
+    const updated = [...resumeData.projects];
+    updated[projectIndex].bullets.push('');
+    setResumeData(prev => ({ ...prev, projects: updated }));
+  };
 
-              {/* Work Experience Summary */}
-              <div>
-                <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-3 flex items-center">
-                  <Briefcase className="w-5 h-5 mr-2 text-blue-600 dark:text-neon-cyan-400" /> Work Experience
-                </h3>
-                {formData.workExperience.length > 0 && formData.workExperience.some(exp => exp.role.trim() || exp.company.trim()) ? (
-                  formData.workExperience.map((exp, index) => (
-                    <div key={index} className="mb-2 last:mb-0">
-                      <p className="text-gray-700 dark:text-gray-200 font-medium">{exp.role || 'N/A'} at {exp.company || 'N/A'}</p>
-                      <p className="text-gray-600 dark:text-gray-300 text-sm mb-1">{exp.year}</p>
-                      <ul className="list-disc list-inside text-gray-700 dark:text-gray-200 text-sm ml-4">
-                        {exp.bullets.filter(bullet => bullet.trim() !== '').map((bullet, bulletIndex) => (
-                          <li key={bulletIndex}>{bullet}</li>
-                        ))}
-                      </ul>
-                      {exp.bullets.filter(bullet => bullet.trim() !== '').length === 0 && <p className="text-gray-600 dark:text-gray-300 text-sm italic">No bullet points provided.</p>}
-                    </div>
-                  ))
-                ) : (
-                  <p className="text-gray-600 dark:text-gray-400 italic">No work experience added.</p>
-                )}
-              </div>
+  const updateBullet = (projectIndex: number, bulletIndex: number, value: string) => {
+    const updated = [...resumeData.projects];
+    updated[projectIndex].bullets[bulletIndex] = value;
+    setResumeData(prev => ({ ...prev, projects: updated }));
+  };
 
-              <hr className="border-t border-gray-200 dark:border-dark-400" />
-
-              {/* Projects Summary */}
-              <div>
-                <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-3 flex items-center">
-                  <Code className="w-5 h-5 mr-2 text-blue-600 dark:text-neon-cyan-400" /> Projects
-                </h3>
-                {formData.projects.length > 0 && formData.projects.some(proj => proj.title.trim()) ? (
-                  formData.projects.map((proj, index) => (
-                    <div key={index} className="mb-2 last:mb-0">
-                      <p className="text-gray-700 dark:text-gray-200 font-medium">{proj.title || 'N/A'}</p>
-                      <ul className="list-disc list-inside text-gray-700 dark:text-gray-200 text-sm ml-4">
-                        {proj.bullets.filter(bullet => bullet.trim() !== '').map((bullet, bulletIndex) => (
-                          <li key={bulletIndex}>{bullet}</li>
-                        ))}
-                      </ul>
-                      {proj.bullets.filter(bullet => bullet.trim() !== '').length === 0 && <p className="text-gray-600 dark:text-gray-300 text-sm italic">No bullet points provided.</p>}
-                    </div>
-                  ))
-                ) : (
-                  <p className="text-gray-600 dark:text-gray-400 italic">No projects added.</p>
-                )}
-              </div>
-
-              <hr className="border-t border-gray-200 dark:border-dark-400" />
-
-              {/* Skills Summary */}
-              <div>
-                <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-3 flex items-center">
-                  <Award className="w-5 h-5 mr-2 text-blue-600 dark:text-neon-cyan-400" /> Skills
-                </h3>
-                {Object.keys(formData.skills).every(cat => formData.skills[cat].filter(s => s.trim() !== '').length === 0) ? (
-                  <p className="text-gray-600 dark:text-gray-400 italic">No skills added.</p>
-                ) : (
-                  Object.entries(formData.skills).map(([category, skills]) => {
-                    const filteredSkills = skills.filter(skill => skill.trim() !== '');
-                    return filteredSkills.length > 0 && (
-                      <p key={category} className="text-gray-700 dark:text-gray-200 mb-1">
-                        <strong>{category}:</strong> {filteredSkills.join(', ')}
-                      </p>
-                    );
-                  })
-                )}
-              </div>
-
-              {(formData.additionalSections.includeCertifications || formData.additionalSections.includeAchievements) && (
-                <hr className="border-t border-gray-200 dark:border-dark-400" />
-              )}
-
-              {/* Certifications Summary */}
-              {formData.additionalSections.includeCertifications && (
-                <div>
-                  <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-3 flex items-center">
-                    <Award className="w-5 h-5 mr-2 text-yellow-500 dark:text-yellow-300" /> Certifications
-                  </h3>
-                  {formData.certifications.length > 0 && formData.certifications.some(cert => cert.trim() !== '') ? (
-                    <ul className="list-disc list-inside text-gray-700 dark:text-gray-200 text-sm ml-4">
-                      {formData.certifications.filter(cert => cert.trim() !== '').map((cert, index) => (
-                        <li key={index}>{cert}</li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <p className="text-gray-600 dark:text-gray-400 italic">No certifications added.</p>
-                  )}
-                </div>
-              )}
-
-              {/* Achievements Summary */}
-              {formData.additionalSections.includeAchievements && (
-                <div>
-                  <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-3 flex items-center">
-                    <CheckCircle className="w-5 h-5 mr-2 text-green-500 dark:text-green-300" /> Achievements
-                  </h3>
-                  {formData.achievements.length > 0 && formData.achievements.some(ach => ach.trim() !== '') ? (
-                    <ul className="list-disc list-inside text-gray-700 dark:text-gray-200 text-sm ml-4">
-                      {formData.achievements.filter(ach => ach.trim() !== '').map((ach, index) => (
-                        <li key={index}>{ach}</li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <p className="text-gray-600 dark:text-gray-400 italic">No achievements added.</p>
-                  )}
-                </div>
-              )}
-            </div>
-          </div>
-        );
+  const removeBullet = (projectIndex: number, bulletIndex: number) => {
+    const updated = [...resumeData.projects];
+    if (updated[projectIndex].bullets.length > 1) {
+      updated[projectIndex].bullets.splice(bulletIndex, 1);
+      setResumeData(prev => ({ ...prev, projects: updated }));
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 dark:from-dark-100 dark:to-dark-200">
-      {/* Header */}
-      <div className="bg-white dark:bg-dark-200 shadow-sm border-b border-gray-200 dark:border-dark-400 sticky top-0 z-40">
-        <div className="container-responsive">
-          <div className="flex items-center justify-between h-16">
-            <button
-              onClick={() => navigate('/')} // Use navigate instead of onNavigateBack
-              className="mb-6 mt-6 bg-primary-600 text-white hover:bg-primary-700 active:bg-primary-800 shadow-md dark:shadow-dark-xl hover:shadow-lg dark:hover:shadow-dark-2xl py-3 px-5 rounded-xl inline-flex items-center space-x-2 transition-all duration-200 dark:bg-neon-blue-500 dark:hover:bg-neon-blue-600 dark:active:bg-neon-blue-700"
-            >
-              <ArrowLeft className="w-5 h-5" />
-              <span className="hidden sm:block">Back to Home</span>
-            </button>
-
-            <h1 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Resume Builder</h1>
-
-            <div className="text-sm text-gray-500 dark:text-gray-400">
-              Step {currentStep + 1} of {steps.length}
-            </div>
-          </div>
-        </div>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Projects</h3>
+        <button
+          onClick={addProject}
+          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors"
+        >
+          <Plus className="w-4 h-4" />
+          <span>Add Project</span>
+        </button>
       </div>
 
-      {/* Progress Bar */}
-      <div className="bg-white dark:bg-dark-200 border-b border-gray-200 dark:border-dark-400">
-        <div className="container-responsive">
-          <div className="flex items-center py-4 overflow-x-auto">
-            {steps.map((step, index) => (
-              <div key={step.id} className="flex items-center flex-shrink-0">
-                <div className={`flex items-center space-x-2 px-3 py-2 rounded-lg ${
-                  index === currentStep ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-neon-cyan-300' :
-                  index < currentStep ? 'bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-300' :
-                  'text-gray-500 dark:text-gray-400'
-                }`}>
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                    index === currentStep ? 'bg-blue-500 text-white dark:bg-neon-cyan-500' :
-                    index < currentStep ? 'bg-green-500 text-white dark:bg-green-700' :
-                    'bg-gray-200 dark:bg-dark-300'
-                  }`}>
-                    {index < currentStep ? <CheckCircle className="w-4 h-4" /> : step.icon}
-                  </div>
-                  <span className="font-medium hidden sm:block">{step.title}</span>
-                </div>
-                {index < steps.length - 1 && (
-                  <div className="w-8 h-px bg-gray-300 dark:bg-dark-400 mx-2"></div>
+      {resumeData.projects.length === 0 && (
+        <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+          <Code className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+          <p>No projects added yet. Showcase your best work!</p>
+        </div>
+      )}
+
+      {resumeData.projects.map((project, index) => (
+        <div key={index} className="border border-gray-200 rounded-xl p-6 space-y-4 dark:border-dark-300">
+          <div className="flex items-center justify-between">
+            <h4 className="font-medium text-gray-900 dark:text-gray-100">Project #{index + 1}</h4>
+            {resumeData.projects.length > 1 && (
+              <button
+                onClick={() => removeProject(index)}
+                className="text-red-600 hover:text-red-700 p-2"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Project Title *</label>
+            <input
+              type="text"
+              value={project.title}
+              onChange={(e) => updateProject(index, 'title', e.target.value)}
+              placeholder="E-commerce Website"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-dark-200 dark:border-dark-300 dark:text-gray-100"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Project Details</label>
+            {project.bullets.map((bullet, bulletIndex) => (
+              <div key={bulletIndex} className="flex gap-2 mb-2">
+                <input
+                  type="text"
+                  value={bullet}
+                  onChange={(e) => updateBullet(index, bulletIndex, e.target.value)}
+                  placeholder="Describe what you built/achieved"
+                  className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-dark-200 dark:border-dark-300 dark:text-gray-100"
+                />
+                {project.bullets.length > 1 && (
+                  <button
+                    onClick={() => removeBullet(index, bulletIndex)}
+                    className="text-red-600 hover:text-red-700 p-2"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
                 )}
               </div>
             ))}
+            <button
+              onClick={() => addBullet(index)}
+              className="text-blue-600 hover:text-blue-700 text-sm font-medium flex items-center"
+            >
+              <Plus className="w-4 h-4 mr-1" />
+              Add Detail
+            </button>
+          </div>
+        </div>
+      ))}
+
+      {resumeData.projects.length === 0 && (
+        <button
+          onClick={addProject}
+          className="w-full border-2 border-dashed border-gray-300 rounded-xl p-8 text-gray-600 hover:text-gray-800 hover:border-gray-400 transition-colors flex flex-col items-center"
+        >
+          <Plus className="w-8 h-8 mb-2" />
+          <span>Add Your First Project</span>
+        </button>
+      )}
+    </div>
+  );
+};
+
+const SkillsStep: React.FC<{ resumeData: ResumeData; setResumeData: React.Dispatch<React.SetStateAction<ResumeData>> }> = ({
+  resumeData,
+  setResumeData
+}) => {
+  const addSkillCategory = () => {
+    setResumeData(prev => ({
+      ...prev,
+      skills: [...prev.skills, { category: '', count: 0, list: [] }]
+    }));
+  };
+
+  const updateSkillCategory = (index: number, field: string, value: any) => {
+    setResumeData(prev => ({
+      ...prev,
+      skills: prev.skills.map((skill, i) => 
+        i === index ? { ...skill, [field]: value, count: field === 'list' ? value.length : skill.count } : skill
+      )
+    }));
+  };
+
+  const removeSkillCategory = (index: number) => {
+    setResumeData(prev => ({
+      ...prev,
+      skills: prev.skills.filter((_, i) => i !== index)
+    }));
+  };
+
+  const addSkillToCategory = (categoryIndex: number, skill: string) => {
+    if (skill.trim()) {
+      const updated = [...resumeData.skills];
+      updated[categoryIndex].list.push(skill.trim());
+      updated[categoryIndex].count = updated[categoryIndex].list.length;
+      setResumeData(prev => ({ ...prev, skills: updated }));
+    }
+  };
+
+  const removeSkillFromCategory = (categoryIndex: number, skillIndex: number) => {
+    const updated = [...resumeData.skills];
+    updated[categoryIndex].list.splice(skillIndex, 1);
+    updated[categoryIndex].count = updated[categoryIndex].list.length;
+    setResumeData(prev => ({ ...prev, skills: updated }));
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Technical Skills</h3>
+        <button
+          onClick={addSkillCategory}
+          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors"
+        >
+          <Plus className="w-4 h-4" />
+          <span>Add Category</span>
+        </button>
+      </div>
+
+      {resumeData.skills.length === 0 && (
+        <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+          <Target className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+          <p>No skills added yet. Organize your skills by category.</p>
+        </div>
+      )}
+
+      {resumeData.skills.map((skillCategory, index) => (
+        <SkillCategoryCard
+          key={index}
+          skillCategory={skillCategory}
+          index={index}
+          onUpdateCategory={updateSkillCategory}
+          onRemoveCategory={removeSkillCategory}
+          onAddSkill={addSkillToCategory}
+          onRemoveSkill={removeSkillFromCategory}
+          canRemove={resumeData.skills.length > 1}
+        />
+      ))}
+
+      {resumeData.skills.length === 0 && (
+        <button
+          onClick={addSkillCategory}
+          className="w-full border-2 border-dashed border-gray-300 rounded-xl p-8 text-gray-600 hover:text-gray-800 hover:border-gray-400 transition-colors flex flex-col items-center"
+        >
+          <Plus className="w-8 h-8 mb-2" />
+          <span>Add Your First Skill Category</span>
+        </button>
+      )}
+    </div>
+  );
+};
+
+const SkillCategoryCard: React.FC<{
+  skillCategory: any;
+  index: number;
+  onUpdateCategory: (index: number, field: string, value: any) => void;
+  onRemoveCategory: (index: number) => void;
+  onAddSkill: (categoryIndex: number, skill: string) => void;
+  onRemoveSkill: (categoryIndex: number, skillIndex: number) => void;
+  canRemove: boolean;
+}> = ({ skillCategory, index, onUpdateCategory, onRemoveCategory, onAddSkill, onRemoveSkill, canRemove }) => {
+  const [newSkill, setNewSkill] = useState('');
+
+  const handleAddSkill = () => {
+    if (newSkill.trim()) {
+      onAddSkill(index, newSkill);
+      setNewSkill('');
+    }
+  };
+
+  return (
+    <div className="border border-gray-200 rounded-xl p-6 space-y-4 dark:border-dark-300">
+      <div className="flex items-center justify-between">
+        <h4 className="font-medium text-gray-900 dark:text-gray-100">Category #{index + 1}</h4>
+        {canRemove && (
+          <button
+            onClick={() => onRemoveCategory(index)}
+            className="text-red-600 hover:text-red-700 p-2"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        )}
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Category Name *</label>
+        <input
+          type="text"
+          value={skillCategory.category}
+          onChange={(e) => onUpdateCategory(index, 'category', e.target.value)}
+          placeholder="Programming Languages, Frameworks, etc."
+          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-dark-200 dark:border-dark-300 dark:text-gray-100"
+        />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Skills</label>
+        <div className="flex gap-2 mb-2">
+          <input
+            type="text"
+            value={newSkill}
+            onChange={(e) => setNewSkill(e.target.value)}
+            placeholder="Add a skill"
+            className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-dark-200 dark:border-dark-300 dark:text-gray-100"
+            onKeyPress={(e) => e.key === 'Enter' && handleAddSkill()}
+          />
+          <button
+            onClick={handleAddSkill}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-lg transition-colors"
+          >
+            Add
+          </button>
+        </div>
+
+        <div className="flex flex-wrap gap-2">
+          {skillCategory.list.map((skill: string, skillIndex: number) => (
+            <span
+              key={skillIndex}
+              className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-800 dark:bg-neon-cyan-500/20 dark:text-neon-cyan-300"
+            >
+              {skill}
+              <button
+                onClick={() => onRemoveSkill(index, skillIndex)}
+                className="ml-2 text-blue-600 hover:text-blue-800"
+              >
+                <X className="w-3 h-3" />
+              </button>
+            </span>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const ReviewStep: React.FC<{
+  resumeData: ResumeData;
+  userType: UserType;
+  onGenerate: () => void;
+  isGenerating: boolean;
+}> = ({ resumeData, userType, onGenerate, isGenerating }) => {
+  return (
+    <div className="space-y-6">
+      <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">Review & Generate</h3>
+      
+      <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-6 dark:from-dark-200 dark:to-dark-300">
+        <h4 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Resume Summary</h4>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+          <div className="bg-white rounded-lg p-4 dark:bg-dark-100">
+            <div className="text-2xl font-bold text-blue-600 dark:text-neon-cyan-400">{resumeData.education.length}</div>
+            <div className="text-sm text-gray-600 dark:text-gray-300">Education</div>
+          </div>
+          <div className="bg-white rounded-lg p-4 dark:bg-dark-100">
+            <div className="text-2xl font-bold text-green-600 dark:text-neon-blue-400">{resumeData.workExperience.length}</div>
+            <div className="text-sm text-gray-600 dark:text-gray-300">Experience</div>
+          </div>
+          <div className="bg-white rounded-lg p-4 dark:bg-dark-100">
+            <div className="text-2xl font-bold text-purple-600 dark:text-neon-purple-400">{resumeData.projects.length}</div>
+            <div className="text-sm text-gray-600 dark:text-gray-300">Projects</div>
+          </div>
+          <div className="bg-white rounded-lg p-4 dark:bg-dark-100">
+            <div className="text-2xl font-bold text-orange-600 dark:text-neon-pink-400">{resumeData.skills.length}</div>
+            <div className="text-sm text-gray-600 dark:text-gray-300">Skill Categories</div>
           </div>
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="container-responsive py-8">
-        <div className="max-w-4xl mx-auto">
-          {/* Step Description */}
-          <div className="text-center mb-8">
-            <div className="bg-white dark:bg-dark-200 rounded-2xl p-6 shadow-lg dark:shadow-dark-xl border border-gray-200 dark:border-dark-400">
-              <div className="flex items-center justify-center mb-4">
-                <div className="bg-blue-100 w-12 h-12 rounded-full flex items-center justify-center text-blue-600">
-                  {steps[currentStep].icon}
-                </div>
-              </div>
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">{steps[currentStep].title}</h2>
-              <p className="text-gray-600 dark:text-gray-300">{steps[currentStep].description}</p>
-            </div>
-          </div>
-
-          {/* Step Content */}
-          <div className="bg-white dark:bg-dark-200 rounded-2xl shadow-lg dark:shadow-dark-xl border border-gray-200 dark:border-dark-400 p-6 sm:p-8 mb-8">
-            {renderStepContent()}
-          </div>
-
-          {/* Navigation */}
-          <div className="flex justify-between items-center">
-            <button
-              onClick={prevStep}
-              disabled={currentStep === 0}
-              className={`flex items-center space-x-2 px-6 py-3 rounded-xl font-semibold transition-all duration-300 ${
-                currentStep === 0
-                  ? 'bg-gray-200 dark:bg-dark-300 text-gray-400 dark:text-gray-500 cursor-not-allowed'
-                  : 'bg-gray-600 hover:bg-gray-700 text-white shadow-lg dark:shadow-dark-xl hover:shadow-xl dark:hover:shadow-dark-2xl'
-              }`}
-            >
-              <ArrowLeft className="w-5 h-5" />
-              <span>Previous</span>
-            </button>
-
-            <div className="text-center">
-              <div className="text-sm text-gray-500 dark:text-gray-400 mb-1">Progress</div>
-              <div className="w-48 bg-gray-200 dark:bg-dark-300 rounded-full h-2">
-                <div
-                  className="bg-gradient-to-r from-blue-500 to-green-500 h-2 rounded-full transition-all duration-300"
-                  style={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
-                />
-              </div>
-            </div>
-
-            <button
-              onClick={nextStep}
-              disabled={!canProceedToNext() || isGenerating}
-              className={`flex items-center space-x-2 px-6 py-3 rounded-xl font-semibold transition-all duration-300 ${
-                !canProceedToNext() || isGenerating
-                  ? 'bg-gray-200 dark:bg-dark-300 text-gray-400 dark:text-gray-500 cursor-not-allowed'
-                  : currentStep === steps.length - 1
-                  ? 'bg-green-600 hover:bg-green-700 text-white shadow-lg dark:shadow-dark-xl hover:shadow-xl dark:hover:shadow-dark-2xl dark:bg-neon-green-500 dark:hover:bg-neon-green-600'
-                  : 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg dark:shadow-dark-xl hover:shadow-xl dark:hover:shadow-dark-2xl dark:bg-neon-blue-500 dark:hover:bg-neon-blue-600'
-              }`}
-            >
-              {isGenerating ? (
-                <>
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                  <span>Generating...</span>
-                </>
-              ) : (
-                <>
-                  <span>{currentStep === steps.length - 1 ? 'Generate Resume' : 'Next'}</span>
-                  <ArrowRight className="w-5 h-5" />
-                </>
-              )}
-            </button>
-          </div>
-        </div>
+      <div className="text-center">
+        <button
+          onClick={onGenerate}
+          disabled={isGenerating || !resumeData.name || !resumeData.email}
+          className={`px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 flex items-center space-x-3 mx-auto shadow-xl hover:shadow-2xl ${
+            isGenerating || !resumeData.name || !resumeData.email
+              ? 'bg-gray-400 cursor-not-allowed text-white'
+              : 'bg-gradient-to-r from-neon-cyan-500 to-neon-purple-500 hover:from-neon-cyan-400 hover:to-neon-purple-400 text-white hover:shadow-neon-cyan transform hover:scale-105'
+          }`}
+        >
+          {isGenerating ? (
+            <>
+              <Loader2 className="w-6 h-6 animate-spin" />
+              <span>Generating Your Resume...</span>
+            </>
+          ) : (
+            <>
+              <Sparkles className="w-6 h-6" />
+              <span>Generate Professional Resume</span>
+            </>
+          )}
+        </button>
       </div>
     </div>
   );
