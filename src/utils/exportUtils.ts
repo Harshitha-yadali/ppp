@@ -64,25 +64,35 @@ export const exportToPDF = async (
     const imgData = canvas.toDataURL('image/png');
     const pdfWidth = 210; // A4 width in mm
     const pdfHeight = 297; // A4 height in mm
-    const margin = options.template === 'minimalist' ? 20 : 15; // Larger margins for minimalist
-    const imgWidth = pdfWidth - 2 * margin;
-    const imgHeight = (canvas.height * imgWidth) / canvas.width;
-    const maxContentHeight = pdfHeight - 2 * margin;
 
-    let yPosition = margin;
+    // CORRECTED: Define specific margins
+    const marginTop = 10; // Reduced top margin to 10mm
+    const marginBottom = 15;
+    const marginLeft = 15;
+    const marginRight = 15;
+
+    // CORRECTED: Update imgWidth and maxContentHeight calculations
+    const imgWidth = pdfWidth - (marginLeft + marginRight);
+    const maxContentHeight = pdfHeight - (marginTop + marginBottom);
+
+    // CORRECTED: Initialize yPosition with marginTop
+    let yPosition = marginTop;
 
     if (imgHeight <= maxContentHeight) {
       // Single page
-      pdf.addImage(imgData, 'PNG', margin, yPosition, imgWidth, imgHeight);
+      // CORRECTED: Use specific margins for addImage
+      pdf.addImage(imgData, 'PNG', marginLeft, yPosition, imgWidth, imgHeight);
     } else {
       // Multiple pages
       let heightLeft = imgHeight;
-      let position = margin;
+      // CORRECTED: Initialize position with marginTop
+      let position = marginTop;
 
       while (heightLeft > 0) {
-        if (position !== margin) {
+        // CORRECTED: Use marginTop for subsequent pages
+        if (position !== marginTop) {
           pdf.addPage();
-          position = margin;
+          position = marginTop;
         }
         
         const sourceY = imgHeight - heightLeft;
@@ -104,7 +114,8 @@ export const exportToPDF = async (
           );
           
           const pageImgData = pageCanvas.toDataURL('image/png');
-          pdf.addImage(pageImgData, 'PNG', margin, position, imgWidth, pageHeight);
+          // CORRECTED: Use specific margins for addImage
+          pdf.addImage(pageImgData, 'PNG', marginLeft, position, imgWidth, pageHeight);
         }
         
         heightLeft -= maxContentHeight;
