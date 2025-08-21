@@ -41,11 +41,11 @@ import { Subscription } from '../types/payment'; // Assuming this path is correc
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
 
 interface LinkedInMessageGeneratorProps {
-  // REMOVED: onNavigateBack: () => void;
+  onNavigateBack: () => void;
   isAuthenticated: boolean;
   onShowAuth: () => void;
   userSubscription: Subscription | null;
-  onShowSubscriptionPlans: () => void;
+  onShowPlanSelection: () => void; // MODIFIED: Changed prop name
   onShowAlert: (title: string, message: string, type?: 'info' | 'success' | 'warning' | 'error', actionText?: string, onAction?: () => void) => void;
   refreshUserSubscription: () => Promise<void>; // ADD THIS PROP
 }
@@ -67,11 +67,11 @@ interface MessageForm {
 }
 
 export const LinkedInMessageGenerator: React.FC<LinkedInMessageGeneratorProps> = ({
-  // REMOVED: onNavigateBack,
+  onNavigateBack,
   isAuthenticated,
   onShowAuth,
   userSubscription,
-  onShowSubscriptionPlans,
+  onShowPlanSelection, // MODIFIED: Destructure the new prop
   onShowAlert,
   refreshUserSubscription, // DESTRUCTURE THE NEW PROP
 }) => {
@@ -155,7 +155,7 @@ export const LinkedInMessageGenerator: React.FC<LinkedInMessageGeneratorProps> =
         `You have used all your ${linkedinMessagesTotal} LinkedIn Message generations from ${planName}. Please upgrade your plan to continue generating messages.`,
         'warning',
         'Upgrade Plan',
-        onShowSubscriptionPlans
+        onShowPlanSelection // MODIFIED: Call the new plan selection handler
       );
       return;
     }
@@ -573,6 +573,7 @@ export const LinkedInMessageGenerator: React.FC<LinkedInMessageGeneratorProps> =
                       <li>• Keep messages concise and focused on value</li>
                       <li>• Always include a clear call-to-action</li>
                       <li>• Follow up if you don't get a response within a week</li>
+                      <li>• Follow up if you don't get a response within a week</li>
                     </ul>
                   </div>
                 </div>
@@ -653,3 +654,4 @@ export const LinkedInMessageGenerator: React.FC<LinkedInMessageGeneratorProps> =
     </div>
   );
 };
+
