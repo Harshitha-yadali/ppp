@@ -251,7 +251,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const forgotPassword = async (data: ForgotPasswordData) => {
     console.log('AuthContext: Calling authService.forgotPassword...');
-    await authService.forgotPassword(data);
+    await authService.forgotPassword(data.email); // FIX: Pass data.email instead of data
     console.log('AuthContext: authService.forgotPassword completed.');
   };
 
