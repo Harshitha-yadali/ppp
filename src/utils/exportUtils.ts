@@ -51,8 +51,7 @@ export const exportToPDF = async (
     });
 
     // Remove the temporary container
-    document.body.removeChild(tempContainer);
-
+    
     // Create PDF
     const pdf = new jsPDF({
       orientation: 'portrait',
