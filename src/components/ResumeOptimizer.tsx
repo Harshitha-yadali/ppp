@@ -222,7 +222,7 @@ const ResumeOptimizer: React.FC<ResumeOptimizerProps> = ({
       console.log('handleOptimize: Optimizations remaining (before useOptimization check):', subscription ? (subscription.optimizationsTotal - subscription.optimizationsUsed) : 'N/A'); // ADDED LOG
 
       if (!subscription || (subscription.optimizationsTotal - subscription.optimizationsUsed) <= 0) {
-        onShowPlanSelection(); // MODIFIED: Call the new plan selection handler
+        onShowPlanSelection('optimizer'); // Pass feature ID for context-specific modal
         return;
       }
 

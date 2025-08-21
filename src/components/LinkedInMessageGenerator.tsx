@@ -155,7 +155,7 @@ export const LinkedInMessageGenerator: React.FC<LinkedInMessageGeneratorProps> =
         `You have used all your ${linkedinMessagesTotal} LinkedIn Message generations from ${planName}. Please upgrade your plan to continue generating messages.`,
         'warning',
         'Upgrade Plan',
-        onShowPlanSelection // MODIFIED: Call the new plan selection handler
+        () => onShowPlanSelection('linkedin-generator') // Pass feature ID for context-specific modal
       );
       return;
     }
