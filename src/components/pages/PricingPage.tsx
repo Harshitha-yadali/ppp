@@ -34,8 +34,9 @@ export const PricingPage: React.FC<PricingPageProps> = ({
   const { isAuthenticated } = useAuth();
   const [selectedPlan, setSelectedPlan] = useState('career_boost_plus');
 
-  const plans = paymentService.getPlans();
-  const addOns = paymentService.getAddOns();
+  // Defensive programming: Ensure paymentService and its methods return arrays
+  const plans = paymentService?.getPlans() || [];
+  const addOns = paymentService?.getAddOns() || [];
 
   const features = [
     {
