@@ -1,4 +1,3 @@
-
 // src/App.tsx
 import React, { useState, useEffect } from 'react';
 import { Menu, X, Home, Info, BookOpen, Phone, FileText, LogIn, LogOut, User, Wallet, Sparkles } from 'lucide-react';
@@ -20,6 +19,7 @@ import { paymentService } from './services/paymentService';
 import { AlertModal } from './components/AlertModal';
 import { ToolsAndPagesNavigation } from './components/pages/ToolsAndPagesNavigation';
 import { Routes, Route, useNavigate } from 'react-router-dom'; // Import Routes, Route, and useNavigate
+import { PlanSelectionModal } from './components/payment/PlanSelectionModal'; // NEW: Import PlanSelectionModal
 
 function App() {
   const { isAuthenticated, user, markProfilePromptSeen, isLoading } = useAuth();
@@ -50,6 +50,9 @@ function App() {
 
   const [isAuthModalOpenedByHash, setIsAuthModalOpenedByHash] = useState(false);
 
+  // NEW: State for PlanSelectionModal
+  const [showPlanSelectionModal, setShowPlanSelectionModal] = useState(false);
+
   const handleMobileMenuToggle = () => {
     setShowMobileMenu(!showMobileMenu);
   };
@@ -67,7 +70,8 @@ function App() {
       handleShowProfile('wallet');
       setShowMobileMenu(false);
     } else if (path === 'subscription-plans') {
-      handleShowSubscriptionPlans();
+      // MODIFIED: Call the new plan selection handler
+      handleShowPlanSelection();
       setShowMobileMenu(false);
     } else {
       navigate(path); // Use navigate for routing
@@ -96,8 +100,22 @@ function App() {
     navigate('/'); // Navigate to the home route
   };
 
-  const handleShowSubscriptionPlans = () => {
-    setShowSubscriptionPlans(true);
+  // MODIFIED: This function now opens the PlanSelectionModal
+  const handleShowPlanSelection = () => {
+    setShowPlanSelectionModal(true);
+  };
+
+  // NEW: Handler for selecting Career Plans from PlanSelectionModal
+  const handleSelectCareerPlans = () => {
+    setShowPlanSelectionModal(false); // Close selection modal
+    setShowSubscriptionPlans(true); // Open subscription plans modal
+  };
+
+  // NEW: Handler for selecting JD Optimizer from PlanSelectionModal
+  // The actual payment and redirection logic will be inside PlanSelectionModal
+  const handleSelectJDOptimizer = () => {
+    setShowPlanSelectionModal(false); // Close selection modal
+    // PlanSelectionModal will handle the payment and redirection to /optimizer
   };
 
   const handleSubscriptionSuccess = async () => {
@@ -218,7 +236,7 @@ function App() {
   const commonPageProps = {
     isAuthenticated: isAuthenticated,
     onShowAuth: handleShowAuth,
-    onShowSubscriptionPlans: handleShowSubscriptionPlans,
+    onShowSubscriptionPlans: handleShowPlanSelection, // MODIFIED: Pass the new handler
     userSubscription: userSubscription,
     onShowAlert: handleShowAlert,
     refreshUserSubscription: refreshUserSubscription,
@@ -247,7 +265,7 @@ function App() {
               onShowAuth={handleShowAuth}
               onShowProfile={handleShowProfile}
               onNavigateBack={handleNavigateHome} // Use handleNavigateHome
-              onShowSubscriptionPlans={handleShowSubscriptionPlans}
+              onShowPlanSelection={handleShowPlanSelection} // MODIFIED: Pass the new handler
               userSubscription={userSubscription}
               refreshUserSubscription={refreshUserSubscription}
             />
@@ -380,6 +398,14 @@ function App() {
           onShowAlert={handleShowAlert}  
         />
       )}
+      {/* NEW: Render PlanSelectionModal */}
+      <PlanSelectionModal
+        isOpen={showPlanSelectionModal}
+        onClose={() => setShowPlanSelectionModal(false)}
+        onSelectCareerPlans={handleSelectCareerPlans}
+        onSubscriptionSuccess={handleSubscriptionSuccess} // Pass this to refresh subscription after direct purchase
+        onShowAlert={handleShowAlert}
+      />
       <AlertModal
         isOpen={showAlertModal}
         onClose={() => setShowAlertModal(false)}
@@ -468,3 +494,4 @@ const AuthButtons: React.FC<{
   );
 };
 export default App;
+

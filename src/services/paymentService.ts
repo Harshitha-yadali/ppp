@@ -57,17 +57,7 @@ class PaymentService {
       scoreChecks: 20,
       linkedinMessages: 100,
       guidedBuilds: 2,
-      tag: 'Great Start',
-      tagColor: 'text-green-800 bg-green-100',
-      gradient: 'from-green-500 to-emerald-500',
-      icon: 'rocket',
-      features: [
-        '✅ 20 Resume Optimizations',
-        '✅ 20 Score Checks',
-        '✅ 100 LinkedIn Messages',
-        '✅ 2 Guided Resume Builds',
-        '✅ Email Support',
-      ],
+      durationInHours: 24 * 365 * 10,
     },
     {
       id: 'smart_apply_pack',
@@ -78,17 +68,7 @@ class PaymentService {
       scoreChecks: 10,
       linkedinMessages: 50,
       guidedBuilds: 1,
-      tag: 'Quick Boost',
-      tagColor: 'text-yellow-800 bg-yellow-100',
-      gradient: 'from-yellow-500 to-orange-500',
-      icon: 'target',
-      features: [
-        '✅ 10 Resume Optimizations',
-        '✅ 10 Score Checks',
-        '✅ 50 LinkedIn Messages',
-        '✅ 1 Guided Resume Build',
-        '✅ Basic Support',
-      ],
+      durationInHours: 24 * 365 * 10,
     },
     {
       id: 'resume_fix_pack',
@@ -99,17 +79,7 @@ class PaymentService {
       scoreChecks: 2,
       linkedinMessages: 0,
       guidedBuilds: 0,
-      tag: 'Essential',
-      tagColor: 'text-red-800 bg-red-100',
-      gradient: 'from-red-500 to-pink-500',
-      icon: 'wrench',
-      features: [
-        '✅ 5 Resume Optimizations',
-        '✅ 2 Score Checks',
-        '❌ LinkedIn Messages',
-        '❌ Guided Builds',
-        '❌ Priority Support',
-      ],
+      durationInHours: 24 * 365 * 10,
     },
     {
       id: 'lite_check',
@@ -120,17 +90,7 @@ class PaymentService {
       scoreChecks: 2,
       linkedinMessages: 10,
       guidedBuilds: 0,
-      tag: 'Trial',
-      tagColor: 'text-gray-800 bg-gray-100',
-      gradient: 'from-gray-500 to-gray-700',
-      icon: 'check_circle',
-      features: [
-        '✅ 2 Resume Optimizations',
-        '✅ 2 Score Checks',
-        '✅ 10 LinkedIn Messages',
-        '❌ Guided Builds',
-        '❌ Priority Support',
-      ],
+      durationInHours: 24 * 365 * 10,
     },
   ];
 
@@ -176,6 +136,14 @@ class PaymentService {
       name: 'Resume Guidance Session (Live)',
       price: 299,
       type: 'guidance_session',
+      quantity: 1,
+    },
+    // NEW ADD-ON: Single JD-Based Optimization Purchase
+    {
+      id: 'jd_optimization_single_purchase',
+      name: 'JD-Based Optimization (1 Use)',
+      price: 49, // Example price in Rupees
+      type: 'optimization',
       quantity: 1,
     },
   ];
@@ -463,32 +431,40 @@ class PaymentService {
 
   async applyCoupon(planId: string, couponCode: string, userId: string | null): Promise<{ couponApplied: string | null; discountAmount: number; finalAmount: number; error?: string }> {
     const plan = this.getPlanById(planId);
-    if (!plan) {
+    if (!plan && planId !== 'addon_only_purchase') { // Allow addon_only_purchase for coupon application
       return { couponApplied: null, discountAmount: 0, finalAmount: 0, error: 'Invalid plan selected' };
     }
 
+    let originalPrice = (plan?.price || 0) * 100; // Convert to paise, or 0 if addon_only
+    if (planId === 'addon_only_purchase') {
+      // For addon_only_purchase, the original price is the sum of selected add-ons.
+      // This logic needs to be handled on the frontend or passed as an argument.
+      // For now, assume originalPrice is 0 for coupon calculation if it's an add-on only purchase.
+      originalPrice = 0; // Coupons typically apply to plans, not individual add-ons unless specified.
+    }
+
     let discountAmount = 0;
-    let finalAmount = plan.price * 100; // Convert plan price to paise
+    let finalAmount = originalPrice;
 
     const normalizedCoupon = couponCode.toLowerCase().trim();
 
     if (normalizedCoupon === 'fullsupport' && planId === 'career_pro_max') {
-      discountAmount = plan.price * 100;
+      discountAmount = originalPrice;
       finalAmount = 0;
     } else if (normalizedCoupon === 'first100' && planId === 'lite_check') {
-      discountAmount = plan.price * 100;
+      discountAmount = originalPrice;
       finalAmount = 0;
     } else if (normalizedCoupon === 'first500' && planId === 'lite_check') {
       // This coupon requires a backend check for usage limit.
       // For frontend simulation, we'll assume it's valid if it reaches here.
       // The actual check will happen in the Supabase Edge Function.
-      discountAmount = Math.floor(plan.price * 100 * 0.98);
-      finalAmount = (plan.price * 100) - discountAmount;
+      discountAmount = Math.floor(originalPrice * 0.98);
+      finalAmount = originalPrice - discountAmount;
     } else if (normalizedCoupon === 'worthyone' && planId === 'career_pro_max') {
-      discountAmount = Math.floor(plan.price * 100 * 0.5);
-      finalAmount = (plan.price * 100) - discountAmount;
+      discountAmount = Math.floor(originalPrice * 0.5);
+      finalAmount = originalPrice - discountAmount;
     } else {
-      return { couponApplied: null, discountAmount: 0, finalAmount: plan.price * 100, error: 'Invalid coupon code or not applicable to selected plan' };
+      return { couponApplied: null, discountAmount: 0, finalAmount: originalPrice, error: 'Invalid coupon code or not applicable to selected plan' };
     }
 
     return { couponApplied: normalizedCoupon, discountAmount, finalAmount };
@@ -746,3 +722,4 @@ class PaymentService {
 }
 
 export const paymentService = new PaymentService();
+

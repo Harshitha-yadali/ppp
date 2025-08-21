@@ -42,20 +42,20 @@ interface ResumeOptimizerProps {
   isAuthenticated: boolean;
   onShowAuth: () => void;
   onShowProfile: (mode?: 'profile' | 'wallet') => void;
-  // REMOVED: onNavigateBack: () => void;
+  onNavigateBack: () => void;
   userSubscription: any; // Keep this as it's passed from App.tsx
   refreshUserSubscription: () => Promise<void>; // Keep this as it's passed from App.tsx
-  onShowSubscriptionPlans: () => void; // Keep this as it's passed from App.tsx
+  onShowPlanSelection: () => void; // MODIFIED: Changed prop name
 }
 
 const ResumeOptimizer: React.FC<ResumeOptimizerProps> = ({
   isAuthenticated,
   onShowAuth,
   onShowProfile,
-  // REMOVED: onNavigateBack,
+  onNavigateBack,
   userSubscription,
   refreshUserSubscription,
-  onShowSubscriptionPlans
+  onShowPlanSelection // MODIFIED: Changed prop name
 }) => {
   const { user } = useAuth();
   const navigate = useNavigate(); // Initialize useNavigate
@@ -136,7 +136,7 @@ const ResumeOptimizer: React.FC<ResumeOptimizerProps> = ({
     setInitialResumeScore(null);
     setFinalResumeScore(null);
     setParsedResumeData(null);
-    setManualProject({ title: '', startDate: '', endDate: '', techStack: [], oneLiner: '' });
+    setManualProject({ title: '', startDate: '', endDate: [], techStack: [], oneLiner: '' });
     setNewTechStack('');
     setLowScoringProjects([]);
     setChangedSections([]);
@@ -222,7 +222,7 @@ const ResumeOptimizer: React.FC<ResumeOptimizerProps> = ({
       console.log('handleOptimize: Optimizations remaining (before useOptimization check):', subscription ? (subscription.optimizationsTotal - subscription.optimizationsUsed) : 'N/A'); // ADDED LOG
 
       if (!subscription || (subscription.optimizationsTotal - subscription.optimizationsUsed) <= 0) {
-        onShowSubscriptionPlans(); // Use the prop directly
+        onShowPlanSelection(); // MODIFIED: Call the new plan selection handler
         return;
       }
 
@@ -546,7 +546,7 @@ const ResumeOptimizer: React.FC<ResumeOptimizerProps> = ({
    */
   const handleSubscriptionSuccess = () => {
     checkSubscriptionStatus();
-    onShowSubscriptionPlans(); // Use the prop directly
+    onShowPlanSelection(); // MODIFIED: Call the new plan selection handler
     setWalletRefreshKey(prevKey => prevKey + 1);
   };
 
@@ -657,7 +657,7 @@ const ResumeOptimizer: React.FC<ResumeOptimizerProps> = ({
                           You have **{subscription.optimizationsTotal - subscription.optimizationsUsed}** optimizations remaining.
                         </p>
                         <button
-                          onClick={() => { onShowSubscriptionPlans(); setShowOptimizationDropdown(false); }} // Use prop directly
+                          onClick={() => { onShowPlanSelection(); setShowOptimizationDropdown(false); }} // MODIFIED: Call the new plan selection handler
                           className="w-full btn-secondary py-2 px-4 rounded-lg text-sm flex items-center justify-center space-x-2 dark:hover:shadow-neon-cyan/20"
                         >
                           <Zap className="w-4 h-4" />
@@ -670,7 +670,7 @@ const ResumeOptimizer: React.FC<ResumeOptimizerProps> = ({
                           You currently do not have an active subscription plan.
                         </p>
                         <button
-                          onClick={() => { onShowSubscriptionPlans(); setShowOptimizationDropdown(false); }} // Use prop directly
+                          onClick={() => { onShowPlanSelection(); setShowOptimizationDropdown(false); }} // MODIFIED: Call the new plan selection handler
                           className="w-full btn-primary py-2 px-4 rounded-lg text-sm flex items-center justify-center space-x-2"
                         >
                           <Crown className="w-4 h-4" />
@@ -1018,4 +1018,5 @@ const ResumeOptimizer: React.FC<ResumeOptimizerProps> = ({
 };
 
 export default ResumeOptimizer;
+
 
