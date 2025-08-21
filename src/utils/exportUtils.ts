@@ -51,7 +51,8 @@ export const exportToPDF = async (
     });
 
     // Remove the temporary container
-    
+    document.body.removeChild(tempContainer);
+
     // Create PDF
     const pdf = new jsPDF({
       orientation: 'portrait',
@@ -63,35 +64,25 @@ export const exportToPDF = async (
     const imgData = canvas.toDataURL('image/png');
     const pdfWidth = 210; // A4 width in mm
     const pdfHeight = 297; // A4 height in mm
+    const margin = options.template === 'minimalist' ? 20 : 15; // Larger margins for minimalist
+    const imgWidth = pdfWidth - 2 * margin;
+    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+    const maxContentHeight = pdfHeight - 2 * margin;
 
-    // CORRECTED: Define specific margins
-    const marginTop = 10; // Reduced top margin to 10mm
-    const marginBottom = 15;
-    const marginLeft = 15;
-    const marginRight = 15;
-
-    // CORRECTED: Update imgWidth and maxContentHeight calculations
-    const imgWidth = pdfWidth - (marginLeft + marginRight);
-    const maxContentHeight = pdfHeight - (marginTop + marginBottom);
-
-    // CORRECTED: Initialize yPosition with marginTop
-    let yPosition = marginTop;
+    let yPosition = margin;
 
     if (imgHeight <= maxContentHeight) {
       // Single page
-      // CORRECTED: Use specific margins for addImage
-      pdf.addImage(imgData, 'PNG', marginLeft, yPosition, imgWidth, imgHeight);
+      pdf.addImage(imgData, 'PNG', margin, yPosition, imgWidth, imgHeight);
     } else {
       // Multiple pages
       let heightLeft = imgHeight;
-      // CORRECTED: Initialize position with marginTop
-      let position = marginTop;
+      let position = margin;
 
       while (heightLeft > 0) {
-        // CORRECTED: Use marginTop for subsequent pages
-        if (position !== marginTop) {
+        if (position !== margin) {
           pdf.addPage();
-          position = marginTop;
+          position = margin;
         }
         
         const sourceY = imgHeight - heightLeft;
@@ -113,8 +104,7 @@ export const exportToPDF = async (
           );
           
           const pageImgData = pageCanvas.toDataURL('image/png');
-          // CORRECTED: Use specific margins for addImage
-          pdf.addImage(pageImgData, 'PNG', marginLeft, position, imgWidth, pageHeight);
+          pdf.addImage(pageImgData, 'PNG', margin, position, imgWidth, pageHeight);
         }
         
         heightLeft -= maxContentHeight;
@@ -204,42 +194,34 @@ const generateResumeHTML = (
   const generateSection = (sectionName: string): string => {
     switch (sectionName) {
       case 'summary':
-        // Conditional logic for 'Professional Summary' or 'Career Objective'
-        const summaryTemplate = options?.template || 'chronological';
-        
-        if (userType === 'student') {
-          if (!resumeData.careerObjective || resumeData.careerObjective.trim() === '') return '';
+        if (userType === 'student' && resumeData.careerObjective) {
           return `
             <div class="section">
               <h2>CAREER OBJECTIVE</h2>
-              ${summaryTemplate !== 'minimalist' ? '<hr style="border: 0.5pt solid #404040; margin: 10px auto; width: 90%;">' : ''}
               <p>${resumeData.careerObjective}</p>
             </div>
           `;
-        } else { // 'experienced' or 'fresher'
-          if (!resumeData.summary || resumeData.summary.trim() === '') return '';
+        } else if (resumeData.summary) {
           return `
-            <div class="section" style="${summaryTemplate === 'functional' ? 'background: #f8f9fa; padding: 15px; border-radius: 8px;' : ''}">
-              <h2>${summaryTemplate === 'functional' ? 'PROFESSIONAL PROFILE' : 'PROFESSIONAL SUMMARY'}</h2>
-              ${summaryTemplate !== 'minimalist' ? '<hr style="border: 0.5pt solid #404040; margin: 10px auto; width: 90%;">' : ''}
+            <div class="section">
+              <h2>${template === 'functional' ? 'PROFESSIONAL PROFILE' : 'PROFESSIONAL SUMMARY'}</h2>
               <p>${resumeData.summary}</p>
             </div>
           `;
         }
+        return '';
 
       case 'workExperience':
         if (!resumeData.workExperience || resumeData.workExperience.length === 0) return '';
         
-        const isExperienceFocused = template === 'chronological';
+        const experienceTitle = template === 'functional' ? 'WORK HISTORY' : 
+                               userType === 'fresher' || userType === 'student' ? 'INTERNSHIPS & TRAINING' : 'PROFESSIONAL EXPERIENCE';
         
         return `
           <div class="section">
-            <h2>${template === 'functional' ? 'WORK HISTORY' : 
-               userType === 'fresher' || userType === 'student' ? 'INTERNSHIPS & TRAINING' : 'PROFESSIONAL EXPERIENCE'}</h2>
-            <hr style="border: 0.5pt solid #404040; margin: 10px auto; width: 90%;">
-
+            <h2>${experienceTitle}</h2>
             ${resumeData.workExperience.map(job => `
-              <div class="experience-item" style="${isExperienceFocused ? 'border-left: 2px solid #e5e7eb; padding-left: 10px;' : ''}">
+              <div class="experience-item">
                 <div class="job-header">
                   <div>
                     <div class="job-title">${job.role}</div>
@@ -247,12 +229,11 @@ const generateResumeHTML = (
                   </div>
                   <div class="date">${job.year}</div>
                 </div>
-                ${job.bullets && job.bullets.length > 0 && template !== 'functional' ? `
+                ${template !== 'functional' && job.bullets ? `
                   <ul>
-                    ${job.bullets.map(bullet => `<li>${typeof bullet === 'string' ? bullet : (bullet as any).description || JSON.stringify(bullet)}</li>`).join('')}
+                    ${job.bullets.map(bullet => `<li>${bullet}</li>`).join('')}
                   </ul>
-                ` : ''}
-                ${template === 'functional' && job.bullets && job.bullets.length > 0 ? `
+                ` : template === 'functional' && job.bullets ? `
                   <p style="margin-left: 10px;">${job.bullets[0]}</p>
                 ` : ''}
               </div>
@@ -263,23 +244,16 @@ const generateResumeHTML = (
       case 'education':
         if (!resumeData.education || resumeData.education.length === 0) return '';
         
-        const isEducationPriority = template === 'minimalist' || userType === 'student';
-        
         return `
           <div class="section">
             <h2>EDUCATION</h2>
-            <hr style="border: 0.5pt solid #404040; margin: 10px auto; width: 90%;">
-
             ${resumeData.education.map(edu => `
-              <div class="education-item" style="${isEducationPriority ? 'background: #f8f9fa; padding: 15px; border-radius: 8px;' : ''}">
+              <div class="education-item">
                 <div class="education-header">
                   <div>
                     <div class="degree">${edu.degree}</div>
                     <div class="school">${edu.school}${edu.location ? `, ${edu.location}` : ''}</div>
                     ${edu.cgpa ? `<div class="cgpa">CGPA: ${edu.cgpa}</div>` : ''}
-                    ${(edu as any).relevantCoursework && (edu as any).relevantCoursework.length > 0 ? `
-                        <div class="coursework">Relevant Coursework: ${(edu as any).relevantCoursework.join(', ')}</div>
-                    ` : ''}
                   </div>
                   <div class="date">${edu.year}</div>
                 </div>
@@ -311,7 +285,6 @@ const generateResumeHTML = (
         return `
           <div class="section">
             <h2>${skillsTitle}</h2>
-            <hr style="border: 0.5pt solid #404040; margin: 10px auto; width: 90%;">
             ${isSkillsFocused ? `
               <div class="skills-grid">
                 ${resumeData.skills.map(skill => `
@@ -341,13 +314,12 @@ const generateResumeHTML = (
         return `
           <div class="section">
             <h2>${projectsTitle}</h2>
-            <hr style="border: 0.5pt solid #404040; margin: 10px auto; width: 90%;">
             ${resumeData.projects.map(project => `
               <div class="project-item ${isProjectsFocused ? 'project-highlighted' : ''}">
                 <div class="project-title">${project.title}</div>
                 ${project.bullets ? `
                   <ul>
-                    ${project.bullets.map(bullet => `<li>${typeof bullet === 'string' ? bullet : (bullet as any).description || JSON.stringify(bullet)}</li>`).join('')}
+                    ${project.bullets.map(bullet => `<li>${bullet}</li>`).join('')}
                   </ul>
                 ` : ''}
               </div>
@@ -358,37 +330,24 @@ const generateResumeHTML = (
       case 'certifications':
         if (!resumeData.certifications || resumeData.certifications.length === 0) return '';
         
-        const isSidebarTemplate = template === 'two_column_safe';
+        if (template === 'two_column_safe') {
+          return `
+            <div class="sidebar-section">
+              <h3>CERTIFICATIONS</h3>
+              ${resumeData.certifications.map(cert => `
+                <div class="cert-item">• ${typeof cert === 'string' ? cert : cert.title || cert}</div>
+              `).join('')}
+            </div>
+          `;
+        }
         
         return `
           <div class="section">
             <h2>CERTIFICATIONS</h2>
-            ${!isSidebarTemplate && template !== 'minimalist' ? '<hr style="border: 0.5pt solid #404040; margin: 10px auto; width: 90%;">' : ''}
-
             <ul>
-              ${resumeData.certifications.map(cert => {
-                let certText = '';
-                if (typeof cert === 'string') {
-                  certText = cert;
-                } else if (cert && typeof cert === 'object') {
-                  if ('title' in cert && 'issuer' in cert) {
-                    certText = `${String((cert as any).title)} - ${String((cert as any).issuer)}`;
-                  } else if ('title' in cert && 'description' in cert) {
-                    certText = `${String((cert as any).title)} - ${String((cert as any).description)}`;
-                  } else if ('name' in cert) {
-                    certText = String((cert as any).name);
-                  } else if ('title' in cert) {
-                    certText = String((cert as any).title);
-                  } else if ('description' in cert) {
-                    certText = (cert as any).description;
-                  } else {
-                    certText = Object.values(cert).filter(Boolean).join(' - ');
-                  }
-                } else {
-                  certText = String(cert);
-                }
-                return `<li>${certText}</li>`;
-              }).join('')}
+              ${resumeData.certifications.map(cert => `
+                <li>${typeof cert === 'string' ? cert : cert.title || cert}</li>
+              `).join('')}
             </ul>
           </div>
         `;
@@ -397,14 +356,12 @@ const generateResumeHTML = (
         const hasAchievements = resumeData.achievements && resumeData.achievements.length > 0;
         const hasExtraCurricular = resumeData.extraCurricularActivities && resumeData.extraCurricularActivities.length > 0;
         const hasLanguages = resumeData.languagesKnown && resumeData.languagesKnown.length > 0;
-        const hasPersonalDetails = resumeData.personalDetails && resumeData.personalDetails.trim() !== '';
         
-        if (!hasAchievements && !hasExtraCurricular && !hasLanguages && !hasPersonalDetails) return '';
+        if (!hasAchievements && !hasExtraCurricular && !hasLanguages) return '';
         
         return `
           <div class="section">
             <h2>ADDITIONAL INFORMATION</h2>
-            <hr style="border: 0.5pt solid #404040; margin: 10px auto; width: 90%;">
             ${hasAchievements ? `
               <div class="subsection">
                 <h4>Achievements:</h4>
@@ -425,12 +382,6 @@ const generateResumeHTML = (
               <div class="subsection">
                 <h4>Languages Known:</h4>
                 <p>${resumeData.languagesKnown!.join(', ')}</p>
-              </div>
-            ` : ''}
-            ${hasPersonalDetails ? `
-              <div class="subsection">
-                <h4>Personal Details:</h4>
-                <p>${resumeData.personalDetails}</p>
               </div>
             ` : ''}
           </div>
@@ -512,18 +463,9 @@ const generateResumeHTML = (
         .company, .school { font-size: ${options.subHeaderSize}pt; }
         .date { font-size: ${options.subHeaderSize}pt; }
         .project-title { font-weight: bold; font-size: ${options.subHeaderSize}pt; margin-bottom: 4pt; }
-        
-        /* MODIFIED: UL and LI styles for custom bullets */
-        ul { list-style: none; padding-left: 0; margin: 0; }
-        li { margin-bottom: ${options.entrySpacing * 1.42}pt; font-size: ${options.bodyTextSize}pt; line-height: 1.25; position: relative; padding-left: 15px; }
-        li::before {
-          content: "•";
-          position: absolute;
-          left: 0;
-          font-size: ${options.bodyTextSize}pt;
-          line-height: 1.25;
-          color: black;
-        }
+        ul { padding-left: 30px; list-style-position: outside; margin: 0; list-style-type: disc; }
+        li { margin-bottom: ${options.entrySpacing * 1.42}pt; font-size: ${options.bodyTextSize}pt; padding-left: 15px; text-indent: -15px; line-height: 1.5; }
+
 
         .skills-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; }
         .skill-box { background: #f8f9fa; padding: 10px; border-radius: 4px; }
@@ -539,18 +481,18 @@ const generateResumeHTML = (
 const getSectionOrderForTemplate = (template: string, userType: UserType): string[] => {
   switch (template) {
     case 'chronological':
-      return ['summary', 'workExperience', 'education', 'skills', 'projects', 'certifications', 'achievementsAndExtras'];
+      return ['summary', 'workExperience', 'education', 'skills', 'projects', 'achievementsAndExtras'];
     case 'functional':
-      return ['summary', 'skills', 'projects', 'workExperience', 'education', 'certifications', 'achievementsAndExtras'];
+      return ['summary', 'skills', 'projects', 'workExperience', 'education'];
     case 'combination':
-      return ['summary', 'skills', 'projects', 'workExperience', 'education', 'certifications', 'achievementsAndExtras'];
+      return ['summary', 'skills', 'projects', 'workExperience', 'education'];
     case 'minimalist':
       if (userType === 'student' || userType === 'fresher') {
-        return ['summary', 'education', 'projects', 'skills', 'workExperience', 'certifications', 'achievementsAndExtras'];
+        return ['summary', 'education', 'projects', 'skills', 'workExperience'];
       }
-      return ['summary', 'workExperience', 'education', 'skills', 'projects', 'certifications', 'achievementsAndExtras'];
+      return ['summary', 'workExperience', 'education', 'skills', 'projects'];
     default:
-      return ['summary', 'workExperience', 'education', 'skills', 'projects', 'certifications', 'achievementsAndExtras'];
+      return ['summary', 'workExperience', 'education', 'skills', 'projects', 'achievementsAndExtras'];
   }
 };
 
@@ -962,4 +904,3 @@ export function generateResumeLayout(
     }
   };
 }
-
