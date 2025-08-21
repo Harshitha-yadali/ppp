@@ -25,7 +25,7 @@ interface ToolsAndPagesNavigationProps {
   isAuthenticated: boolean;
   onShowAuth: () => void;
   userSubscription: Subscription | null;
-  onShowSubscriptionPlans: () => void;
+  onShowSubscriptionPlans: () => void; // MODIFIED: This now calls the PlanSelectionModal
 }
 
 interface FeatureCardProps {
@@ -39,7 +39,7 @@ interface FeatureCardProps {
   onShowAuth: () => void;
   requiresAuth?: boolean;
   userSubscription: Subscription | null;
-  onShowSubscriptionPlans: () => void;
+  onShowSubscriptionPlans: () => void; // MODIFIED: This now calls the PlanSelectionModal
   isTool?: boolean;
 }
 
@@ -54,7 +54,7 @@ const FeatureCard: React.FC<FeatureCardProps> = ({
   onShowAuth,
   requiresAuth = false,
   userSubscription,
-  onShowSubscriptionPlans,
+  onShowSubscriptionPlans, // MODIFIED: Destructure the new prop
   isTool = false,
 }) => {
   const handleCardClick = () => {
@@ -85,7 +85,7 @@ const FeatureCard: React.FC<FeatureCardProps> = ({
       }
 
       if (isAuthenticated && userSubscription && remainingCount !== null && remainingCount <= 0) {
-        onShowSubscriptionPlans();
+        onShowSubscriptionPlans(); // MODIFIED: Call the new plan selection handler
         return;
       }
     }
@@ -165,7 +165,7 @@ export const ToolsAndPagesNavigation: React.FC<ToolsAndPagesNavigationProps> = (
   isAuthenticated,
   onShowAuth,
   userSubscription,
-  onShowSubscriptionPlans,
+  onShowSubscriptionPlans, // MODIFIED: Destructure the new prop
 }) => {
   const { user } = useAuth(); // Use useAuth to get user details if needed
 
@@ -284,7 +284,7 @@ export const ToolsAndPagesNavigation: React.FC<ToolsAndPagesNavigationProps> = (
                 isAuthenticated={isAuthenticated}
                 onShowAuth={onShowAuth}
                 userSubscription={userSubscription}
-                onShowSubscriptionPlans={onShowSubscriptionPlans}
+                onShowSubscriptionPlans={onShowSubscriptionPlans} // MODIFIED: Pass the new prop
               />
             ))}
           </div>
@@ -304,7 +304,7 @@ export const ToolsAndPagesNavigation: React.FC<ToolsAndPagesNavigationProps> = (
                 isAuthenticated={isAuthenticated}
                 onShowAuth={onShowAuth}
                 userSubscription={userSubscription}
-                onShowSubscriptionPlans={onShowSubscriptionPlans}
+                onShowSubscriptionPlans={onShowSubscriptionPlans} // MODIFIED: Pass the new prop
               />
             ))}
           </div>
@@ -313,3 +313,4 @@ export const ToolsAndPagesNavigation: React.FC<ToolsAndPagesNavigationProps> = (
     </div>
   );
 };
+
