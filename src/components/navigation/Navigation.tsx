@@ -1,6 +1,6 @@
 // src/components/navigation/Navigation.tsx
 import React, { useState } from 'react';
-import { Home, Info, Phone, BookOpen, MessageCircle, ChevronDown, Target, TrendingUp, PlusCircle, Zap, Sparkles } from 'lucide-react';
+import { Home, Info, Phone, BookOpen, MessageCircle, ChevronDown, Target, TrendingUp, PlusCircle, Zap, Sparkles, Crown } from 'lucide-react'; // ADD Crown here
 import { useAuth } from '../../contexts/AuthContext';
 import { Link, useNavigate } from 'react-router-dom'; // Import Link and useNavigate
 
@@ -78,15 +78,6 @@ export const Navigation: React.FC<NavigationProps> = ({ onPageChange }) => { // 
                     <span className="font-medium">{tool.label}</span>
                   </Link>
                 ))}
-                {/* REMOVED: Link to all tools and pages */}
-                {/* <Link // MODIFIED: Use Link component
-                  to="/all-tools" // Link to the path
-                  onClick={() => setShowAIToolsDropdown(false)} // Close dropdown on click
-                  className="w-full flex items-center space-x-3 px-4 py-3 text-left hover:bg-primary-50 transition-colors text-gray-700 hover:text-primary-700 dark:text-gray-300 dark:hover:bg-dark-200 dark:hover:text-neon-cyan-400 border-t border-gray-100 mt-2 pt-2"
-                >
-                  <Sparkles className="w-4 h-4" />
-                  <span className="font-medium">All Tools & Pages</span>
-                </Link> */}
               </div>
             )}
           </div>
