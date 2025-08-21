@@ -34,9 +34,13 @@ export const PricingPage: React.FC<PricingPageProps> = ({
   const { isAuthenticated } = useAuth();
   const [selectedPlan, setSelectedPlan] = useState('career_boost_plus');
 
-  // Defensive programming: Ensure paymentService and its methods return arrays
-  const plans = paymentService?.getPlans() || [];
-  const addOns = paymentService?.getAddOns() || [];
+  // Defensive initialization: Ensure plans and addOns are always arrays
+  // This explicitly checks if the result of getPlans()/getAddOns() is an array.
+  const plans = Array.isArray(paymentService?.getPlans()) ? paymentService.getPlans() : [];
+  const addOns = Array.isArray(paymentService?.getAddOns()) ? paymentService.getAddOns() : [];
+
+  console.log('PricingPage: plans value (after defensive check):', plans);
+  console.log('PricingPage: addOns value (after defensive check):', addOns);
 
   const features = [
     {
@@ -118,7 +122,7 @@ export const PricingPage: React.FC<PricingPageProps> = ({
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-16">
               <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-gray-100 mb-6">What You Get</h2>
-              <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+              <p className="text-xl text-gray-600 dark:text-gray-300">
                 Professional AI-powered tools to transform your career prospects
               </p>
             </div>
