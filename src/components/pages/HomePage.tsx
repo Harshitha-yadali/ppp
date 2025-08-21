@@ -41,7 +41,7 @@ interface HomePageProps {
   // REMOVED: onPageChange: (page: string) => void;
   isAuthenticated: boolean;
   onShowAuth: () => void;
-  onShowSubscriptionPlans: () => void;
+  onShowSubscriptionPlans: () => void; // MODIFIED: This now calls the PlanSelectionModal
   userSubscription: any; // New prop for user's subscription status
 }
 
@@ -51,7 +51,7 @@ export const HomePage: React.FC<HomePageProps> = ({
   // REMOVED: onPageChange,
   isAuthenticated,
   onShowAuth,
-  onShowSubscriptionPlans,
+  onShowSubscriptionPlans, // Destructure new prop
   userSubscription // Destructure new prop
 }) => {
   const [showOptimizationDropdown, setShowOptimizationDropdown] = React.useState(false);
@@ -98,12 +98,15 @@ export const HomePage: React.FC<HomePageProps> = ({
       return;
     }
 
-    if (isAuthenticated) {
-      console.log('User is authenticated. Navigating to page.');
-      navigate(feature.id); // Use navigate
+    // If authenticated, check if credits are available. If not, show plan selection.
+    if (isAuthenticated && feature.requiresAuth && !isFeatureAvailable(feature.id)) {
+      onShowSubscriptionPlans(); // MODIFIED: Call the new plan selection handler
+      return;
     }
-    
-    if (feature.id === 'optimizer') {
+
+    // If authenticated and credits are available, navigate to the page.
+    if (isAuthenticated || !feature.requiresAuth) { // Allow non-auth features to navigate
+      console.log('User is authenticated or feature does not require auth. Navigating to page.');
       navigate(feature.id); // Use navigate
     }
   };
@@ -395,3 +398,4 @@ export const HomePage: React.FC<HomePageProps> = ({
     </div>
   );
 };
+
