@@ -34,7 +34,7 @@ interface ResumeScoreCheckerProps {
   isAuthenticated: boolean;
   onShowAuth: () => void;
   userSubscription: Subscription | null; // Add this prop
-  onShowSubscriptionPlans: () => void; // Add this prop
+  onShowPlanSelection: () => void; // MODIFIED: Changed prop name
   onShowAlert: (title: string, message: string, type?: 'info' | 'success' | 'warning' | 'error', actionText?: string, onAction?: () => void) => void;
   refreshUserSubscription: () => Promise<void>; // ADD THIS PROP
 }
@@ -44,7 +44,7 @@ export const ResumeScoreChecker: React.FC<ResumeScoreCheckerProps> = ({
   isAuthenticated,
   onShowAuth,
   userSubscription, // Destructure the new prop
-  onShowSubscriptionPlans, // Destructure the new prop
+  onShowPlanSelection, // MODIFIED: Destructure the new prop
   onShowAlert,
   refreshUserSubscription, // DESTUCTURE THE NEW PROP
 }) => {
@@ -59,7 +59,7 @@ export const ResumeScoreChecker: React.FC<ResumeScoreCheckerProps> = ({
 
   const analyzeResume = async () => {
     if (!isAuthenticated) {
-      onShowAuth();
+      onShowAlert('Authentication Required', 'Please sign in to get your resume score.', 'error', 'Sign In', onShowAuth);
       return;
     }
 
@@ -74,7 +74,7 @@ export const ResumeScoreChecker: React.FC<ResumeScoreCheckerProps> = ({
         `You have used all your ${scoreChecksTotal} Resume Score Checks from ${planName}. Please upgrade your plan to continue checking scores.`,
         'warning',
         'Upgrade Plan',
-        onShowSubscriptionPlans
+        onShowPlanSelection // MODIFIED: Call the new plan selection handler
       );
       return;
     }
@@ -435,3 +435,4 @@ export const ResumeScoreChecker: React.FC<ResumeScoreCheckerProps> = ({
     </div>
   );
 };
+
