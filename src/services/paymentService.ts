@@ -146,6 +146,14 @@ class PaymentService {
       type: 'optimization',
       quantity: 1,
     },
+    // NEW ADD-ON: Single Guided Resume Build Purchase
+    {
+      id: 'guided_resume_build_single_purchase',
+      name: 'Guided Resume Build (1 Use)',
+      price: 99, // Example price in Rupees
+      type: 'guided_build',
+      quantity: 1,
+    },
   ];
 
   getPlans(): SubscriptionPlan[] {
