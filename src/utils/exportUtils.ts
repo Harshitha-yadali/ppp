@@ -464,7 +464,7 @@ const generateResumeHTML = (
         .date { font-size: ${options.subHeaderSize}pt; }
         .project-title { font-weight: bold; font-size: ${options.subHeaderSize}pt; margin-bottom: 4pt; }
         ul { padding-left: 24px; list-style-position: inside; margin: 0; list-style-type: disc; }
-        li { margin-bottom: ${options.entrySpacing * 1.42}pt; font-size: ${options.bodyTextSize}pt; padding-left: 20px; text-indent: -20px; line-height: 1.5; }
+        li { margin-bottom: ${options.entrySpacing * 1.42}pt; font-size: ${options.bodyTextSize}pt; padding-left: 15px; text-indent: -15px; line-height: 1.5; }
 
 
         .skills-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; }
