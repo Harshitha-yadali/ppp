@@ -120,46 +120,19 @@ interface SkillsScore extends BreakdownBase {
 
 export interface DetailedScore {
   totalScore: number;
-  analysis: string; // Added analysis
-  keyStrengths: string[]; // Added keyStrengths
-  improvementAreas: string[]; // Added improvementAreas
+  analysis: string;
+  keyStrengths: string[];
+  improvementAreas: string[];
   breakdown: {
-    projects: {
-      score: number;
-      maxScore: 25;
-      details: string;
-      completionRate: number;
-    };
-    technicalSkills: {
-      score: number;
-      maxScore: 25;
-      details: string;
-      relevantSkills: number;
-    };
-    experience: {
-      score: number;
-      maxScore: 25;
-      details: string;
-      yearsOfExperience: number;
-      internships: number;
-      leadershipRoles: number;
-    };
-    educationCertifications: {
-      score: number;
-      maxScore: 15;
-      details: string;
-      hasBachelors: boolean;
-      hasMasters: boolean;
-      certificationCount: number;
-    };
-    resumeStructure: {
-      score: number;
-      maxScore: 10;
-      details: string;
-      hasProperSections: boolean;
-      hasConsistentFormatting: boolean;
-      isATSFriendly: boolean;
-    };
+     atsCompatibility: ATSCompatibility;
+    keywordSkillMatch: KeywordSkillMatch;
+    projectWorkRelevance: ProjectWorkRelevance;
+    structureFlow: StructureFlow;
+    criticalFixesRedFlags: CriticalFixesRedFlags;
+    impactScore: ImpactScore;
+    brevityScore: BrevityScore;
+    styleScore: StyleScore;
+    skillsScore: SkillsScore;
   };
   recommendations: string[];
   grade: 'A+' | 'A' | 'B+' | 'B' | 'C+' | 'C' | 'D' | 'F';
