@@ -45,7 +45,7 @@ interface LinkedInMessageGeneratorProps {
   isAuthenticated: boolean;
   onShowAuth: () => void;
   userSubscription: Subscription | null;
-  onShowPlanSelection: () => void; // MODIFIED: Changed prop name
+  onShowSubscriptionPlans: (featureId?: string) => void; // MODIFIED: Changed prop name
   onShowAlert: (title: string, message: string, type?: 'info' | 'success' | 'warning' | 'error', actionText?: string, onAction?: () => void) => void;
   refreshUserSubscription: () => Promise<void>; // ADD THIS PROP
 }
@@ -71,7 +71,7 @@ export const LinkedInMessageGenerator: React.FC<LinkedInMessageGeneratorProps> =
   isAuthenticated,
   onShowAuth,
   userSubscription,
-  onShowPlanSelection, // MODIFIED: Destructure the new prop
+  onShowSubscriptionPlans, // MODIFIED: Destructure the new prop
   onShowAlert,
   refreshUserSubscription, // DESTRUCTURE THE NEW PROP
 }) => {
@@ -155,7 +155,7 @@ export const LinkedInMessageGenerator: React.FC<LinkedInMessageGeneratorProps> =
         `You have used all your ${linkedinMessagesTotal} LinkedIn Message generations from ${planName}. Please upgrade your plan to continue generating messages.`,
         'warning',
         'Upgrade Plan',
-        () => onShowPlanSelection('linkedin-generator') // Pass feature ID for context-specific modal
+        () => onShowSubscriptionPlans('linkedin-generator') // Pass feature ID for context-specific modal
       );
       return;
     }
@@ -654,4 +654,3 @@ export const LinkedInMessageGenerator: React.FC<LinkedInMessageGeneratorProps> =
     </div>
   );
 };
-
