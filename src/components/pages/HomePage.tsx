@@ -122,7 +122,7 @@ export const HomePage: React.FC<HomePageProps> = ({
       title: 'Resume Score Check',
       description: 'Get an instant ATS score with detailed analysis and improvement suggestions.',
       icon: <TrendingUp className="w-6 h-6" />,
-      requiresAuth: false
+      requiresAuth: true
     },
     {
       id: 'guided-builder',
