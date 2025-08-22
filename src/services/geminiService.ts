@@ -1,3 +1,4 @@
+// src/services/geminiService.ts
 import { ResumeData, UserType } from '../types/resume';
 
 const OPENROUTER_API_KEY = import.meta.env.VITE_OPENROUTER_API_KEY;
@@ -337,7 +338,7 @@ GitHub URL provided: ${githubUrl || 'NONE - leave empty'}`;
         } else if (parsedResult.email) {
           const emailRegex = /([a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)/;
           const match = parsedResult.email.match(emailRegex);
-          parsedResult.email = match && match[1] ? match[1] : ""; // Extract valid email or set empty
+          parsedResult.email = match && match ? match : ""; // Extract valid email or set empty
         } else {
           parsedResult.email = ""; // Ensure it's an empty string if nothing is found
         }
@@ -348,12 +349,15 @@ GitHub URL provided: ${githubUrl || 'NONE - leave empty'}`;
         } else if (parsedResult.phone) {
           // This regex tries to capture common phone number patterns including international codes, parentheses, spaces, and hyphens.
           // It's designed to be robust but might need adjustments for very unusual formats.
-          const phoneRegex = /(\+?\d{1,3}[-.\s]?)?(\(?\d{3}\)?[-.\s]?)?\d{3}[-.\s]?\d{4}/;
+          const phoneRegex = /(\+?\d{1,3}[-.\s]?)(\(?\d{3}\)?[-.\s]?)?\d{3}[-.\s]?\d{4}/;
           const match = parsedResult.phone.match(phoneRegex);
-          parsedResult.phone = match && match[0] ? match[0] : ""; // Extract valid phone or set empty
+          parsedResult.phone = match && match ? match : ""; // Extract valid phone or set empty
         } else {
           parsedResult.phone = ""; // Ensure it's an empty string if nothing is found
         }
+
+        // Set the origin for JD-optimized resumes
+        parsedResult.origin = 'jd_optimized'; // ADDED LINE
 
         return parsedResult;
       } catch (parseError) {
@@ -381,3 +385,4 @@ GitHub URL provided: ${githubUrl || 'NONE - leave empty'}`;
   // If the loop finishes, it means all retries failed
   throw new Error(`Failed to optimize resume after ${maxRetries} attempts.`);
 };
+
