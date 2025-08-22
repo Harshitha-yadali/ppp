@@ -465,10 +465,49 @@ class PaymentService {
     }
   }
 
-  async applyCoupon(planId: string, couponCode: string, userId: string | null): Promise<{ couponApplied: string | null; discountAmount: number; finalAmount: number; error?: string }> {
+  // NEW: Private method to validate coupon on the server
+  private async validateCouponServer(couponCode: string, userId: string, accessToken: string): Promise<{ isValid: boolean; message: string }> {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/validate-coupon`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({ couponCode, userId }),
+      });
+
+      const result = await response.json();
+      if (!response.ok) {
+        // If the response is not OK, it means the Edge Function itself returned an error (e.g., 400, 500)
+        // This usually indicates a problem with the request or the function's execution.
+        console.error('Error from validate-coupon Edge Function:', result.message || response.statusText);
+        return { isValid: false, message: result.message || 'Failed to validate coupon on server.' };
+      }
+      return result; // This will contain { isValid: boolean, message: string }
+    } catch (error) {
+      console.error('Network error during coupon validation:', error);
+      return { isValid: false, message: 'Network error during coupon validation. Please try again.' };
+    }
+  }
+
+  // MODIFIED: applyCoupon now performs server-side validation
+  async applyCoupon(planId: string, couponCode: string, userId: string | null): Promise<{ couponApplied: string | null; discountAmount: number; finalAmount: number; error?: string; isValid: boolean; message: string }> {
     const plan = this.getPlanById(planId);
     if (!plan && planId !== 'addon_only_purchase') { // Allow addon_only_purchase for coupon application
-      return { couponApplied: null, discountAmount: 0, finalAmount: 0, error: 'Invalid plan selected' };
+      return { couponApplied: null, discountAmount: 0, finalAmount: 0, error: 'Invalid plan selected', isValid: false, message: 'Invalid plan selected' };
+    }
+
+    // Perform server-side validation first
+    if (userId) {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session || !session.access_token) {
+        return { couponApplied: null, discountAmount: 0, finalAmount: 0, error: 'Authentication required for coupon validation', isValid: false, message: 'Authentication required for coupon validation' };
+      }
+      const serverValidation = await this.validateCouponServer(couponCode, userId, session.access_token);
+      if (!serverValidation.isValid) {
+        return { couponApplied: null, discountAmount: 0, finalAmount: 0, error: serverValidation.message, isValid: false, message: serverValidation.message };
+      }
     }
 
     let originalPrice = (plan?.price || 0) * 100; // Convert to paise, or 0 if addon_only
@@ -481,6 +520,7 @@ class PaymentService {
 
     let discountAmount = 0;
     let finalAmount = originalPrice;
+    let message = 'Coupon applied successfully!';
 
     const normalizedCoupon = couponCode.toLowerCase().trim();
 
@@ -500,10 +540,10 @@ class PaymentService {
       discountAmount = Math.floor(originalPrice * 0.5);
       finalAmount = originalPrice - discountAmount;
     } else {
-      return { couponApplied: null, discountAmount: 0, finalAmount: originalPrice, error: 'Invalid coupon code or not applicable to selected plan' };
+      return { couponApplied: null, discountAmount: 0, finalAmount: originalPrice, error: 'Invalid coupon code or not applicable to selected plan', isValid: false, message: 'Invalid coupon code or not applicable to selected plan' };
     }
 
-    return { couponApplied: normalizedCoupon, discountAmount, finalAmount };
+    return { couponApplied: normalizedCoupon, discountAmount, finalAmount, isValid: true, message: message };
   }
 
   async processPayment(
@@ -765,3 +805,4 @@ class PaymentService {
 }
 
 export const paymentService = new PaymentService();
+
