@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { MatchScore, DetailedScore, ResumeData } from '../types/resume';
 import { RecommendedProject } from '../types/analysis'; // This import seems unused, but I'll leave it as it was in original
-import { TrendingUp, Target, CheckCircle, AlertCircle, ArrowRight, BarChart3, Award, BookOpen, Code, Lightbulb, Clock, Star, ChevronDown, ChevronUp, Zap, Palette, Sparkles } from 'lucide-react';
+import { TrendingUp, Target,   ArrowRight, BarChart3, Award, BookOpen, Code, Lightbulb, Clock, Star, ChevronDown, ChevronUp, Zap, Palette, Sparkles } from 'lucide-react';
 import { getDetailedResumeScore } from '../services/scoringService'; // This import seems unused, but I'll leave it as it was in original
 import { analyzeProjectAlignment } from '../services/projectAnalysisService'; // This import seems unused, but I'll leave it as it was in original
 
