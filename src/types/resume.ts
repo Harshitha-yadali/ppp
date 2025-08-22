@@ -123,17 +123,7 @@ export interface DetailedScore {
   analysis: string;
   keyStrengths: string[];
   improvementAreas: string[];
-  breakdown: {
-     atsCompatibility: ATSCompatibility;
-    keywordSkillMatch: KeywordSkillMatch;
-    projectWorkRelevance: ProjectWorkRelevance;
-    structureFlow: StructureFlow;
-    criticalFixesRedFlags: CriticalFixesRedFlags;
-    impactScore: ImpactScore;
-    brevityScore: BrevityScore;
-    styleScore: StyleScore;
-    skillsScore: SkillsScore;
-  };
+  breakdown: ScoreBreakdown;
   recommendations: string[];
   grade: Grade;
 }
