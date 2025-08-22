@@ -378,7 +378,7 @@ const ResumeOptimizer: React.FC<ResumeOptimizerProps> = ({
       const finalScore = await getDetailedResumeScore(finalOptimizedResume, jobDescription, setIsCalculatingScore);
       setFinalResumeScore(finalScore);
 
-      const afterScoreData = generateAfterScore(reconstructResumeText(finalOptimizedResume));
+    const afterScoreData = await generateAfterScore(finalOptimizedResume, jobDescription);
       setAfterScore(afterScoreData);
 
       const sections = ['workExperience', 'education', 'projects', 'skills', 'certifications'];
