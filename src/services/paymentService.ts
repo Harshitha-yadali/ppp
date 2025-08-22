@@ -69,7 +69,7 @@ class PaymentService {
         '✅ Email Support',
       ],
     },
-    {
+      {
       id: 'smart_apply_pack',
       name: 'Smart Apply Pack',
       price: 499,
@@ -78,7 +78,17 @@ class PaymentService {
       scoreChecks: 10,
       linkedinMessages: 50,
       guidedBuilds: 1,
-      durationInHours: 24 * 365 * 10,
+      tag: 'Quick Boost',
+      tagColor: 'text-yellow-800 bg-yellow-100',
+      gradient: 'from-yellow-500 to-orange-500',
+      icon: 'target',
+      features: [
+        '✅ 10 Resume Optimizations',
+        '✅ 10 Score Checks',
+        '✅ 50 LinkedIn Messages',
+        '✅ 1 Guided Resume Build',
+        '✅ Basic Support',
+      ],
     },
     {
       id: 'resume_fix_pack',
