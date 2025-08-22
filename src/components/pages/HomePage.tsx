@@ -132,7 +132,7 @@ export const HomePage: React.FC<HomePageProps> = ({
       title: 'Guided Resume Builder',
       description: 'Create a professional resume from scratch with our step-by-step AI-powered builder.',
       icon: <PlusCircle className="w-6 h-6" />,
-      requiresAuth: true
+      requiresAuth: false
     },
     
     {
