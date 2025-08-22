@@ -388,7 +388,7 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({
                             </div>
                             <h3 className="text-base sm:text-xl font-bold text-gray-900 mb-2">{plan.name}</h3>
                             <div className="text-center mb-4"> {/* Increased mb to push credits down */}
-                              <span className="block text-xl sm:text-3xl font-bold dark:text-gray-900"> {/* Added 'block' */}
+                              <span className="block text-xl sm:text-3xl font-bold text-gray-900 dark:text-dark-900"> {/* Added 'block' */}
                                 ₹{plan.price}
                               </span>
                               <span className="block text-gray-600 text-xs sm:text-base"> {/* Added 'block', removed ml-1 */}
