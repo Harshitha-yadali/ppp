@@ -81,27 +81,7 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({
   // Combine regular plans with the special "Add-ons Only" option
   const allPlansWithAddOnOption = [
     ...plans,
-    {
-      id: 'addon_only_purchase',
-      name: '🛒 Add-ons Only',
-      price: 0,
-      duration: 'One-time Purchase',
-      optimizations: 0,
-      scoreChecks: 0,
-      linkedinMessages: 0,
-      guidedBuilds: 0,
-      tag: 'Buy individual features',
-      tagColor: 'text-gray-800 bg-gray-100',
-      gradient: 'from-gray-500 to-gray-700',
-      icon: 'gift',
-      features: [
-        '✅ Purchase only what you need',
-        '✅ No monthly commitment',
-        '✅ Credits never expire',
-        '✅ Mix and match features'
-      ],
-      popular: false
-    },
+    
   ];
 
   // REMOVED: The useEffect block that sets selectedPlan based on currentSlide.
