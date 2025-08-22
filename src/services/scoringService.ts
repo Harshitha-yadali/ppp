@@ -1,3 +1,4 @@
+// src/services/scoringService.ts
 import { MatchScore, DetailedScore, ResumeData } from '../types/resume';
 
 const OPENROUTER_API_KEY = import.meta.env.VITE_OPENROUTER_API_KEY;
@@ -5,6 +6,13 @@ const OPENROUTER_API_KEY = import.meta.env.VITE_OPENROUTER_API_KEY;
 if (!OPENROUTER_API_KEY) {
   throw new Error('OpenRouter API key is not configured. Please add VITE_OPENROUTER_API_KEY to your environment variables.');
 }
+
+export const applyScoreFloor = (score: number, resumeData: ResumeData): number => {
+  if (resumeData.origin === 'guided' || resumeData.origin === 'jd_optimized') {
+    return Math.max(score, 90);
+  }
+  return score;
+};
 
 export const getMatchScore = async (resumeText: string, jobDescription: string): Promise<MatchScore> => {
   const prompt = `You are an expert ATS (Applicant Tracking System) and HR professional. Analyze the match between the provided resume and job description.
@@ -70,7 +78,7 @@ Respond ONLY with valid JSON in this exact structure:
     }
 
     const data = await response.json();
-    const result = data?.choices?.[0]?.message?.content;
+    const result = data?.choices?.?.message?.content;
 
     if (!result) {
       throw new Error('No response content from OpenRouter API');
@@ -281,7 +289,7 @@ Respond ONLY with valid JSON in this exact structure:
     }
 
     const data = await response.json();
-    const result = data?.choices?.[0]?.message?.content;
+    const result = data?.choices?.?.message?.content;
 
     if (!result) {
       throw new Error('No response content from OpenRouter API');
@@ -411,15 +419,15 @@ export const generateAfterScore = async (
   let finalScore = detailed.totalScore;
   let improvementAreas = [...detailed.improvementAreas];
 
-  if (resumeData.origin === 'guided') {
-    // Guided resumes should never fall below a high-quality threshold.
-    finalScore = Math.max(finalScore, 90);
-  } else {
-    // Highlight categories that are substantially lacking (<50% of max).
+  // Apply score floor based on origin
+  finalScore = applyScoreFloor(finalScore, resumeData);
+
+  // Only apply major gaps logic if not a "guided" or "jd_optimized" resume,
+  // as those are already floored to 90+.
+  if (resumeData.origin !== 'guided' && resumeData.origin !== 'jd_optimized') {
     const majorMissing = Object.entries(detailed.breakdown)
       .filter(([, value]) => value.score < value.maxScore * 0.5)
       .map(([key]) => `Major gaps in ${key}`);
-
     improvementAreas = [...improvementAreas, ...majorMissing];
   }
 
@@ -430,3 +438,4 @@ export const generateAfterScore = async (
     improvementAreas,
   };
 };
+
