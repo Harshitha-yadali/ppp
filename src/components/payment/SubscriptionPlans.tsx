@@ -165,24 +165,29 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({
   const handleApplyCoupon = async () => {
     if (!couponCode.trim()) {
       setCouponError('Please enter a coupon code');
+      onShowAlert('Coupon Error', 'Please enter a coupon code.', 'warning');
       return;
     }
-    // paymentService.applyCoupon returns amounts in paise
-    const result = await paymentService.applyCoupon(selectedPlan, couponCode.trim(), user?.id || null);
-    if (result.couponApplied) {
+    if (!user) {
+      onShowAlert('Authentication Required', 'Please sign in to apply coupon.', 'error', 'Sign In', () => {});
+      return;
+    }
+
+    // paymentService.applyCoupon now returns isValid and message
+    const result = await paymentService.applyCoupon(selectedPlan, couponCode.trim(), user.id);
+
+    if (result.isValid) {
       setAppliedCoupon({
-        code: result.couponApplied,
+        code: result.couponApplied!, // Use non-null assertion as isValid implies couponApplied is not null
         discount: result.discountAmount,
         finalAmount: result.finalAmount,
       });
       setCouponError('');
-      // Show success alert for coupon application
-      onShowAlert('Coupon Applied!', `Coupon "${result.couponApplied}" applied successfully. You saved ₹${(result.discount / 100).toFixed(2)}!`, 'success');
+      onShowAlert('Coupon Applied!', result.message, 'success');
     } else {
-      setCouponError(result.error || 'Invalid coupon code or not applicable to selected plan');
+      setCouponError(result.message); // Display the specific error message from the service
       setAppliedCoupon(null);
-      // Show error alert for coupon application failure
-      onShowAlert('Coupon Error', result.error || 'Invalid coupon code or not applicable to selected plan', 'warning');
+      onShowAlert('Coupon Error', result.message, 'warning');
     }
   };
 
