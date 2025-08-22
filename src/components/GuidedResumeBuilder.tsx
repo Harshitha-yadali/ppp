@@ -39,7 +39,7 @@ interface GuidedResumeBuilderProps {
   isAuthenticated: boolean;
   onShowAuth: () => void;
   userSubscription: any;
-  onShowPlanSelection: (featureId?: string) => void;
+  onShowSubscriptionPlans: (featureId?: string) => void; // MODIFIED: Changed prop name
   onShowAlert: (title: string, message: string, type?: 'info' | 'success' | 'warning' | 'error', actionText?: string, onAction?: () => void) => void;
   refreshUserSubscription: () => Promise<void>;
 }
@@ -49,7 +49,7 @@ export const GuidedResumeBuilder: React.FC<GuidedResumeBuilderProps> = ({
   isAuthenticated,
   onShowAuth,
   userSubscription,
-  onShowPlanSelection,
+  onShowSubscriptionPlans, // MODIFIED: Destructure the new prop name
   onShowAlert,
   refreshUserSubscription,
 }) => {
@@ -141,7 +141,8 @@ export const GuidedResumeBuilder: React.FC<GuidedResumeBuilderProps> = ({
 
     // Check subscription and guided build credits
     if (!userSubscription || (userSubscription.guidedBuildsTotal - userSubscription.guidedBuildsUsed) <= 0) {
-      onShowPlanSelection('guided-builder');
+      // MODIFIED: Call with the correct prop name
+      onShowSubscriptionPlans('guided-builder');
       return;
     }
 
@@ -939,10 +940,10 @@ const SkillsStep: React.FC<{ resumeData: ResumeData; setResumeData: React.Dispat
           key={index}
           skillCategory={skillCategory}
           index={index}
-          onUpdateCategory={updateSkillCategory}
-          onRemoveCategory={removeSkillCategory}
-          onAddSkill={addSkillToCategory}
-          onRemoveSkill={removeSkillFromCategory}
+          onUpdateCategory={onUpdateCategory}
+          onRemoveCategory={onRemoveCategory}
+          onAddSkill={onAddSkill}
+          onRemoveSkill={onRemoveSkill}
           canRemove={resumeData.skills.length > 1}
         />
       ))}
@@ -1101,3 +1102,4 @@ const ReviewStep: React.FC<{
     </div>
   );
 };
+
