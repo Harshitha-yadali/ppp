@@ -90,7 +90,7 @@ class PaymentService {
         '✅ Basic Support',
       ],
     },
-    {
+   {
       id: 'resume_fix_pack',
       name: 'Resume Fix Pack',
       price: 199,
@@ -99,7 +99,17 @@ class PaymentService {
       scoreChecks: 2,
       linkedinMessages: 0,
       guidedBuilds: 0,
-      durationInHours: 24 * 365 * 10,
+      tag: 'Essential',
+      tagColor: 'text-red-800 bg-red-100',
+      gradient: 'from-red-500 to-pink-500',
+      icon: 'wrench',
+      features: [
+        '✅ 5 Resume Optimizations',
+        '✅ 2 Score Checks',
+        '❌ LinkedIn Messages',
+        '❌ Guided Builds',
+        '❌ Priority Support',
+      ],
     },
     {
       id: 'lite_check',
