@@ -395,14 +395,7 @@ function App() {
         walletRefreshKey={walletRefreshKey}
         setWalletRefreshKey={setWalletRefreshKey}
       />
-      {showSubscriptionPlans && (
-        <SubscriptionPlans
-          isOpen={showSubscriptionPlans}
-          onNavigateBack={() => setShowSubscriptionPlans(false)}
-          onSubscriptionSuccess={handleSubscriptionSuccess}
-          onShowAlert={handleShowAlert}  
-        />
-      )}
+      
       {/* NEW: Render PlanSelectionModal */}
       <PlanSelectionModal
         isOpen={showPlanSelectionModal}
