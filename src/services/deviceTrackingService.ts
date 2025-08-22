@@ -35,7 +35,7 @@ export interface UserDevice {
   osName: string;
   isTrusted: boolean;
   lastSeenAt: string;
-  lastLocation?: any;
+  lastLocation?: Location;
   activeSessions: number;
 }
 
