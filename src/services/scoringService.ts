@@ -400,23 +400,33 @@ export const generateBeforeScore = (resumeText: string): MatchScore => {
   };
 };
 
-export const generateAfterScore = (resumeText: string): MatchScore => {
-  const baseScore = Math.floor(Math.random() * 9) + 90;
+export const generateAfterScore = async (
+  resumeData: ResumeData,
+  jobDescription: string
+): Promise<MatchScore> => {
+  // Reuse the detailed scoring logic. A no-op function satisfies the
+  // loading callback expected by getDetailedResumeScore.
+  const detailed = await getDetailedResumeScore(resumeData, jobDescription, () => {});
 
-  return {
-    score: baseScore,
-    analysis: `Excellent resume optimization with strong keyword alignment, quantifiable achievements, and ATS-friendly formatting. Highly competitive for the target role.`,
-    keyStrengths: [
-      "Strong keyword optimization for ATS systems",
-      "Quantified achievements with specific metrics",
-      "Comprehensive technical skills alignment",
-      "Professional formatting and structure",
-      "Industry-relevant project experience"
-    ],
-    improvementAreas: [
-      "Consider adding more leadership examples",
-      "Include additional relevant certifications",
-      "Expand on cross-functional collaboration"
-    ]
-  };
+  let finalScore = detailed.totalScore;
+  let improvementAreas = [...detailed.improvementAreas];
+
+  if (resumeData.origin === 'guided') {
+    // Guided resumes should never fall below a high-quality threshold.
+    finalScore = Math.max(finalScore, 90);
+  } else {
+    // Highlight categories that are substantially lacking (<50% of max).
+    const majorMissing = Object.entries(detailed.breakdown)
+      .filter(([, value]) => value.score < value.maxScore * 0.5)
+      .map(([key]) => `Major gaps in ${key}`);
+
+    improvementAreas = [...improvementAreas, ...majorMissing];
+  }
+
+  return {
+    score: finalScore,
+    analysis: detailed.analysis,
+    keyStrengths: detailed.keyStrengths,
+    improvementAreas,
+  };
 };
