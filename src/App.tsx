@@ -14,23 +14,22 @@ import { Contact } from './components/pages/Contact';
 import { Tutorials } from './components/pages/Tutorials';
 import { AuthModal } from './components/auth/AuthModal';
 import { UserProfileManagement } from './components/UserProfileManagement';
-import { SubscriptionPlans } from './components/payment/SubscriptionPlans';
+import { SubscriptionPlans } from './components/payment/SubscriptionPlans'; // Ensure this import is present
 import { paymentService } from './services/paymentService';
 import { AlertModal } from './components/AlertModal';
 import { ToolsAndPagesNavigation } from './components/pages/ToolsAndPagesNavigation';
-import { Routes, Route, useNavigate } from 'react-router-dom'; // Import Routes, Route, and useNavigate
-import { PlanSelectionModal } from './components/payment/PlanSelectionModal'; // NEW: Import PlanSelectionModal
+import { Routes, Route, useNavigate } from 'react-router-dom';
+import { PlanSelectionModal } from './components/payment/PlanSelectionModal';
 import { PricingPage } from './components/pages/PricingPage';
 
 function App() {
   const { isAuthenticated, user, markProfilePromptSeen, isLoading } = useAuth();
-  const navigate = useNavigate(); // Initialize useNavigate
+  const navigate = useNavigate();
 
-  // REMOVED: const [currentPage, setCurrentPage] = useState('new-home');
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showProfileManagement, setShowProfileManagement] = useState(false);
-  const [showSubscriptionPlans, setShowSubscriptionPlans] = useState(false);
+  const [showSubscriptionPlans, setShowSubscriptionPlans] = useState(false); // REINTRODUCED: State for SubscriptionPlans modal
   const [showSuccessNotification, setShowSuccessNotification] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   const [profileViewMode, setProfileViewMode] = useState<'profile' | 'wallet'>('profile');
@@ -51,7 +50,6 @@ function App() {
 
   const [isAuthModalOpenedByHash, setIsAuthModalOpenedByHash] = useState(false);
 
-  // NEW: State for PlanSelectionModal
   const [showPlanSelectionModal, setShowPlanSelectionModal] = useState(false);
   const [planSelectionFeatureId, setPlanSelectionFeatureId] = useState<string | undefined>(undefined);
 
@@ -61,7 +59,6 @@ function App() {
 
   const logoImage = "https://res.cloudinary.com/dlkovvlud/image/upload/w_1000,c_fill,ar_1:1,g_auto,r_max,bo_5px_solid_red,b_rgb:262c35/v1751536902/a-modern-logo-design-featuring-primoboos_XhhkS8E_Q5iOwxbAXB4CqQ_HnpCsJn4S1yrhb826jmMDw_nmycqj.jpg";
 
-  // MODIFIED: handlePageChange now uses navigate
   const handlePageChange = (path: string) => {
     if (path === 'menu') {
       handleMobileMenuToggle();
@@ -72,11 +69,10 @@ function App() {
       handleShowProfile('wallet');
       setShowMobileMenu(false);
     } else if (path === 'subscription-plans') {
-      // MODIFIED: Call the new plan selection handler
       handleShowPlanSelection();
       setShowMobileMenu(false);
     } else {
-      navigate(path); // Use navigate for routing
+      navigate(path);
       setShowMobileMenu(false);
     }
   };
@@ -97,38 +93,21 @@ function App() {
     console.log('App.tsx: handleShowProfile called. showProfileManagement set to true.');
   };
 
-  // MODIFIED: handleNavigateHome now uses navigate
   const handleNavigateHome = () => {
-    navigate('/'); // Navigate to the home route
+    navigate('/');
   };
 
-  // MODIFIED: This function now opens the PlanSelectionModal
   const handleShowPlanSelection = (featureId?: string) => {
-     console.log('App.tsx: handleShowPlanSelection called with featureId:', featureId); // ADD THIS LINE
+     console.log('App.tsx: handleShowPlanSelection called with featureId:', featureId);
     setPlanSelectionFeatureId(featureId);
     setShowPlanSelectionModal(true);
   };
 
-  // NEW: Handler for selecting Career Plans from PlanSelectionModal
- // src/App.tsx
-// ...
-const handleSelectCareerPlans = () => {
-  console.log('handleSelectCareerPlans called. Attempting to close modal and navigate to /pricing.');
-  setShowPlanSelectionModal(false); // Close selection modal
-  // Add a small delay before navigating
-  setTimeout(() => {
-    navigate('/pricing'); // Navigate to the pricing route
-    console.log('Navigation to /pricing initiated after delay.');
-  }, 50); // Small delay
-};
-// ...
-
-
-  // NEW: Handler for selecting JD Optimizer from PlanSelectionModal
-  // The actual payment and redirection logic will be inside PlanSelectionModal
-  const handleSelectJDOptimizer = () => {
-    setShowPlanSelectionModal(false); // Close selection modal
-    // PlanSelectionModal will handle the payment and redirection to /optimizer
+  // MODIFIED: handleSelectCareerPlans now opens SubscriptionPlans modal
+  const handleSelectCareerPlans = () => {
+    console.log('handleSelectCareerPlans called. Attempting to close PlanSelectionModal and open SubscriptionPlans modal.');
+    setShowPlanSelectionModal(false); // Close PlanSelectionModal
+    setShowSubscriptionPlans(true); // OPEN: SubscriptionPlans modal
   };
 
   const handleSubscriptionSuccess = async () => {
@@ -147,7 +126,7 @@ const handleSelectCareerPlans = () => {
     if (isAuthenticated && user) {
       const sub = await paymentService.getUserSubscription(user.id);
       setUserSubscription(sub);
-      console.log('App.tsx: fetchSubscription - Fetched subscription:', sub); // ADDED LOG
+      console.log('App.tsx: fetchSubscription - Fetched subscription:', sub);
     } else {
       setUserSubscription(null);
     }
@@ -158,7 +137,7 @@ const handleSelectCareerPlans = () => {
       console.log('App.tsx: Refreshing user subscription...');
       const sub = await paymentService.getUserSubscription(user.id);
       setUserSubscription(sub);
-      console.log('App.tsx: refreshUserSubscription - Fetched subscription:', sub); // ADDED LOG
+      console.log('App.tsx: refreshUserSubscription - Fetched subscription:', sub);
     }
   };
 
@@ -244,17 +223,14 @@ const handleSelectCareerPlans = () => {
     }
   }, [isAuthenticated, user, user?.hasSeenProfilePrompt, isLoading, isAuthModalOpenedByHash]);
 
-  // REMOVED: renderCurrentPage function
-
   const commonPageProps = {
     isAuthenticated: isAuthenticated,
     onShowAuth: handleShowAuth,
-    onShowSubscriptionPlans: handleShowPlanSelection, // MODIFIED: Pass the new handler
+    onShowSubscriptionPlans: handleShowPlanSelection,
     userSubscription: userSubscription,
     onShowAlert: handleShowAlert,
     refreshUserSubscription: refreshUserSubscription,
-    onNavigateBack: handleNavigateHome, // ADDED: onNavigateBack property
-    // No longer passing onPageChange directly to every component, they will use useNavigate
+    onNavigateBack: handleNavigateHome,
   };
 
   return (
@@ -265,10 +241,9 @@ const handleSelectCareerPlans = () => {
         </div>
       )}
       <Header onMobileMenuToggle={handleMobileMenuToggle} showMobileMenu={showMobileMenu} onShowProfile={handleShowProfile}>
-        <Navigation onPageChange={handlePageChange} /> {/* Pass handlePageChange to Navigation */}
+        <Navigation onPageChange={handlePageChange} />
       </Header>
       
-      {/* NEW: Routes setup */}
       <Routes>
         <Route path="/" element={<HomePage {...commonPageProps} />} />
         <Route path="/optimizer" element={
@@ -277,8 +252,8 @@ const handleSelectCareerPlans = () => {
               isAuthenticated={isAuthenticated}
               onShowAuth={handleShowAuth}
               onShowProfile={handleShowProfile}
-              onNavigateBack={handleNavigateHome} // Use handleNavigateHome
-              onShowPlanSelection={handleShowPlanSelection} // MODIFIED: Pass the new handler
+              onNavigateBack={handleNavigateHome}
+              onShowSubscriptionPlans={handleShowPlanSelection}
               userSubscription={userSubscription}
               refreshUserSubscription={refreshUserSubscription}
             />
@@ -292,7 +267,6 @@ const handleSelectCareerPlans = () => {
         <Route path="/tutorials" element={<Tutorials />} />
         <Route path="/all-tools" element={<ToolsAndPagesNavigation {...commonPageProps} />} />
         <Route path="/pricing" element={<PricingPage onShowAuth={handleShowAuth} onShowSubscriptionPlans={handleShowPlanSelection} />} />
-        {/* Add more routes as needed */}
       </Routes>
 
       {showMobileMenu && (
@@ -324,7 +298,7 @@ const handleSelectCareerPlans = () => {
               <div className="border-t border-secondary-200 pt-4 dark:border-dark-300">
                 <nav className="flex flex-col space-y-4">
                   {[
-                    { id: '/', label: 'Home', icon: <Home className="w-5 h-5" /> }, // Use path for id
+                    { id: '/', label: 'Home', icon: <Home className="w-5 h-5" /> },
                     { id: '/about', label: 'About Us', icon: <Info className="w-5 h-5" /> },
                     { id: '/tutorials', label: 'Tutorials', icon: <BookOpen className="w-5 h-5" /> },
                     { id: '/contact', label: 'Contact', icon: <Phone className="w-5 h-5" /> },
@@ -337,7 +311,6 @@ const handleSelectCareerPlans = () => {
                         handlePageChange(item.id);
                       }}
                       className={`flex items-center space-x-3 min-h-touch px-4 py-3 rounded-xl font-medium transition-all duration-200 ${
-                        // Check current path for active state
                         window.location.pathname === item.id
                           ? 'bg-primary-100 text-primary-700 shadow-md dark:bg-dark-200 dark:text-neon-cyan-400'
                           : 'text-secondary-700 hover:text-primary-600 hover:bg-primary-50 dark:text-gray-300 dark:hover:text-neon-cyan-400 dark:hover:bg-dark-200'
@@ -351,7 +324,7 @@ const handleSelectCareerPlans = () => {
               </div>
               <div className="border-t border-secondary-200 pt-4 dark:border-dark-300">
                 <AuthButtons
-                  onPageChange={handlePageChange} // Pass handlePageChange
+                  onPageChange={handlePageChange}
                   onClose={() => setShowMobileMenu(false)}
                   onShowAuth={handleShowAuth}
                   onShowProfile={handleShowProfile}
@@ -364,7 +337,7 @@ const handleSelectCareerPlans = () => {
                   </p>
                   <button
                     onClick={() => {
-                      handlePageChange('/'); // Navigate to home
+                      handlePageChange('/');
                       setShowMobileMenu(false);
                     }}
                     className="w-full btn-primary text-sm flex items-center justify-center space-x-2 shadow-neon-cyan"
@@ -405,15 +378,25 @@ const handleSelectCareerPlans = () => {
         setWalletRefreshKey={setWalletRefreshKey}
       />
       
-      {/* NEW: Render PlanSelectionModal */}
       <PlanSelectionModal
         isOpen={showPlanSelectionModal}
         onClose={() => setShowPlanSelectionModal(false)}
         onSelectCareerPlans={handleSelectCareerPlans}
-        onSubscriptionSuccess={handleSubscriptionSuccess} // Pass this to refresh subscription after direct purchase
+        onSubscriptionSuccess={handleSubscriptionSuccess}
         onShowAlert={handleShowAlert}
         triggeredByFeatureId={planSelectionFeatureId}
       />
+
+      {/* REINTRODUCED: SubscriptionPlans modal rendering */}
+      {showSubscriptionPlans && (
+        <SubscriptionPlans
+          isOpen={showSubscriptionPlans}
+          onNavigateBack={() => setShowSubscriptionPlans(false)}
+          onSubscriptionSuccess={handleSubscriptionSuccess}
+          onShowAlert={handleShowAlert}
+        />
+      )}
+
       <AlertModal
         isOpen={showAlertModal}
         onClose={() => setShowAlertModal(false)}
@@ -427,7 +410,7 @@ const handleSelectCareerPlans = () => {
   );
 }
 const AuthButtons: React.FC<{
-  onPageChange: (path: string) => void; // Changed type to path
+  onPageChange: (path: string) => void;
   onClose: () => void;
   onShowAuth: () => void;
   onShowProfile: (mode?: 'profile' | 'wallet') => void;
@@ -502,4 +485,3 @@ const AuthButtons: React.FC<{
   );
 };
 export default App;
-
