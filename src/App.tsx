@@ -110,10 +110,19 @@ function App() {
   };
 
   // NEW: Handler for selecting Career Plans from PlanSelectionModal
-  const handleSelectCareerPlans = () => {
-    setShowPlanSelectionModal(false); // Close selection modal
-    setShowSubscriptionPlans(true); // Open subscription plans modal
-  };
+ // src/App.tsx
+// ...
+const handleSelectCareerPlans = () => {
+  console.log('handleSelectCareerPlans called. Attempting to close modal and navigate to /pricing.');
+  setShowPlanSelectionModal(false); // Close selection modal
+  // Add a small delay before navigating
+  setTimeout(() => {
+    navigate('/pricing'); // Navigate to the pricing route
+    console.log('Navigation to /pricing initiated after delay.');
+  }, 50); // Small delay
+};
+// ...
+
 
   // NEW: Handler for selecting JD Optimizer from PlanSelectionModal
   // The actual payment and redirection logic will be inside PlanSelectionModal
