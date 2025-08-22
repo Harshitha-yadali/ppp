@@ -57,7 +57,17 @@ class PaymentService {
       scoreChecks: 20,
       linkedinMessages: 100,
       guidedBuilds: 2,
-      durationInHours: 24 * 365 * 10,
+      tag: 'Great Start',
+      tagColor: 'text-green-800 bg-green-100',
+      gradient: 'from-green-500 to-emerald-500',
+      icon: 'rocket',
+      features: [
+        '✅ 20 Resume Optimizations',
+        '✅ 20 Score Checks',
+        '✅ 100 LinkedIn Messages',
+        '✅ 2 Guided Resume Builds',
+        '✅ Email Support',
+      ],
     },
     {
       id: 'smart_apply_pack',
