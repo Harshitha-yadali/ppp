@@ -54,6 +54,69 @@ export interface MatchScore {
   keyStrengths: string[];
   improvementAreas: string[];
 }
+interface BreakdownBase {
+  score: number;
+  maxScore: number;
+  details: string;
+}
+
+interface ATSCompatibility extends BreakdownBase {
+  noTablesColumnsFonts: boolean;
+  properFileStructure: boolean;
+  consistentBulletFormatting: boolean;
+}
+
+interface KeywordSkillMatch extends BreakdownBase {
+  technicalSoftSkillsAligned: boolean;
+  toolsTechCertsPresent: boolean;
+  roleSpecificVerbsUsed: boolean;
+}
+
+interface ProjectWorkRelevance extends BreakdownBase {
+  projectsAlignedWithJD: boolean;
+  quantifiedImpact: boolean;
+}
+
+interface StructureFlow extends BreakdownBase {
+  logicalSectionOrder: boolean;
+  noMissingSections: boolean;
+  goodWhitespaceMargins: boolean;
+}
+
+interface CriticalFixesRedFlags extends BreakdownBase {
+  hasContactInfo: boolean;
+  noOverusedWords: boolean;
+  usesActionVerbs: boolean;
+  noGrammarSpellingErrors: boolean;
+}
+
+interface ImpactScore extends BreakdownBase {
+  strongActionVerbs: boolean;
+  quantifiedAccomplishments: boolean;
+  achievementOrientedContent: boolean;
+  measurableResults: boolean;
+}
+
+interface BrevityScore extends BreakdownBase {
+  conciseness: boolean;
+  wordEconomy: boolean;
+  avoidingRedundancy: boolean;
+  directLanguage: boolean;
+}
+
+interface StyleScore extends BreakdownBase {
+  professionalTone: boolean;
+  consistencyInFormatting: boolean;
+  clarityOfLanguage: boolean;
+  overallPolish: boolean;
+}
+
+interface SkillsScore extends BreakdownBase {
+  relevanceToJD: boolean;
+  proficiencyIndicated: boolean;
+  varietyTechnicalSoft: boolean;
+  placement: boolean;
+}
 
 export interface DetailedScore {
   totalScore: number;
