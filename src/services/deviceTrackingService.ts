@@ -56,7 +56,7 @@ export interface ActivityLog {
   activityType: string;
   activityDetails?: any;
   ipAddress?: string;
-  location?: Location;;
+  location?: Location;
   riskScore: number;
   createdAt: string;
 }
