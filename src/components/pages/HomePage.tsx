@@ -98,11 +98,14 @@ export const HomePage: React.FC<HomePageProps> = ({
       return;
     }
 
-    // REMOVED: The conditional block that checked for credits and showed plan selection.
-    // The credit check will now happen on the tool's dedicated page.
+    // If authenticated, check if credits are available. If not, show plan selection.
+    if (isAuthenticated && feature.requiresAuth && !isFeatureAvailable(feature.id)) {
+      onShowSubscriptionPlans(feature.id); // Pass feature ID for context-specific modal
+      return;
+    }
 
-    // If authenticated or feature does not require auth, navigate to the page.
-    if (isAuthenticated || !feature.requiresAuth) {
+    // If authenticated and credits are available, navigate to the page.
+    if (isAuthenticated || !feature.requiresAuth) { // Allow non-auth features to navigate
       console.log('User is authenticated or feature does not require auth. Navigating to page.');
       navigate(feature.id); // Use navigate
     }
@@ -389,6 +392,8 @@ export const HomePage: React.FC<HomePageProps> = ({
             </div>
           </div>
         </div>
+      </div>
+
       {/* CTA Section */}
     </div>
   );
