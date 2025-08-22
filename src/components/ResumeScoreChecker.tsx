@@ -48,6 +48,7 @@ export const ResumeScoreChecker: React.FC<ResumeScoreCheckerProps> = ({
   onShowAlert,
   refreshUserSubscription, // DESTUCTURE THE NEW PROP
 }) => {
+   console.log('ResumeScoreChecker: Component rendered. userSubscription:', userSubscription);
   const [resumeText, setResumeText] = useState('');
   const [jobDescription, setJobDescription] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
