@@ -489,7 +489,7 @@ export const SubscriptionPlans: React.FC<SubscriptionPlansProps> = ({
                     <h3 className="text-sm lg:text-xl font-bold text-gray-900 dark:text-gray-100 mb-2 break-words">{plan.name}</h3>
                     {/* Price and Duration - Adjusted for separate lines and spacing */}
                     <div className="text-center mb-4"> {/* Increased mb */}
-                      <span className="block text-lg lg:text-3xl font-bold text-gray-900 dark:text-gray-100"> {/* Added 'block' */}
+                      <span className="block text-lg lg:text-3xl font-bold text-gray-900 dark:text-gray-900"> {/* Added 'block' */}
                         ₹{plan.price}
                       </span>
                       <span className="block text-gray-600 dark:text-gray-400 text-xs lg:text-base"> {/* Added 'block', removed ml-1 */}
