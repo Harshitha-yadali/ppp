@@ -44,6 +44,7 @@ export interface ResumeData {
   extraCurricularActivities?: string[]; // For freshers - activities, leadership
   languagesKnown?: string[]; // For freshers - languages spoken
   personalDetails?: string; // For freshers - personal information
+  origin?: string;
 }
 
 export type UserType = 'fresher' | 'experienced' | 'student';
