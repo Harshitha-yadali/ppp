@@ -63,32 +63,9 @@ const FeatureCard: React.FC<FeatureCardProps> = ({
       return;
     }
 
-    if (isTool) {
-      let remainingCount: number | null = null;
-      if (userSubscription) {
-        switch (id) {
-          case 'optimizer':
-            remainingCount = userSubscription.optimizationsTotal - userSubscription.optimizationsUsed;
-            break;
-          case 'score-checker':
-            remainingCount = userSubscription.scoreChecksTotal - userSubscription.scoreChecksUsed;
-            break;
-          case 'guided-builder':
-            remainingCount = userSubscription.guidedBuildsTotal - userSubscription.guidedBuildsUsed;
-            break;
-          case 'linkedin-generator':
-            remainingCount = userSubscription.linkedinMessagesTotal - userSubscription.linkedinMessagesUsed;
-            break;
-          default:
-            remainingCount = null;
-        }
-      }
+    // REMOVED: The conditional block that checked for credits and showed plan selection.
+    // The credit check will now happen on the tool's dedicated page.
 
-      if (isAuthenticated && userSubscription && remainingCount !== null && remainingCount <= 0) {
-        onShowSubscriptionPlans(); // MODIFIED: Call the new plan selection handler
-        return;
-      }
-    }
     onPageChange(id);
   };
 
