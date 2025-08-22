@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { MatchScore, DetailedScore, ResumeData } from '../types/resume';
 import { RecommendedProject } from '../types/analysis'; // This import seems unused, but I'll leave it as it was in original
-import { TrendingUp, Target, CheckCircle, AlertCircle, ArrowRight, Eye, BarChart3, RefreshCw, Award, Users, BookOpen, Code, FileText, Lightbulb, Clock, Star, ChevronDown, ChevronUp, ExternalLink } from 'lucide-react';
+import { TrendingUp, Target, CheckCircle, AlertCircle, ArrowRight, BarChart3, Award, BookOpen, Code, Lightbulb, Clock, Star, ChevronDown, ChevronUp, Zap, Palette, Sparkles } from 'lucide-react';
 import { getDetailedResumeScore } from '../services/scoringService'; // This import seems unused, but I'll leave it as it was in original
 import { analyzeProjectAlignment } from '../services/projectAnalysisService'; // This import seems unused, but I'll leave it as it was in original
 
@@ -98,7 +98,7 @@ export const ComprehensiveAnalysis: React.FC<ComprehensiveAnalysisProps> = ({
     );
   };
 
-  const getSectionDisplayName = (section: string) => {
+  const getSectionDisplayName = (section: keyof DetailedScore['breakdown'] | string) => {
     const sectionNames: { [key: string]: string } = {
       'summary': 'Professional Summary',
       'workExperience': 'Work Experience',
@@ -116,20 +116,26 @@ export const ComprehensiveAnalysis: React.FC<ComprehensiveAnalysisProps> = ({
       'projectWorkRelevance': 'Project & Work Relevance',
       'structureFlow': 'Structure & Flow',
       'criticalFixesRedFlags': 'Critical Fixes & Red Flags',
-      'overallImpactReadability': 'Overall Impact & Readability'
+     'impactScore': 'Impact Score',       
+      'brevityScore': 'Brevity Score',    
+      'styleScore': 'Style Score',      
+      'skillsScore': 'Skills Score'
     };
     return sectionNames[section] || section;
   };
 
   // Helper to determine icon for breakdown section
-  const getBreakdownIcon = (key: string) => {
+  const getBreakdownIcon = (key: keyof DetailedScore['breakdown']) => {
     switch (key) {
       case 'atsCompatibility': return <Code className="w-5 h-5" />;
       case 'keywordSkillMatch': return <Target className="w-5 h-5" />;
       case 'projectWorkRelevance': return <Lightbulb className="w-5 h-5" />;
       case 'structureFlow': return <BookOpen className="w-5 h-5" />;
       case 'criticalFixesRedFlags': return <AlertCircle className="w-5 h-5" />;
-      case 'overallImpactReadability': return <Eye className="w-5 h-5" />;
+      case 'impactScore': return <Zap className="w-5 h-5" />;
+      case 'brevityScore': return <Clock className="w-5 h-5" />;
+      case 'styleScore': return <Palette className="w-5 h-5" />;
+      case 'skillsScore': return <Sparkles className="w-5 h-5" />;
       default: return <Star className="w-5 h-5" />;
     }
   };
@@ -252,7 +258,7 @@ export const ComprehensiveAnalysis: React.FC<ComprehensiveAnalysisProps> = ({
                 className="w-full flex items-center justify-between p-4 sm:p-5 text-left font-semibold text-secondary-900 dark:text-gray-100 transition-colors hover:bg-gray-50 dark:hover:bg-dark-200"
               >
                 <div className="flex items-center space-x-3">
-                  {getBreakdownIcon(key)}
+                  {getBreakdownIcon(key as keyof DetailedScore['breakdown'])}
                   <span className="text-fluid-sm sm:text-fluid-base">{getSectionDisplayName(key)}</span>
                 </div>
                 <div className="flex items-center space-x-3">
