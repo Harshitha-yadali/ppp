@@ -157,7 +157,7 @@ export const ResumeScoreChecker: React.FC<ResumeScoreCheckerProps> = ({
     return 'text-red-600';
   };
 
-  const getCategoryIcon = (category: string) => {
+  const getCategoryIcon = (category: keyof DetailedScore['breakdown']) => {
     switch (category) {
       case 'atsCompatibility': return <FileCheck className="w-5 h-5 mr-2 text-blue-600" />;
       case 'keywordSkillMatch': return <Search className="w-5 h-5 mr-2 text-green-600" />;
@@ -172,7 +172,7 @@ export const ResumeScoreChecker: React.FC<ResumeScoreCheckerProps> = ({
     }
   };
 
-  const getCategoryTitle = (category: string) => {
+  const getCategoryTitle = (category: keyof DetailedScore['breakdown']) => {
     switch (category) {
       case 'atsCompatibility': return 'ATS Compatibility';
       case 'keywordSkillMatch': return 'Keyword & Skill Match';
@@ -375,7 +375,7 @@ export const ResumeScoreChecker: React.FC<ResumeScoreCheckerProps> = ({
                   {Object.entries(scoreResult.breakdown).map(([category, data]) => (
                     <div key={category} className="bg-gray-50 p-4 rounded-lg border border-gray-200 dark:bg-dark-200 dark:border-dark-300">
                       <h4 className="font-semibold text-gray-800 dark:text-gray-100 mb-2 flex items-center">
-                        {getCategoryIcon(category)} {getCategoryTitle(category)}
+                       {getCategoryIcon(category as keyof DetailedScore['breakdown'])} {getCategoryTitle(category as keyof DetailedScore['breakdown'])}
                       </h4>
                       <div className="flex items-center mb-2">
                         <span className={`text-2xl font-bold ${getCategoryScoreColor(data.score, data.maxScore)} dark:text-neon-cyan-400`}>
