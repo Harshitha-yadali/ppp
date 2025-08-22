@@ -438,7 +438,7 @@ class DeviceTrackingService {
   }
 
   // Calculate risk score for activity
-  private async calculateRiskScore(userId: string, ip: string, location: any): Promise<number> {
+   private async calculateRiskScore(userId: string, ip: string, location: Location | null): Promise<number> {
     try {
       try {
         const { data, error } = await supabase.rpc('detect_suspicious_activity', {
