@@ -1,3 +1,4 @@
+ (cd "$(git rev-parse --show-toplevel)" && git apply --3way <<'EOF' 
 diff --git a/src/services/deviceTrackingService.ts b/src/services/deviceTrackingService.ts
 index 59139b65759982b0e5047f02eb9337d8ebfb9429..2413aedb46cdecc57d9db884d1d338ac746b1b1b 100644
 --- a/src/services/deviceTrackingService.ts
@@ -369,3 +370,6 @@ index 59139b65759982b0e5047f02eb9337d8ebfb9429..2413aedb46cdecc57d9db884d1d338ac
        }
      } catch (error) {
        console.error('Error in calculateRiskScore:', error);
+ 
+EOF
+)
