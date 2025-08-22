@@ -289,7 +289,7 @@ Respond ONLY with valid JSON in this exact structure:
     }
 
     const data = await response.json();
-    const result = data?.choices?.?.message?.content;
+    const result =data?.choices?.[0]?.message?.content;
 
     if (!result) {
       throw new Error('No response content from OpenRouter API');
