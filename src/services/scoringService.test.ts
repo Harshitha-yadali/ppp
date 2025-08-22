@@ -33,5 +33,5 @@ index 0000000000000000000000000000000000000000..2bb67c8ab28d35535041ac31d8330c6e
 +  const resume = createBaseResume();
 +  resume.projects = [];
 +  const result = applyScoreFloor(80, resume);
-+  assert.equal(result, 80);
+  assert.equal(result, 80);
 +});
