@@ -20,7 +20,13 @@ interface DeviceInfo {
   timezone: string;
   language: string;
 }
-
+export interface Location {
+  city: string;
+  region: string;
+  country: string;
+  latitude: number;
+  longitude: number;
+}
 export interface UserDevice {
   id: string;
   deviceName?: string;
