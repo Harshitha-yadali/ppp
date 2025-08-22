@@ -1,6 +1,45 @@
 // src/services/paymentService.ts
 import { supabase } from '../lib/supabaseClient';
-import { SubscriptionPlan, Subscription } from '../types/payment'; // Assuming these types are defined
+
+// Assuming these types are defined in types/payment.ts
+// For this example, we'll define a basic structure here.
+export interface SubscriptionPlan {
+  id: string;
+  name: string;
+  price: number;
+  duration: string;
+  durationInHours?: number; // Added this property
+  optimizations: number;
+  scoreChecks: number;
+  linkedinMessages: number | typeof Infinity;
+  guidedBuilds: number;
+  tag: string;
+  tagColor: string;
+  gradient: string;
+  icon: string;
+  features: string[];
+  popular?: boolean;
+}
+
+export interface Subscription {
+  id: string;
+  userId: string;
+  planId: string;
+  status: string;
+  startDate: string;
+  endDate: string;
+  optimizationsUsed: number;
+  optimizationsTotal: number;
+  paymentId: string | null;
+  couponUsed: string | null;
+  scoreChecksUsed: number;
+  scoreChecksTotal: number;
+  linkedinMessagesUsed: number;
+  linkedinMessagesTotal: number;
+  guidedBuildsUsed: number;
+  guidedBuildsTotal: number;
+}
+
 
 class PaymentService {
   // Define plans data directly in the service
@@ -10,6 +49,7 @@ class PaymentService {
       name: 'Career Pro Max',
       price: 1999,
       duration: 'One-time Purchase',
+      durationInHours: 8760, // 365 days
       optimizations: 50,
       scoreChecks: 50,
       linkedinMessages: Infinity,
@@ -32,6 +72,7 @@ class PaymentService {
       name: 'Career Boost+',
       price: 1499,
       duration: 'One-time Purchase',
+      durationInHours: 8760, // 365 days
       optimizations: 30,
       scoreChecks: 30,
       linkedinMessages: Infinity,
@@ -53,6 +94,7 @@ class PaymentService {
       name: 'Pro Resume Kit',
       price: 999,
       duration: 'One-time Purchase',
+      durationInHours: 8760, // 365 days
       optimizations: 20,
       scoreChecks: 20,
       linkedinMessages: 100,
@@ -69,11 +111,12 @@ class PaymentService {
         '✅ Email Support',
       ],
     },
-      {
+    {
       id: 'smart_apply_pack',
       name: 'Smart Apply Pack',
       price: 499,
       duration: 'One-time Purchase',
+      durationInHours: 8760, // 365 days
       optimizations: 10,
       scoreChecks: 10,
       linkedinMessages: 50,
@@ -90,11 +133,12 @@ class PaymentService {
         '✅ Basic Support',
       ],
     },
-   {
+    {
       id: 'resume_fix_pack',
       name: 'Resume Fix Pack',
       price: 199,
       duration: 'One-time Purchase',
+      durationInHours: 8760, // 365 days
       optimizations: 5,
       scoreChecks: 2,
       linkedinMessages: 0,
@@ -115,7 +159,8 @@ class PaymentService {
       id: 'lite_check',
       name: 'Lite Check',
       price: 99,
-      duration: 'One-time Purchase',
+      duration: 'One-time Purchase', // While it's a "Trial", for consistency with DB date calculation, give it a duration.
+      durationInHours: 168, // 7 days (7 * 24 hours)
       optimizations: 2,
       scoreChecks: 2,
       linkedinMessages: 10,
@@ -698,9 +743,15 @@ class PaymentService {
 
       // Get the plan details
       const plan = this.getPlanById(planId);
-     if (!plan) {
-  throw new Error('Invalid plan selected for free subscription.');
-}
+      if (!plan) {
+        throw new Error('Invalid plan selected for free subscription.');
+      }
+
+      // Add this validation check for durationInHours
+      if (typeof plan.durationInHours !== 'number' || isNaN(plan.durationInHours) || !isFinite(plan.durationInHours)) {
+        console.error('PaymentService: Invalid durationInHours detected for plan:', plan);
+        throw new Error('Invalid plan duration configuration. Please contact support.');
+      }
 
       // Create a pending transaction record for the free plan
       const { data: transaction, error: transactionError } = await supabase
@@ -775,15 +826,15 @@ class PaymentService {
             plan_id: planId,
             status: 'active',
             start_date: new Date().toISOString(),
-            end_date: new Date(Date.now() + (plan!.durationInHours * 60 * 60 * 1000)).toISOString(),
+            end_date: new Date(Date.now() + (plan.durationInHours * 60 * 60 * 1000)).toISOString(),
             optimizations_used: 0,
-            optimizations_total: plan!.optimizations,
+            optimizations_total: plan.optimizations,
             score_checks_used: 0,
-            score_checks_total: plan!.scoreChecks,
+            score_checks_total: plan.scoreChecks,
             linkedin_messages_used: 0,
-            linkedin_messages_total: plan!.linkedinMessages,
+            linkedin_messages_total: plan.linkedinMessages,
             guided_builds_used: 0,
-            guided_builds_total: plan!.guidedBuilds,
+            guided_builds_total: plan.guidedBuilds,
             payment_id: 'FREE_PLAN_ACTIVATION',
             coupon_used: couponCode,
           })
@@ -837,4 +888,3 @@ class PaymentService {
 }
 
 export const paymentService = new PaymentService();
-
