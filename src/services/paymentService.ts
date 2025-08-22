@@ -40,6 +40,8 @@ export interface Subscription {
   guidedBuildsTotal: number;
 }
 
+// Define the credit types and their corresponding database fields
+type CreditType = 'optimizations' | 'score_checks' | 'linkedin_messages' | 'guided_builds';
 
 class PaymentService {
   // Define plans data directly in the service
@@ -322,13 +324,24 @@ class PaymentService {
     }
   }
 
-  async useOptimization(userId: string): Promise<{ success: boolean; remaining?: number; error?: string }> {
-    console.log('PaymentService: Attempting to use optimization for userId:', userId);
+  /**
+   * Refactored generic method to use a specific credit type.
+   * @param userId The ID of the user.
+   * @param creditField The name of the credit field to update (e.g., 'optimizations', 'score_checks').
+   * @returns An object with success status and remaining credits.
+   */
+  private async useCredit(
+    userId: string,
+    creditField: CreditType
+  ): Promise<{ success: boolean; remaining?: number; error?: string }> {
+    const totalField = `${creditField}_total`;
+    const usedField = `${creditField}_used`;
+
+    console.log(`PaymentService: Attempting to use ${creditField} for userId:`, userId);
     try {
-      // 1. Fetch the current subscription to get the latest usage count
       const { data: currentSubscription, error: fetchError } = await supabase
         .from('subscriptions')
-        .select('id, optimizations_used, optimizations_total')
+        .select(`id, ${usedField}, ${totalField}`)
         .eq('user_id', userId)
         .eq('status', 'active')
         .order('created_at', { ascending: false })
@@ -336,202 +349,65 @@ class PaymentService {
         .maybeSingle();
 
       if (fetchError) {
-        console.error('PaymentService: Error fetching current subscription for useOptimization:', fetchError);
+        console.error(`PaymentService: Error fetching current subscription for ${creditField}:`, fetchError);
         return { success: false, error: 'Failed to fetch current subscription.' };
       }
 
       if (!currentSubscription) {
-        console.warn('PaymentService: No active subscription found for useOptimization for userId:', userId);
+        console.warn(`PaymentService: No active subscription found for ${creditField} for userId:`, userId);
         return { success: false, error: 'No active subscription found.' };
       }
 
-      const newOptimizationsUsed = currentSubscription.optimizations_used + 1;
-      const remaining = currentSubscription.optimizations_total - newOptimizationsUsed;
+      const newCreditsUsed = (currentSubscription[usedField] || 0) + 1;
+      const remaining = currentSubscription[totalField] - newCreditsUsed;
 
-      // 2. Check if there are enough optimizations remaining
-      if (remaining < 0 && currentSubscription.optimizations_total !== Infinity) {
-        console.warn('PaymentService: Optimization credits exhausted for userId:', userId);
-        return { success: false, error: 'Optimization credits exhausted.' };
+      if (remaining < 0 && currentSubscription[totalField] !== Infinity) {
+        console.warn(`PaymentService: ${creditField} credits exhausted for userId:`, userId);
+        return { success: false, error: 'Credits exhausted.' };
       }
 
-      // 3. Update the optimizations_used count in the database
-      console.log(`PaymentService: Updating optimizations_used for subscription ${currentSubscription.id} from ${currentSubscription.optimizations_used} to ${newOptimizationsUsed}`);
+      console.log(`PaymentService: Updating ${usedField} for subscription ${currentSubscription.id} from ${currentSubscription[usedField]} to ${newCreditsUsed}`);
+      const updateData: { [key: string]: any } = {
+        [usedField]: newCreditsUsed,
+        updated_at: new Date().toISOString(),
+      };
+      
       const { error: updateError } = await supabase
         .from('subscriptions')
-        .update({
-          optimizations_used: newOptimizationsUsed,
-          updated_at: new Date().toISOString(), // Ensure updated_at is also updated
-        })
+        .update(updateData)
         .eq('id', currentSubscription.id);
 
       if (updateError) {
-        console.error('PaymentService: Error updating optimizations_used:', updateError);
-        return { success: false, error: 'Failed to update optimization usage.' };
+        console.error(`PaymentService: Error updating ${usedField}:`, updateError);
+        return { success: false, error: 'Failed to update credit usage.' };
       }
 
-      console.log(`PaymentService: Successfully used optimization for userId: ${userId}. Remaining: ${remaining}`);
+      console.log(`PaymentService: Successfully used ${creditField} for userId: ${userId}. Remaining: ${remaining}`);
       return { success: true, remaining: remaining };
     } catch (error) {
-      console.error('PaymentService: Unexpected error in useOptimization:', error);
-      return { success: false, error: 'An unexpected error occurred while using optimization.' };
+      console.error(`PaymentService: Unexpected error in useCredit (${creditField}):`, error);
+      return { success: false, error: 'An unexpected error occurred while using credits.' };
     }
+  }
+
+  // Exposed public methods for using credits, now calling the generic private method
+  async useOptimization(userId: string): Promise<{ success: boolean; remaining?: number; error?: string }> {
+    return this.useCredit(userId, 'optimizations');
   }
 
   async useScoreCheck(userId: string): Promise<{ success: boolean; remaining?: number; error?: string }> {
-    console.log('PaymentService: Attempting to use score check for userId:', userId);
-    try {
-      const { data: currentSubscription, error: fetchError } = await supabase
-        .from('subscriptions')
-        .select('id, score_checks_used, score_checks_total')
-        .eq('user_id', userId)
-        .eq('status', 'active')
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .maybeSingle();
-
-      if (fetchError) {
-        console.error('PaymentService: Error fetching current subscription for useScoreCheck:', fetchError);
-        return { success: false, error: 'Failed to fetch current subscription.' };
-      }
-
-      if (!currentSubscription) {
-        console.warn('PaymentService: No active subscription found for useScoreCheck for userId:', userId);
-        return { success: false, error: 'No active subscription found.' };
-      }
-
-      const newScoreChecksUsed = currentSubscription.score_checks_used + 1;
-      const remaining = currentSubscription.score_checks_total - newScoreChecksUsed;
-
-      if (remaining < 0 && currentSubscription.score_checks_total !== Infinity) {
-        console.warn('PaymentService: Score check credits exhausted for userId:', userId);
-        return { success: false, error: 'Score check credits exhausted.' };
-      }
-
-      console.log(`PaymentService: Updating score_checks_used for subscription ${currentSubscription.id} from ${currentSubscription.score_checks_used} to ${newScoreChecksUsed}`);
-      const { error: updateError } = await supabase
-        .from('subscriptions')
-        .update({
-          score_checks_used: newScoreChecksUsed,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', currentSubscription.id);
-
-      if (updateError) {
-        console.error('PaymentService: Error updating score_checks_used:', updateError);
-        return { success: false, error: 'Failed to update score check usage.' };
-      }
-
-      console.log(`PaymentService: Successfully used score check for userId: ${userId}. Remaining: ${remaining}`);
-      return { success: true, remaining: remaining };
-    } catch (error) {
-      console.error('PaymentService: Unexpected error in useScoreCheck:', error);
-      return { success: false, error: 'An unexpected error occurred while using score check.' };
-    }
+    return this.useCredit(userId, 'score_checks');
   }
 
   async useLinkedInMessage(userId: string): Promise<{ success: boolean; remaining?: number; error?: string }> {
-    console.log('PaymentService: Attempting to use LinkedIn message for userId:', userId);
-    try {
-      const { data: currentSubscription, error: fetchError } = await supabase
-        .from('subscriptions')
-        .select('id, linkedin_messages_used, linkedin_messages_total')
-        .eq('user_id', userId)
-        .eq('status', 'active')
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .maybeSingle();
-
-      if (fetchError) {
-        console.error('PaymentService: Error fetching current subscription for useLinkedInMessage:', fetchError);
-        return { success: false, error: 'Failed to fetch current subscription.' };
-      }
-
-      if (!currentSubscription) {
-        console.warn('PaymentService: No active subscription found for useLinkedInMessage for userId:', userId);
-        return { success: false, error: 'No active subscription found.' };
-      }
-
-      const newLinkedInMessagesUsed = currentSubscription.linkedin_messages_used + 1;
-      const remaining = currentSubscription.linkedin_messages_total - newLinkedInMessagesUsed;
-
-      if (remaining < 0 && currentSubscription.linkedin_messages_total !== Infinity) {
-        console.warn('PaymentService: LinkedIn message credits exhausted for userId:', userId);
-        return { success: false, error: 'LinkedIn message credits exhausted.' };
-      }
-
-      console.log(`PaymentService: Updating linkedin_messages_used for subscription ${currentSubscription.id} from ${currentSubscription.linkedin_messages_used} to ${newLinkedInMessagesUsed}`);
-      const { error: updateError } = await supabase
-        .from('subscriptions')
-        .update({
-          linkedin_messages_used: newLinkedInMessagesUsed,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', currentSubscription.id);
-
-      if (updateError) {
-        console.error('PaymentService: Error updating linkedin_messages_used:', updateError);
-        return { success: false, error: 'Failed to update LinkedIn message usage.' };
-      }
-
-      console.log(`PaymentService: Successfully used LinkedIn message for userId: ${userId}. Remaining: ${remaining}`);
-      return { success: true, remaining: remaining };
-    } catch (error) {
-      console.error('PaymentService: Unexpected error in useLinkedInMessage:', error);
-      return { success: false, error: 'An unexpected error occurred while using LinkedIn message.' };
-    }
+    return this.useCredit(userId, 'linkedin_messages');
   }
 
   async useGuidedBuild(userId: string): Promise<{ success: boolean; remaining?: number; error?: string }> {
-    console.log('PaymentService: Attempting to use guided build for userId:', userId);
-    try {
-      const { data: currentSubscription, error: fetchError } = await supabase
-        .from('subscriptions')
-        .select('id, guided_builds_used, guided_builds_total')
-        .eq('user_id', userId)
-        .eq('status', 'active')
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .maybeSingle();
-
-      if (fetchError) {
-        console.error('PaymentService: Error fetching current subscription for useGuidedBuild:', fetchError);
-        return { success: false, error: 'Failed to fetch current subscription.' };
-      }
-
-      if (!currentSubscription) {
-        console.warn('PaymentService: No active subscription found for useGuidedBuild for userId:', userId);
-        return { success: false, error: 'No active subscription found.' };
-      }
-
-      const newGuidedBuildsUsed = currentSubscription.guided_builds_used + 1;
-      const remaining = currentSubscription.guided_builds_total - newGuidedBuildsUsed;
-
-      if (remaining < 0 && currentSubscription.guided_builds_total !== Infinity) {
-        console.warn('PaymentService: Guided build credits exhausted for userId:', userId);
-        return { success: false, error: 'Guided build credits exhausted.' };
-      }
-
-      console.log(`PaymentService: Updating guided_builds_used for subscription ${currentSubscription.id} from ${currentSubscription.guided_builds_used} to ${newGuidedBuildsUsed}`);
-      const { error: updateError } = await supabase
-        .from('subscriptions')
-        .update({
-          guided_builds_used: newGuidedBuildsUsed,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', currentSubscription.id);
-
-      if (updateError) {
-        console.error('PaymentService: Error updating guided_builds_used:', updateError);
-        return { success: false, error: 'Failed to update guided build usage.' };
-      }
-
-      console.log(`PaymentService: Successfully used guided build for userId: ${userId}. Remaining: ${remaining}`);
-      return { success: true, remaining: remaining };
-    } catch (error) {
-      console.error('PaymentService: Unexpected error in useGuidedBuild:', error);
-      return { success: false, error: 'An unexpected error occurred while using guided build.' };
-    }
+    return this.useCredit(userId, 'guided_builds');
   }
+
+
   async activateFreeTrial(userId: string): Promise<void> {
     console.log('PaymentService: Attempting to activate free trial for userId:', userId);
     try {
@@ -833,7 +709,7 @@ class PaymentService {
             score_checks_used: 0,
             score_checks_total: plan.scoreChecks,
             linkedin_messages_used: 0,
-            linkedin_messages_total: plan.linkedinMessages,
+            linkedin_messages_total: linkedinMessagesTotalValue,
             guided_builds_used: 0,
             guided_builds_total: plan.guidedBuilds,
             payment_id: 'FREE_PLAN_ACTIVATION',
