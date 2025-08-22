@@ -161,6 +161,34 @@ serve(async (req) => {
     if (couponCode) {
       const normalizedCoupon = couponCode.toLowerCase().trim();
 
+      // NEW: Per-user coupon usage check
+      if (normalizedCoupon !== 'first500') { // 'first500' has a global check, so skip per-user for it
+        const { count: userCouponUsageCount, error: userCouponUsageError } = await supabase
+          .from('payment_transactions')
+          .select('id', { count: 'exact' })
+          .eq('user_id', user.id)
+          .eq('coupon_code', normalizedCoupon)
+          .in('status', ['success', 'pending']);
+
+        if (userCouponUsageError) {
+          console.error(`[${new Date().toISOString()}] - Error checking user coupon usage:`, userCouponUsageError);
+          throw new Error('Failed to verify coupon usage. Please try again.');
+        }
+
+        if (userCouponUsageCount && userCouponUsageCount > 0) {
+          console.log(`[${new Date().toISOString()}] - Coupon "${normalizedCoupon}" already used by user ${user.id}.`);
+          return new Response(
+            JSON.stringify({ error: `Coupon "${normalizedCoupon}" has already been used by this account.` }),
+            {
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+              status: 400, // Bad Request
+            },
+          );
+        }
+      }
+      // END NEW: Per-user coupon usage check
+
+      // Existing coupon logic
       // NEW: full_support coupon - free career_pro_max plan
       if (normalizedCoupon === 'fullsupport' && planId === 'career_pro_max') {
         finalAmount = 0;
@@ -329,4 +357,3 @@ serve(async (req) => {
     );
   }
 });
-
