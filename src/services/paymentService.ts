@@ -120,7 +120,17 @@ class PaymentService {
       scoreChecks: 2,
       linkedinMessages: 10,
       guidedBuilds: 0,
-      durationInHours: 24 * 365 * 10,
+      tag: 'Trial',
+      tagColor: 'text-gray-800 bg-gray-100',
+      gradient: 'from-gray-500 to-gray-700',
+      icon: 'check_circle',
+      features: [
+        '✅ 2 Resume Optimizations',
+        '✅ 2 Score Checks',
+        '✅ 10 LinkedIn Messages',
+        '❌ Guided Builds',
+        '❌ Priority Support',
+      ],
     },
   ];
 
