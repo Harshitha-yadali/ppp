@@ -104,6 +104,7 @@ function App() {
 
   // MODIFIED: This function now opens the PlanSelectionModal
   const handleShowPlanSelection = (featureId?: string) => {
+     console.log('App.tsx: handleShowPlanSelection called with featureId:', featureId); // ADD THIS LINE
     setPlanSelectionFeatureId(featureId);
     setShowPlanSelectionModal(true);
   };
