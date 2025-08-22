@@ -331,7 +331,7 @@ export const ResumeScoreChecker: React.FC<ResumeScoreCheckerProps> = ({
                         <div className="absolute inset-0 flex items-center justify-center">
                           <div className="text-center">
                             <div className={`text-3xl font-bold ${getScoreColor(scoreResult.totalScore)} dark:text-neon-cyan-400`}>
-                              {scoreResult.totalScore}%
+                              {scoreResult.totalScore}/100
                             </div>
                             <div className="text-sm text-gray-500 dark:text-gray-400">Grade: {getScoreGrade(scoreResult.totalScore)}</div>
                           </div>
