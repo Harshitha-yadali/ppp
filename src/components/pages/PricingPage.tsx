@@ -177,7 +177,7 @@ export const PricingPage: React.FC<PricingPageProps> = ({
                         {getPlanIcon(plan.icon)}
                       </div>
                       <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">{plan.name}</h3>
-                      <div className="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+                      <div className="text-4xl font-bold text-gray-900 dark:text-gray-800 mb-2">
                         ₹{plan.price}
                       </div>
                       <p className="text-gray-600 dark:text-gray-300">{plan.duration}</p>
