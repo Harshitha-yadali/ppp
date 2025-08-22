@@ -60,6 +60,7 @@ export const ResumeScoreChecker: React.FC<ResumeScoreCheckerProps> = ({
 
   const analyzeResume = async () => {
     if (!isAuthenticated) {
+      console.log('ResumeScoreChecker: analyzeResume called. userSubscription at call time:', userSubscription);
       onShowAlert('Authentication Required', 'Please sign in to get your resume score.', 'error', 'Sign In', onShowAuth);
       return;
     }
