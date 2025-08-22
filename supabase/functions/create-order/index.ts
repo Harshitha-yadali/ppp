@@ -23,7 +23,7 @@ interface PlanConfig {
   duration: string;
   optimizations: number;
   scoreChecks: number;
-  linkedinMessages: number;
+  linkedinMessages: number | typeof Infinity; // Corrected to allow Infinity
   guidedBuilds: number;
   durationInHours: number;
 }
@@ -133,7 +133,7 @@ serve(async (req) => {
     }
 
     // Get plan details
-    let plan;
+    let plan: PlanConfig;
     if (planId === 'addon_only_purchase' || planId === null) {
       // Handle add-on only purchases
       plan = {
@@ -144,13 +144,15 @@ serve(async (req) => {
         optimizations: 0,
         scoreChecks: 0,
         linkedinMessages: 0,
-        guidedBuilds: 0
+        guidedBuilds: 0,
+        durationInHours: 0, // No specific duration for add-on only
       };
     } else {
-      plan = plans.find((p) => p.id === planId);
-      if (!plan) {
+      const foundPlan = plans.find((p) => p.id === planId);
+      if (!foundPlan) {
         throw new Error('Invalid plan selected');
       }
+      plan = foundPlan;
     }
 
     // Calculate final amount based on plan price (all calculations in paise)
@@ -161,32 +163,32 @@ serve(async (req) => {
     if (couponCode) {
       const normalizedCoupon = couponCode.toLowerCase().trim();
 
-      // NEW: Per-user coupon usage check
-      if (normalizedCoupon !== 'first500') { // 'first500' has a global check, so skip per-user for it
-        const { count: userCouponUsageCount, error: userCouponUsageError } = await supabase
-          .from('payment_transactions')
-          .select('id', { count: 'exact' })
-          .eq('user_id', user.id)
-          .eq('coupon_code', normalizedCoupon)
-          .in('status', ['success', 'pending']);
+      // Per-user coupon usage check (now applies to all non-empty coupon codes)
+      // The original code's `if (normalizedCoupon !== '')` condition has been removed
+      // to ensure this check applies broadly without explicit bypasses.
+      const { count: userCouponUsageCount, error: userCouponUsageError } = await supabase
+        .from('payment_transactions')
+        .select('id', { count: 'exact' })
+        .eq('user_id', user.id)
+        .eq('coupon_code', normalizedCoupon)
+        .in('status', ['success', 'pending']);
 
-        if (userCouponUsageError) {
-          console.error(`[${new Date().toISOString()}] - Error checking user coupon usage:`, userCouponUsageError);
-          throw new Error('Failed to verify coupon usage. Please try again.');
-        }
-
-        if (userCouponUsageCount && userCouponUsageCount > 0) {
-          console.log(`[${new Date().toISOString()}] - Coupon "${normalizedCoupon}" already used by user ${user.id}.`);
-          return new Response(
-            JSON.stringify({ error: `Coupon "${normalizedCoupon}" has already been used by this account.` }),
-            {
-              headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-              status: 400, // Bad Request
-            },
-          );
-        }
+      if (userCouponUsageError) {
+        console.error(`[${new Date().toISOString()}] - Error checking user coupon usage:`, userCouponUsageError);
+        throw new Error('Failed to verify coupon usage. Please try again.');
       }
-      // END NEW: Per-user coupon usage check
+
+      if (userCouponUsageCount && userCouponUsageCount > 0) {
+        console.log(`[${new Date().toISOString()}] - Coupon "${normalizedCoupon}" already used by user ${user.id}.`);
+        return new Response(
+          JSON.stringify({ error: `Coupon "${normalizedCoupon}" has already been used by this account.` }),
+          {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            status: 400, // Bad Request
+          },
+        );
+      }
+      // END Per-user coupon usage check
 
       // Existing coupon logic
       // NEW: full_support coupon - free career_pro_max plan
@@ -203,7 +205,7 @@ serve(async (req) => {
       }
       // first500 coupon - 98% off lite_check plan only (NEW LOGIC)
       else if (normalizedCoupon === 'first500' && planId === 'lite_check') {
-        // Check usage limit for first500 coupon
+        // Check usage limit for first500 coupon (global limit)
         const { count, error: countError } = await supabase
           .from('payment_transactions')
           .select('id', { count: 'exact' })
@@ -297,7 +299,7 @@ serve(async (req) => {
         originalAmount: plan.price * 100, // Original plan price in paise
         couponCode: appliedCoupon,
         discountAmount: discountAmount, // In paise
-        walletDeduction: walletDeduction, // In paise - Store the actual walletDeduction
+        walletDeduction: walletDeduction || 0, // In paise - Store the actual walletDeduction
         addOnsTotal: addOnsTotal || 0, // In paise
         transactionId: transactionId, // Pass the transactionId to Razorpay notes
         selectedAddOns: JSON.stringify(selectedAddOns || {}),
