@@ -135,5 +135,5 @@ export interface DetailedScore {
     skillsScore: SkillsScore;
   };
   recommendations: string[];
-  grade: 'A+' | 'A' | 'B+' | 'B' | 'C+' | 'C' | 'D' | 'F';
+  grade: Grade;
 }
