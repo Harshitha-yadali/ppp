@@ -698,9 +698,9 @@ class PaymentService {
 
       // Get the plan details
       const plan = this.getPlanById(planId);
-      if (!plan && planId !== 'addon_only_purchase') {
-        throw new Error('Invalid plan selected for free subscription.');
-      }
+     if (!plan) {
+  throw new Error('Invalid plan selected for free subscription.');
+}
 
       // Create a pending transaction record for the free plan
       const { data: transaction, error: transactionError } = await supabase
