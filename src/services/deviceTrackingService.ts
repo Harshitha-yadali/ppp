@@ -44,7 +44,7 @@ export interface UserSession {
   deviceId: string;
   ipAddress: string;
   userAgent: string;
-  location?: any;
+  location?: Location;
   isActive: boolean;
   expiresAt: string;
   lastActivityAt: string;
@@ -56,7 +56,7 @@ export interface ActivityLog {
   activityType: string;
   activityDetails?: any;
   ipAddress?: string;
-  location?: any;
+  location?: Location;;
   riskScore: number;
   createdAt: string;
 }
