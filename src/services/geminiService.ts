@@ -120,7 +120,7 @@ SKILLS REQUIREMENTS:
 5. Include both technical and soft skills relevant to the role
 6.NO NEED TO GENERATE SOFT SKILLS
 CERTIFICATIONS REQUIREMENTS:
-1. For each certification, provide a concise 2-3 sentence description in the 'description' field.
+1. For each certification, provide a concise 15 words description in the 'description' field.
 
 SOCIAL LINKS REQUIREMENTS - CRITICAL:
 1. LinkedIn URL: "${linkedinUrl || ''}" - ONLY include if this is NOT empty
