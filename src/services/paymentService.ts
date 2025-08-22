@@ -819,6 +819,7 @@ class PaymentService {
 
       // Create subscription if it's a plan activation (not just add-ons)
       if (planId && planId !== 'addon_only_purchase') {
+        const linkedinMessagesTotalValue = plan.linkedinMessages === Infinity ? 999999999 : plan.linkedinMessages;
         const { data: subscription, error: subscriptionError } = await supabase
           .from('subscriptions')
           .insert({
