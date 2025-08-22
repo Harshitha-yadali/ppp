@@ -15,7 +15,7 @@ export interface SubscriptionPlan {
   icon: string;
   features: string[];
   popular?: boolean;
-  durationInHours?: number; // ADD THIS LINE
+  durationInHours: number; // ADD THIS LINE
 }
 
 
