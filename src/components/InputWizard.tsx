@@ -124,7 +124,7 @@ export const InputWizard: React.FC<InputWizardProps> = ({
               {isAuthenticated && user && (
                 <button
                   onClick={() => onShowProfile('profile')}
-                  className="mt-4 w-full flex items-center justify-center space-x-2 btn-danger py-2 px-4 rounded-lg text-sm"
+                  className="mt-4 w-30 flex items-center justify-center space-x-2 btn-danger py-2 px-4 rounded-lg text-sm"
                 >
                   <Edit3 className="w-4 h-4" />
                   <span>Update Your Details</span>
