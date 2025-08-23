@@ -33,7 +33,7 @@ const createPDFConfig = (options: ExportOptions) => ({
     body: { size: options.bodyTextSize, weight: 'normal' }
   },
   spacing: {
-    nameFromTop: 10, // Start name higher on the page to match reference
+    nameFromTop: 20, // Start name higher on the page to match reference
     afterName: 2,
     afterContact: 3,
     sectionSpacingBefore: options.sectionSpacing, // Space before section title
