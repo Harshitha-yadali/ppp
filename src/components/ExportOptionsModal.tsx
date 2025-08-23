@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { X, Download, Settings, Type, Layout, Ruler, CheckCircle, AlertCircle } from 'lucide-react';
-import { ExportOptions, defaultExportOptions, TemplateType, templateConfigs } from '../types/export';
+import { ExportOptions, defaultExportOptions, TemplateType } from '../types/export';
 import { ResumePreview } from './ResumePreview';
 import { ResumeData, UserType } from '../types/resume';
 
@@ -93,43 +93,31 @@ export const ExportOptionsModal: React.FC<ExportOptionsModalProps> = ({
                 <Layout className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-blue-600" />
                 Resume Template
               </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                {templateConfigs.map((template) => (
-                  <button
-                    key={template.id}
-                    onClick={() => handleOptionChange('template', template.id)}
-                    className={`flex flex-col items-start p-4 rounded-lg border-2 transition-all text-left ${
-                      options.template === template.id ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-blue-300'
-                    }`}
-                  >
-                    <div className="w-full mb-3">
-                      <div className={`w-full h-20 bg-gray-100 rounded mb-2 flex items-center justify-center text-xs text-gray-500 ${
-                        template.layout.type === 'two-column' ? 'grid grid-cols-3 gap-1 p-2' : 'flex-col'
-                      }`}>
-                        {template.layout.type === 'two-column' ? (
-                          <>
-                            <div className="col-span-2 bg-gray-200 rounded h-full flex items-center justify-center text-xs">Main</div>
-                            <div className="bg-gray-300 rounded h-full flex items-center justify-center text-xs">Side</div>
-                          </>
-                        ) : (
-                          <span>{template.name.split(' ')[0]}</span>
-                        )}
-                      </div>
-                    </div>
-                    <span className="font-medium text-sm mb-1">{template.name}</span>
-                    <span className="text-xs text-gray-500 text-left leading-tight">{template.summary}</span>
-                    <div className="mt-2 flex flex-wrap gap-1">
-                      {template.bestFor.slice(0, 2).map((use, index) => (
-                        <span key={index} className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
-                          {use}
-                        </span>
-                      ))}
-                    </div>
-                    {template.id === 'chronological' && (
-                      <span className="text-xs text-green-600 font-medium mt-1">⭐ Most Popular</span>
-                    )}
-                  </button>
-                ))}
+              <div className="grid grid-cols-2 gap-4">
+                <button
+                  onClick={() => handleOptionChange('template', 'standard')}
+                  className={`flex flex-col items-center p-4 rounded-lg border-2 transition-all ${
+                    options.template === 'standard' ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-blue-300'
+                  }`}
+                >
+                  <div className="w-20 h-28 bg-gray-100 rounded mb-2 flex items-center justify-center text-xs text-gray-500">
+                    Standard
+                  </div>
+                  <span className="font-medium text-sm">Standard</span>
+                  <span className="text-xs text-gray-500 text-center">Recommended</span>
+                </button>
+                <button
+                  onClick={() => handleOptionChange('template', 'compact')}
+                  className={`flex flex-col items-center p-4 rounded-lg border-2 transition-all ${
+                    options.template === 'compact' ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-blue-300'
+                  }`}
+                >
+                  <div className="w-20 h-28 bg-gray-100 rounded mb-2 flex items-center justify-center text-xs text-gray-500">
+                    Compact
+                  </div>
+                  <span className="font-medium text-sm">Compact</span>
+                  <span className="text-xs text-gray-500 text-center">More content</span>
+                </button>
               </div>
             </div>
 
