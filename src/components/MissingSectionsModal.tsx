@@ -15,7 +15,8 @@ import {
   Github,
   ArrowLeft,
   ArrowRight,
-  Target // Added for skills icon
+  Target, // Added for skills icon
+  GraduationCap // Added for education icon
 } from 'lucide-react';
 
 
@@ -37,6 +38,15 @@ interface Skill { // New interface for Skill structure
   list: string[];
 }
 
+// ADDED: Education interface
+interface Education {
+  degree: string;
+  school: string;
+  year: string;
+  cgpa?: string;
+  location?: string;
+}
+
 // New interface for ContactDetails
 interface ContactDetails {
   phone: string;
@@ -49,6 +59,7 @@ interface MissingSectionsData {
   workExperience?: WorkExperience[];
   projects?: Project[];
   skills?: Skill[]; // Added skills to MissingSectionsData
+  education?: Education[]; // ADDED: Education to MissingSectionsData
   certifications?: string[];
   contactDetails?: ContactDetails;
 }
@@ -74,6 +85,9 @@ export const MissingSectionsModal: React.FC<MissingSectionsModalProps> = ({
   ]);
   const [skills, setSkills] = useState<Skill[]>([ // New state for skills
     { category: '', count: 0, list: [] }
+  ]);
+  const [education, setEducation] = useState<Education[]>([ // ADDED: Education state
+    { degree: '', school: '', year: '', cgpa: '', location: '' }
   ]);
   const [certifications, setCertifications] = useState<string[]>(['']);
   const [contactDetails, setContactDetails] = useState<ContactDetails>({
@@ -201,6 +215,23 @@ export const MissingSectionsModal: React.FC<MissingSectionsModalProps> = ({
     setSkills(updated);
   };
 
+  // ADDED: Education functions
+  const addEducation = () => {
+    setEducation([...education, { degree: '', school: '', year: '', cgpa: '', location: '' }]);
+  };
+
+  const removeEducation = (index: number) => {
+    if (education.length > 1) {
+      setEducation(education.filter((_, i) => i !== index));
+    }
+  };
+
+  const updateEducation = (index: number, field: keyof Education, value: any) => {
+    const updated = [...education];
+    updated[index] = { ...updated[index], [field]: value };
+    setEducation(updated);
+  };
+
   const addCertification = () => {
     setCertifications([...certifications, '']);
   };
@@ -235,6 +266,10 @@ export const MissingSectionsModal: React.FC<MissingSectionsModalProps> = ({
 
     if (currentSection === 'skills') { // Validation for skills
       return skills.some(s => s.category.trim() && s.list.some(item => item.trim()));
+    }
+
+    if (currentSection === 'education') { // ADDED: Validation for education
+      return education.some(edu => edu.degree.trim() && edu.school.trim() && edu.year.trim());
     }
 
     if (currentSection === 'certifications') {
@@ -284,6 +319,12 @@ export const MissingSectionsModal: React.FC<MissingSectionsModalProps> = ({
         ...s,
         list: s.list.filter(item => item.trim())
       }));
+    }
+
+    if (missingSections.includes('education')) { // ADDED: Include education in submitted data
+      data.education = education.filter(edu =>
+        edu.degree.trim() && edu.school.trim() && edu.year.trim()
+      );
     }
 
     if (missingSections.includes('certifications')) {
@@ -600,6 +641,100 @@ export const MissingSectionsModal: React.FC<MissingSectionsModalProps> = ({
     </div>
   );
 
+  // ADDED: render function for education form
+  const renderEducationForm = () => (
+    <div className="space-y-4 sm:space-y-6">
+      <div className="text-center mb-6">
+        <div className="bg-blue-100 w-12 h-12 sm:w-16 sm:h-16 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4">
+          <GraduationCap className="w-6 h-6 sm:w-8 sm:h-8 text-blue-600" />
+        </div>
+        <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">Add Education</h3>
+        <p className="text-sm sm:text-base text-gray-600">Please provide your educational background.</p>
+      </div>
+
+      {education.map((edu, eduIndex) => (
+        <div key={eduIndex} className="border border-gray-200 rounded-lg sm:rounded-xl p-3 sm:p-4 space-y-3 sm:space-y-4">
+          <div className="flex items-center justify-between mb-3">
+            <h4 className="font-medium text-gray-900 text-sm sm:text-base">Education #{eduIndex + 1}</h4>
+            {education.length > 1 && (
+              <button
+                onClick={() => removeEducation(eduIndex)}
+                className="text-red-600 hover:text-red-700 p-2 min-w-[44px] min-h-[44px] flex items-center justify-center"
+              >
+                <X className="w-4 h-4 sm:w-5 sm:h-5" />
+              </button>
+            )}
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
+            <div>
+              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">Degree *</label>
+              <input
+                type="text"
+                value={edu.degree}
+                onChange={(e) => updateEducation(eduIndex, 'degree', e.target.value)}
+                placeholder="e.g., Bachelor of Technology"
+                className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm min-h-[44px]"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">Institution *</label>
+              <input
+                type="text"
+                value={edu.school}
+                onChange={(e) => updateEducation(eduIndex, 'school', e.target.value)}
+                placeholder="e.g., University Name"
+                className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm min-h-[44px]"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">Year *</label>
+            <input
+              type="text"
+              value={edu.year}
+              onChange={(e) => updateEducation(eduIndex, 'year', e.target.value)}
+              placeholder="e.g., 2020-2024"
+              className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm min-h-[44px]"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">CGPA/GPA</label>
+            <input
+              type="text"
+              value={edu.cgpa || ''}
+              onChange={(e) => updateEducation(eduIndex, 'cgpa', e.target.value)}
+              placeholder="e.g., 8.5/10 or 3.8/4.0"
+              className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm min-h-[44px]"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">Location</label>
+            <input
+              type="text"
+              value={edu.location || ''}
+              onChange={(e) => updateEducation(eduIndex, 'location', e.target.value)}
+              placeholder="e.g., City, State"
+              className="w-full px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm min-h-[44px]"
+            />
+          </div>
+        </div>
+      ))}
+
+      <button
+        onClick={addEducation}
+        className="w-full border-2 border-dashed border-gray-300 rounded-lg sm:rounded-xl p-3 sm:p-4 text-gray-600 hover:text-gray-800 hover:border-gray-400 transition-colors flex items-center justify-center text-sm min-h-[44px]"
+      >
+        <Plus className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+        Add Another Education Entry
+      </button>
+    </div>
+  );
+
   const renderCertificationsForm = () => (
     <div className="space-y-4 sm:space-y-6">
       <div className="text-center mb-6">
@@ -710,6 +845,7 @@ export const MissingSectionsModal: React.FC<MissingSectionsModalProps> = ({
       case 'workExperience': return <Briefcase className="w-4 h-4" />;
       case 'projects': return <Code className="w-4 h-4" />;
       case 'skills': return <Target className="w-4 h-4" />; // Icon for skills
+      case 'education': return <GraduationCap className="w-4 h-4" />; // ADDED: Icon for education
       case 'certifications': return <Award className="w-4 h-4" />;
       case 'contactDetails': return <Mail className="w-4 h-4" />;
       default: return <AlertCircle className="w-4 h-4" />;
@@ -721,6 +857,7 @@ export const MissingSectionsModal: React.FC<MissingSectionsModalProps> = ({
       case 'workExperience': return 'Work Experience';
       case 'projects': return 'Projects';
       case 'skills': return 'Skills'; // Name for skills
+      case 'education': return 'Education'; // ADDED: Name for education
       case 'certifications': return 'Certifications';
       case 'contactDetails': return 'Contact Details';
       default: return section;
@@ -815,6 +952,7 @@ export const MissingSectionsModal: React.FC<MissingSectionsModalProps> = ({
           {currentSection === 'workExperience' && renderWorkExperienceForm()}
           {currentSection === 'projects' && renderProjectsForm()}
           {currentSection === 'skills' && renderSkillsForm()} {/* Render skills form */}
+          {currentSection === 'education' && renderEducationForm()} {/* ADDED: Render education form */}
           {currentSection === 'certifications' && renderCertificationsForm()}
           {currentSection === 'contactDetails' && renderContactDetailsForm()}
         </div>
