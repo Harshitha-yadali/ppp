@@ -319,6 +319,10 @@ const ResumeOptimizer: React.FC<ResumeOptimizerProps> = ({
     if (!resumeData.skills || resumeData.skills.length === 0 || resumeData.skills.every(skillCat => !skillCat.list || skillCat.list.every(s => !s.trim()))) {
       missing.push('skills');
     }
+    // ADDED: Check for missing education section
+    if (!resumeData.education || resumeData.education.length === 0 || resumeData.education.every(edu => !edu.degree?.trim() || !edu.school?.trim() || !edu.year?.trim())) {
+      missing.push('education');
+    }
     return missing;
   };
 
@@ -336,6 +340,7 @@ const ResumeOptimizer: React.FC<ResumeOptimizerProps> = ({
         ...(data.workExperience && data.workExperience.length > 0 && { workExperience: data.workExperience }),
         ...(data.projects && data.projects.length > 0 && { projects: data.projects }),
         ...(data.skills && data.skills.length > 0 && { skills: data.skills }),
+        ...(data.education && data.education.length > 0 && { education: data.education }), // ADDED: Update education
         ...(data.summary && { summary: data.summary }),
       };
       setShowMissingSectionsModal(false);
@@ -419,7 +424,7 @@ const ResumeOptimizer: React.FC<ResumeOptimizerProps> = ({
       setShowProjectOptions(true);
     } else {
       if (parsedResumeData && initialResumeScore) {
-        const { data: { session } } = supabase.auth.getSession();
+        const { data: { session } = { data: { session: null } } } = supabase.auth.getSession(); // Default to null session
         proceedWithFinalOptimization(parsedResumeData, initialResumeScore, session?.access_token || '');
       }
     }
@@ -491,7 +496,7 @@ const ResumeOptimizer: React.FC<ResumeOptimizerProps> = ({
       const updatedResume = { ...parsedResumeData, projects: [...(parsedResumeData.projects || []), newProject] };
 
       setShowManualProjectAdd(false);
-      const { data: { session } } = await supabase.auth.getSession();
+      const { data: { session } = { data: { session: null } } } = await supabase.auth.getSession(); // Default to null session
       if (initialResumeScore) {
         await proceedWithFinalOptimization(updatedResume, initialResumeScore, session?.access_token || '');
       } else {
@@ -1018,5 +1023,4 @@ const ResumeOptimizer: React.FC<ResumeOptimizerProps> = ({
 };
 
 export default ResumeOptimizer;
-
 
