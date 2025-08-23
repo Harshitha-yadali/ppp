@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { MatchScore, DetailedScore, ResumeData } from '../types/resume';
 import { RecommendedProject } from '../types/analysis'; // This import seems unused, but I'll leave it as it was in original
-import { TrendingUp, Target,   ArrowRight, BarChart3, Award, BookOpen, Code, Lightbulb, Clock, Star, ChevronDown, ChevronUp, Zap, Palette, Sparkles } from 'lucide-react';
+import { TrendingUp, Target,   ArrowRight, BarChart3, Award, BookOpen, Code, Lightbulb, Clock, Star, ChevronDown, ChevronUp, Zap, Palette, Sparkles, CheckCircle } from 'lucide-react';
 import { getDetailedResumeScore } from '../services/scoringService'; // This import seems unused, but I'll leave it as it was in original
 import { analyzeProjectAlignment } from '../services/projectAnalysisService'; // This import seems unused, but I'll leave it as it was in original
 
@@ -163,7 +163,7 @@ export const ComprehensiveAnalysis: React.FC<ComprehensiveAnalysisProps> = ({
                 ? 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300' 
                 : 'bg-secondary-100 text-secondary-800 dark:bg-dark-200 dark:text-gray-300')
           }`}>
-            {improvement > 0 ? '+' : ''}{improvement} points
+            {improvement} points
           </div>
         </div>
       </div>
@@ -172,7 +172,7 @@ export const ComprehensiveAnalysis: React.FC<ComprehensiveAnalysisProps> = ({
         {/* Score Comparison Section */}
         <div className="mb-6 lg:mb-8">
           <h3 className="text-fluid-lg sm:text-fluid-xl font-bold text-secondary-900 dark:text-gray-100 mb-4 lg:mb-6 flex items-center">
-            <BarChart3 className="w-5 h-5 sm:w-6 sm:h-6 mr-2 text-primary-600 dark:text-neon-cyan-400" />
+            <BarChart3 className="w-5 h-5 sm:w-6 h-6 mr-2 text-primary-600 dark:text-neon-cyan-400" />
             Score Comparison
           </h3>
 
@@ -246,7 +246,7 @@ export const ComprehensiveAnalysis: React.FC<ComprehensiveAnalysisProps> = ({
         {/* --- DETAILED SCORE BREAKDOWN SECTION --- */}
         <div className="mb-6 lg:mb-8">
           <h3 className="text-fluid-lg sm:text-fluid-xl font-bold text-secondary-900 dark:text-gray-100 mb-4 lg:mb-6 flex items-center">
-            <BarChart3 className="w-5 h-5 sm:w-6 sm:h-6 mr-2 text-purple-600 dark:text-neon-purple-400" />
+            <BarChart3 className="w-5 h-5 sm:w-6 h-6 mr-2 text-purple-600 dark:text-neon-purple-400" />
             Detailed Score Breakdown
           </h3>
 
@@ -336,3 +336,4 @@ export const ComprehensiveAnalysis: React.FC<ComprehensiveAnalysisProps> = ({
     </div>
   );
 };
+
